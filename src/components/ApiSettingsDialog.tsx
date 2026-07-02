@@ -1,15 +1,14 @@
 import { useState } from 'react'
 import { X, Key, Eye, EyeOff, Info } from 'lucide-react'
 import { useAppStore } from '../store/useAppStore'
-import { isCustomKeyActive, getTodayUsageCount } from '../lib/geminiClient'
+import { isCustomKeyActive } from '../lib/geminiClient'
 
 export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) {
   const { customApiKey, setCustomApiKey } = useAppStore()
   const [keyInput, setKeyInput] = useState(customApiKey || '')
   const [showKey, setShowKey] = useState(false)
 
-  const customActive = isCustomKeyActive()
-  const dailyCount = getTodayUsageCount()
+  const keyActive = isCustomKeyActive()
 
   const handleSave = () => {
     setCustomApiKey(keyInput.trim() || null)
@@ -31,7 +30,7 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
               <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
                 <Key className="w-5 h-5 text-primary-500" />
               </div>
-              <h2 className="font-bold text-gray-900">Secure API Settings</h2>
+              <h2 className="font-bold text-gray-900">AI Settings</h2>
             </div>
             <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
               <X className="w-5 h-5 text-gray-400" />
@@ -46,11 +45,11 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
             <div className="flex items-start gap-3">
               <Info className="w-5 h-5 text-primary-500 flex-shrink-0 mt-0.5" />
               <div className="space-y-3">
-                <p className="text-sm font-semibold text-secondary-800">100% Free & Secure</p>
+                <p className="text-sm font-semibold text-secondary-800">100% Free &amp; Secure</p>
                 <ul className="text-xs text-secondary-700 space-y-2">
                   <li>No cost: Google AI Studio API keys are completely free.</li>
-                  <li>Private: Your key is stored only on this device.</li>
-                  <li>Unlimited: Your own key bypasses the 30 requests/day shared limit.</li>
+                  <li>Private: Your key is stored only on this device — never on any server.</li>
+                  <li>Unlimited: Use AI features as much as you need, at zero cost.</li>
                 </ul>
               </div>
             </div>
@@ -60,32 +59,16 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-600">Connection Status:</span>
             <div className="flex items-center gap-2">
-              <span className={`w-2 h-2 rounded-full ${customActive ? 'bg-green-500' : 'bg-primary-400'}`} />
-              <span className={`text-sm font-semibold ${customActive ? 'text-green-600' : 'text-primary-500'}`}>
-                {customActive ? 'Custom Key Active' : 'System Fallback Active'}
+              <span className={`w-2 h-2 rounded-full ${keyActive ? 'bg-green-500' : 'bg-gray-300'}`} />
+              <span className={`text-sm font-semibold ${keyActive ? 'text-green-600' : 'text-gray-400'}`}>
+                {keyActive ? 'Key Active' : 'No Key Set'}
               </span>
             </div>
           </div>
 
-          {/* Usage Info */}
-          {!customActive && (
-            <div className="bg-gray-50 rounded-xl p-4">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">Daily Usage</span>
-                <span className="font-semibold text-gray-900">{dailyCount} / 30</span>
-              </div>
-              <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary-400 rounded-full transition-all"
-                  style={{ width: `${(dailyCount / 30) * 100}%` }}
-                />
-              </div>
-            </div>
-          )}
-
           {/* API Key Input */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Gemini API Key</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Your Free Gemini API Key</label>
             <div className="relative">
               <input
                 type={showKey ? 'text' : 'password'}
@@ -107,7 +90,7 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
               </button>
             </div>
             <p className="text-xs text-gray-400 mt-2">
-              Get a free key at{' '}
+              Get your free key at{' '}
               <a
                 href="https://aistudio.google.com/apikey"
                 target="_blank"
@@ -116,6 +99,7 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
               >
                 aistudio.google.com/apikey
               </a>
+              {' '}— no credit card required.
             </p>
           </div>
         </div>
@@ -141,3 +125,4 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
     </div>
   )
 }
+

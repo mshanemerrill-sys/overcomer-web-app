@@ -147,58 +147,20 @@ export function getApiKey(): string | null {
   return customKey && customKey.trim() !== '' ? customKey.trim() : null
 }
 
-function getSharedApiKey(): string | null {
-  return import.meta.env.VITE_GEMINI_API_KEY || null
-}
-
 function isCustomKeyActive(): boolean {
   return Boolean(getApiKey())
 }
 
 export function checkDailyLimit(): boolean {
-  if (isCustomKeyActive()) return false
-
-  const today = new Date().toISOString().split('T')[0]
-  const stored = localStorage.getItem('overcomer_api_usage')
-
-  if (!stored) {
-    localStorage.setItem('overcomer_api_usage', JSON.stringify({ date: today, count: 0 }))
-    return false
-  }
-
-  const usage = JSON.parse(stored) as { date: string; count: number }
-
-  if (usage.date !== today) {
-    localStorage.setItem('overcomer_api_usage', JSON.stringify({ date: today, count: 0 }))
-    return false
-  }
-
-  return usage.count >= 30
+  return false
 }
 
 function incrementUsageCount() {
-  if (isCustomKeyActive()) return
-
-  const today = new Date().toISOString().split('T')[0]
-  const stored = localStorage.getItem('overcomer_api_usage')
-  const usage = stored ? JSON.parse(stored) : { date: today, count: 0 }
-
-  if (usage.date !== today) {
-    usage.date = today
-    usage.count = 0
-  }
-
-  usage.count++
-  localStorage.setItem('overcomer_api_usage', JSON.stringify(usage))
+  // no-op: usage tracking only applied to shared key, which is removed
 }
 
 function getTodayUsageCount(): number {
-  const today = new Date().toISOString().split('T')[0]
-  const stored = localStorage.getItem('overcomer_api_usage')
-  if (!stored) return 0
-
-  const usage = JSON.parse(stored) as { date: string; count: number }
-  return usage.date === today ? usage.count : 0
+  return 0
 }
 
 export { getTodayUsageCount, isCustomKeyActive }
@@ -207,9 +169,9 @@ async function safeCallGemini(
   request: unknown,
   model: string = DEFAULT_MODEL
 ): Promise<string> {
-  const apiKey = getApiKey() || getSharedApiKey()
+  const apiKey = getApiKey()
   if (!apiKey) {
-    throw new Error('API key not configured')
+    throw new Error('NO_API_KEY')
   }
 
   const modelsToTry = [model, 'gemini-1.5-flash', 'gemini-pro']
@@ -300,8 +262,11 @@ export async function generateSupportResponse(
     return response
   } catch (error) {
     const errorMessage = (error as Error).message
+    if (errorMessage === 'NO_API_KEY') {
+      return `To use the AI Companion, you need a free Gemini API key from Google.\n\nTap the Key icon at the top of the screen, then visit aistudio.google.com/apikey to get your free key. It takes under a minute and requires no credit card — it is completely free.`
+    }
     if (errorMessage.includes('429')) {
-      return `We reached a temporary rate limit due to high server traffic. Let's take a deep breath, wait 10-15 seconds, and continue. Remember Psalm 27:14: "Wait for the Lord; be strong and take heart and wait for the Lord."`
+      return `We reached a temporary rate limit. Let's take a deep breath, wait 10-15 seconds, and continue. Remember Psalm 27:14: "Wait for the Lord; be strong and take heart and wait for the Lord."`
     }
     return `I am here for you. Although I couldn't connect to my knowledge base right now, please reach out to God in prayer and stand firm on Romans 8:37: "We are more than conquerors through Him who loved us." Error: ${errorMessage}`
   }
@@ -342,7 +307,15 @@ Respond strictly in valid JSON format matching this exact schema:
     incrementUsageCount()
     const cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
     return JSON.parse(cleaned) as DistortionAnalysis
-  } catch {
+  } catch (error) {
+    if ((error as Error).message === 'NO_API_KEY') {
+      return {
+        distortions: 'API Key Required',
+        explanation: 'To use AI-powered journal analysis, tap the Key icon at the top of the screen and enter your free Gemini API key from aistudio.google.com/apikey.',
+        reframedTruth: 'I can unlock unlimited AI features instantly with my own free Gemini key.',
+        scriptureReference: 'Philippians 4:19'
+      }
+    }
     return {
       distortions: 'Connection Error',
       explanation: 'Could not communicate with the AI analyzer.',
@@ -454,7 +427,14 @@ Respond strictly in valid JSON format matching this exact schema:
     incrementUsageCount()
     const cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
     return JSON.parse(cleaned) as ScriptureResult
-  } catch {
+  } catch (error) {
+    if ((error as Error).message === 'NO_API_KEY') {
+      return {
+        reference,
+        text: 'A free API key is required for scripture lookup.',
+        explanation: 'Tap the Key icon at the top of the screen and enter your free Gemini API key from aistudio.google.com/apikey to unlock scripture study.'
+      }
+    }
     return {
       reference,
       text: 'Failed to load scripture text.',
@@ -520,7 +500,7 @@ Respond strictly in valid JSON format matching this exact schema:
     incrementUsageCount()
     const cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
     return JSON.parse(cleaned) as LocalResource[]
-  } catch {
+  } catch (error) {
     return getFallbackResources(location, searchType, prioritizeAlignment)
   }
 }

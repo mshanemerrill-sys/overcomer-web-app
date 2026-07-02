@@ -1,15 +1,16 @@
 import { useState } from 'react'
-import { Chrome as Home, Quote, MessageCircle, BookOpen, ScrollText, TriangleAlert as AlertTriangle, User, Settings, ExternalLink } from 'lucide-react'
+import { Chrome as Home, Quote, MessageCircle, BookOpen, ScrollText, TriangleAlert as AlertTriangle, User, Settings, ExternalLink, DoorOpen } from 'lucide-react'
 import { useAppStore } from '../store/useAppStore'
 import FreedomTab from './tabs/FreedomTab'
 import InspirationTab from './tabs/InspirationTab'
 import CompanionTab from './tabs/CompanionTab'
 import JournalTab from './tabs/JournalTab'
 import BibleTab from './tabs/BibleTab'
+import ReentryTab from './tabs/ReentryTab'
 import SOSOverlay from '../components/SOSOverlay'
 import type { FocusPath } from '../lib/types'
 
-type TabType = 'freedom' | 'inspiration' | 'companion' | 'journal' | 'bible'
+type TabType = 'freedom' | 'inspiration' | 'companion' | 'journal' | 'bible' | 'reentry'
 
 interface MainAppScreenProps {
   onShowAuth: () => void
@@ -88,11 +89,12 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
         {activeTab === 'companion' && <CompanionTab />}
         {activeTab === 'journal' && <JournalTab />}
         {activeTab === 'bible' && <BibleTab />}
+        {activeTab === 'reentry' && <ReentryTab />}
       </main>
 
       {/* Bottom Navigation */}
       <nav className="bg-white border-t border-gray-200 safe-bottom sticky bottom-0">
-        <div className="grid grid-cols-5 py-2">
+        <div className="grid grid-cols-6 py-1">
           <NavButton
             icon={<Home className="w-5 h-5" />}
             label="Freedom"
@@ -101,13 +103,13 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
           />
           <NavButton
             icon={<Quote className="w-5 h-5" />}
-            label="Inspiration"
+            label="Inspire"
             active={activeTab === 'inspiration'}
             onClick={() => setActiveTab('inspiration')}
           />
           <NavButton
             icon={<MessageCircle className="w-5 h-5" />}
-            label="Companion"
+            label="Chat"
             active={activeTab === 'companion'}
             onClick={() => setActiveTab('companion')}
           />
@@ -122,6 +124,12 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
             label="Bible"
             active={activeTab === 'bible'}
             onClick={() => setActiveTab('bible')}
+          />
+          <NavButton
+            icon={<DoorOpen className="w-5 h-5" />}
+            label="Re-entry"
+            active={activeTab === 'reentry'}
+            onClick={() => setActiveTab('reentry')}
           />
         </div>
 

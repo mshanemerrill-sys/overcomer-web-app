@@ -7,7 +7,6 @@ import {
   Wind, MapPin, Phone, ExternalLink, MessageCircle, RefreshCw, Download
 } from 'lucide-react'
 import type { FocusPath, VerseOfTheDay } from '../../lib/types'
-import ReentrySection from '../../components/ReentrySection'
 
 interface FreedomTabProps {
   onNavigateToCompanion: () => void
@@ -84,9 +83,6 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
 
       {/* Support & Church Locator */}
       <SupportLocatorCard />
-
-      {/* Reentry & Transition Freedom */}
-      <ReentrySection />
 
       {/* Calming Breathing Support */}
       <BreathingCard />
