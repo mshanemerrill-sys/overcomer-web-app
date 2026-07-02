@@ -4,169 +4,169 @@ export const academyLessons: AcademyLesson[] = [
   {
     id: 1,
     stepNumber: 1,
-    stepTitle: 'Admit Your Weakness',
-    title: 'The 7-Step Recovery Program',
-    content: `The OverComer 7-Step Recovery Program is founded on biblical principles that lead to complete freedom in Christ. Unlike secular programs that label you as perpetually recovering, we embrace the truth that in Christ, you are a NEW creation (2 Corinthians 5:17).\n\n**Step 1: Admit Your Weakness**\n\nThis first step requires honest self-examination and the courage to acknowledge that in our own strength, we cannot overcome. But this admission is not defeat—it is the doorway to Divine strength.\n\n**Key Scripture:** "My grace is sufficient for you, for my power is made perfect in weakness." (2 Corinthians 12:9)\n\nWhen we admit our weakness, we open the door for God's unlimited power to work through us. This is not about labeling yourself as powerless forever; it is about recognizing that your strength comes from surrender to Christ.\n\n**The Freedom Truth:** You are not admitting that you are forever broken. You are admitting that apart from Christ, you cannot, but WITH Christ, you CAN do all things (Philippians 4:13). This is the paradox of Christian freedom: we become strong by admitting our need for His strength.`,
+    stepTitle: 'Admit',
+    title: 'Step 1 — Admit Your Powerlessness',
+    content: `**Admitting is Not Defeat — It Is the Door to Divine Power**\n\nThe OverComer 7-Step Program begins with the courage to be completely honest. Admitting you have a problem and are powerless over your struggle in your own strength is not weakness — it is the most powerful first step you can take.\n\n**Key Scripture:** "For I know that in me (that is, in my flesh,) dwells no good thing. I want to do what is right, but I can't." (Romans 7:18)\n\n**Why Admitting Matters:**\nDenial is the face of addiction and struggle. Breaking through self-deception allows you to ask the most important question: "Am I living the life that Christ wants me to live?" Admitting there is a problem creates a healthy mindset to begin working on the difficult components of the struggle.\n\n**How to Complete Step 1:**\n- Accept that something is wrong and that you no longer have control in your own strength\n- Embrace the truth and want to make an honest change\n- Understand that freedom cannot be done alone — acknowledge you need help\n- Abandon pride and seek humility. You cannot admit powerlessness while holding onto pride\n- Recognize: powerlessness in the flesh is the pathway to independence and strength THROUGH Christ\n\n**The Truth That Changes Everything:**\n"But he said to me, 'My grace is sufficient for you, for my power is made perfect in weakness.' Therefore I will boast all the more gladly about my weaknesses, so that Christ's power may rest on me." (2 Corinthians 12:9-10)\n\nYou are NOT admitting you are broken forever. You are admitting that apart from Christ, you cannot — but WITH Christ, you are more than a conqueror (Romans 8:37).`,
     reflectionQuestions: [
-      'What specific areas of your life do you need to surrender to God\'s strength?',
-      'How does admitting weakness actually lead to spiritual strength?',
-      'What does it mean to you that God\'s power is made perfect in your weakness?'
+      'What specific struggle are you admitting powerlessness over today?',
+      'What has denial cost you? What could honesty unlock?',
+      'How does admitting weakness actually open the door to God\'s unlimited power?'
     ]
   },
   {
     id: 2,
     stepNumber: 1,
-    stepTitle: 'Admit Your Weakness',
-    title: 'Trusting God\'s Process',
-    content: `**Understanding God's Timing and Process**\n\nRecovery and transformation are journeys, not instant events. While our spirit is made new instantly in Christ, our minds and habits require a process of renewal.\n\n**Trust the Process:**\n\nGod often works through seasons. Just as a seed planted in soil requires time, water, and sunlight to grow, your freedom journey requires patience and trust in God's timing.\n\n**Key Scripture:** "Trust in the LORD with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight." (Proverbs 3:5-6)\n\n**The Lie:** "This is taking too long. I must be doing something wrong."\n\n**The Truth:** God is faithful. His timing is perfect. Your process is uniquely designed for your growth and transformation.\n\nAvoid the trap of comparing your journey to others. Some experience instantaneous deliverance; others walk through a longer season of renewing. Both are valid, and God is working in both.\n\n**Practical Steps:**\n- Celebrate small victories\n- Keep a gratitude journal\n- Surround yourself with encouragers\n- Stay in Scripture daily`,
+    stepTitle: 'Admit',
+    title: 'Am I Living the Life Christ Wants?',
+    content: `**The Critical Question That Opens the Door**\n\nBefore lasting change can come, we must honestly examine whether our current life aligns with what Christ desires for us.\n\n**Ask Yourself These Honest Questions:**\n\n- Does my struggle interfere with healthy habits like spending time with my family, reading my Bible, praying, or even just eating or sleeping well?\n- Does my struggle cause me to miss important obligations surrounding work, family, or personal commitments?\n- Do I fall back into my struggle to relieve stress and anxiety?\n- Are my tolerance levels lower when dealing with people under pressure?\n- Do I hide my struggle from my loved ones?\n\n**The Weight of Secrets:**\nMany enter OverComer/Recovery with secrets, shame, and fear — fear of people finding out what they've done, fear of moving forward without the vice, and fear of surviving in this new life. Often the shame makes the struggle more difficult. Sharing your struggles and admitting your wrongs to another person can help you begin to forgive yourself.\n\n**Key Scripture:** "If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness." (1 John 1:9)\n\n**Also:** "Whoever conceals their sins does not prosper, but the one who confesses and renounces them finds mercy." (Proverbs 28:13)\n\n**The Freedom Promise:**\nMatthew 11:28-30 (MSG): "Are you tired? Worn out? Come to me. Get away with me and you'll recover your life. I'll show you how to take a real rest. Learn the unforced rhythms of grace."`,
     reflectionQuestions: [
-      'Where in your journey do you need to practice more patience with God\'s timing?',
-      'What small victories can you celebrate today?',
-      'How can you trust God more deeply in your current season?'
+      'Honestly: is your life currently reflecting Christ\'s best for you?',
+      'What secrets are you still carrying that need to be brought into the light?',
+      'What would genuine freedom look like for you in 6 months?'
     ]
   },
   {
     id: 3,
     stepNumber: 2,
-    stepTitle: 'Repent to God',
-    title: 'I AM An OverComer Affirmations',
-    content: `**Your Identity in Christ**\n\nOne of the most powerful weapons against temptation is knowing who you ARE in Christ. The enemy wants you to identify with your struggle; God wants you to identify with your NEW nature.\n\n**I AM Affirmations Based on Scripture:**\n\n*"I AM a new creation in Christ; the old has gone, the new is here!"* (2 Corinthians 5:17)\n\n*"I AM more than a conqueror through Him who loves me!"* (Romans 8:37)\n\n*"I AM free indeed because the Son has set me free!"* (John 8:36)\n\n*"I AM the righteousness of God in Christ Jesus!"* (2 Corinthians 5:21)\n\n*"I AM chosen, holy, and dearly loved!"* (Colossians 3:12)\n\n*"I AM God\'s masterpiece, created for good works!"* (Ephesians 2:10)\n\n**Why Affirmations Matter:**\n\nWhat you consistently speak over yourself shapes your beliefs and actions. When the enemy whispers lies ("You\'re just an addict," "You\'ll never change"), you respond with TRUTH from God\'s Word.\n\n**Step 2: Repent to God** means turning from false identities and embracing your TRUE identity as His beloved child.`,
+    stepTitle: 'Repent',
+    title: 'Step 2 — Repent to God',
+    content: `**Repentance Is Not Groveling — It Is Returning to the Father**\n\nStep 2 is not about punishing yourself. Repentance means turning AWAY from sin and turning TO the Father with a sincere heart. It is the most powerful act of freedom available to you.\n\n**What Repentance Looks Like:**\n- Agree with God that what you have been doing is wrong\n- Turn away from it with genuine intent\n- Turn TO the Father — He is running TOWARD you (Luke 15:20)\n- Trust His forgiveness immediately\n- Walk in newness of life\n\n**Key Scriptures:**\n"Repent, then, and turn to God, so that your sins may be wiped out, that times of refreshing may come from the Lord." (Acts 3:19)\n\n"Have mercy upon me, O God, according to your lovingkindness; according unto the multitude of thy tender mercies blot out my transgressions. Wash me thoroughly from mine iniquity, and cleanse me from my sin." (Psalm 51:1-2)\n\n"If my people who are called by my name shall humble themselves and pray and seek my face and turn from their wicked ways; then, I will hear from heaven and forgive their sin and heal their land." (2 Chronicles 7:14)\n\n**Godly Sorrow vs. Worldly Sorrow:**\n"Godly sorrow brings repentance that leads to salvation and leaves no regret, but worldly sorrow brings death." (2 Corinthians 7:10)\n\nGod does not want you to spiral in guilt. He wants you to confess, receive forgiveness, and MOVE FORWARD. His forgiveness is not slow or reluctant — it is instant and complete.`,
     reflectionQuestions: [
-      'Which "I AM" declaration resonates most with you today?',
-      'What lies have you believed about your identity that need replacing with truth?',
-      'How will you practice speaking these truths daily?'
+      'Is there anything specific you need to genuinely turn from today?',
+      'Do you believe God\'s forgiveness is truly complete when you repent? Why or why not?',
+      'What does "producing fruit in keeping with repentance" (Matthew 3:8) look like for you?'
     ]
   },
   {
     id: 4,
     stepNumber: 2,
-    stepTitle: 'Repent to God',
-    title: 'Trigger Prevention & Management',
-    content: `**Understanding and Overcoming Triggers**\n\nTriggers are external or internal cues that can lead to temptation. Understanding your triggers is essential for walking in consistent freedom.\n\n**Common Triggers:**\n- HALT: Hungry, Angry, Lonely, Tired\n- Stress and anxiety\n- Certain people, places, or things\n- Emotional pain or trauma\n- Celebrations and "victory" moments\n\n**Step 2: Repent to God** includes repenting of unhelpful coping mechanisms and turning to God for healthy ways to manage triggers.\n\n**Biblical Trigger Response Plan:**\n\n1. **PAUSE:** "Be still, and know that I am God." (Psalm 46:10)\n\n2. **PRAY:** Cast your cares on Him immediately.\n\n3. **PRACTICE:** Use a grounding technique (breathing, Scripture meditation, calling a support person).\n\n4. **PROCEED:** Move forward in wisdom, not emotion.\n\n**The Stopping Power of Truth:**\n\nWhen a trigger hits, immediately declare truth:\n*"I am not being tempted beyond what I can bear. God is faithful; He will provide a way out."* (1 Corinthians 10:13)\n\n*"I submit myself to God. I resist the devil, and he must flee!"* (James 4:7)`,
+    stepTitle: 'Repent',
+    title: 'I AM An OverComer — Your True Identity',
+    content: `**You Are NOT Who Others Say You Are. You Are Who GOD Says You Are.**\n\nOne of the most powerful steps in repentance is repenting of BELIEVING LIES about your identity. The enemy wants you to identify with your struggle. God declares you a NEW CREATION.\n\n**I AM AN OVERCOMER:**\n\n*I AM Loved By God. I AM NOT Who Others Say I Am. I AM NOT Who I Used To Be. I AM Who God Says I Am.*\n\n**Who God Says You Are:**\n- Genesis 1:27 — I am created in the image of God\n- Deuteronomy 28 — I am Blessed\n- Psalms 17:8 — I am the apple of God's Eye\n- Jeremiah 1:5 — I am known by Him, set apart, and appointed\n- Matthew 5:14 — I am the light of the world\n- Romans 1:7 — I am a saint\n- Romans 8:18 — I am the recipient of a glorious future\n- 1 Corinthians 15:57 — I am victorious\n- 2 Corinthians 5:17 — I am a New Creation\n- 2 Corinthians 5:20 — I am an ambassador of Christ\n- Philippians 3:20 — I am a citizen of heaven\n- Ephesians 1&2 — I am Blessed, Chosen, Adopted, Redeemed, Forgiven, Sealed, Loved, Saved, God's Child\n- 1 Peter 2:9 — I am a chosen people, a royal priesthood, a holy nation, God's special possession\n- Revelation 12:11 — "They overcame him by the blood of the Lamb and by the word of their testimony"\n\n**Speak these declarations daily.** What you consistently confess shapes your beliefs and your life.`,
     reflectionQuestions: [
-      'What are your top 3 personal triggers?',
-      'What Biblical truths will you speak when triggered?',
-      'Who can you call for support when triggers arise?'
+      'Which "I AM" declaration do you most need to receive today?',
+      'What false labels have you believed about yourself that need to be replaced with God\'s truth?',
+      'How will you practice declaring your identity in Christ this week?'
     ]
   },
   {
     id: 5,
     stepNumber: 3,
-    stepTitle: 'Release to God',
-    title: 'OverComer Ministry & Fellowship',
-    content: `**The Power of Christian Community**\n\nFreedom is not a solo journey. God designed us for relationship—with Him and with others. Isolation is one of the enemy's primary tactics.\n\n**Step 3: Release to God** means releasing independence and embracing the fellowship of believers.\n\n**Why Community Matters:**\n\n*"Two are better than one... if either of them falls down, one can help the other up."* (Ecclesiastes 4:9-10)\n\nCommunity provides:\n- Accountability in love\n- Encouragement during hard times\n- Celebration of victories\n- Wisdom and perspective\n- Prayer support\n\n**Finding Your Fellowship:**\n\n1. Connect with a local Bible-believing church\n2. Join a small group or Bible study\n3. Find an accountability partner\n4. Consider Celebrate Recovery or similar ministries\n5. Build relationships with mature Christians who can mentor you\n\n**Warning Signs of Isolation:**\n- Pulling away from community\n- Thinking "no one understands"\n- Skipping church or group meetings\n- Keeping secrets\n\nWhen you notice these signs, immediately reach out to someone you trust.`,
+    stepTitle: 'Release',
+    title: 'Step 3 — Release Control to God',
+    content: `**He Holds You Together — Cast Everything on Him**\n\nStep 3 requires total surrender. Releasing control does not mean giving up — it means giving it TO the One who can actually handle it.\n\n**The Laminin Revelation:**\nLaminin is the protein molecule that physically holds the human body together. Scientists discovered its molecular shape: it is a cross. Colossians 1:17 declares: "He is before all things, and in him all things hold together." God literally built the sign of the cross into the structure of your body — you are BRANDED by the Cross and held together by Christ.\n\n**What to Release/Cast Off:**\n- Your past failures and who you USED to be\n- Your hurts and what people said or did to you\n- All your struggles and burdens\n\n"Casting literally means THROW UPON. Cast all your care upon him; for he careth for you." (1 Peter 5:7)\n\n**Key Scriptures:**\n"I urge you brothers and sisters, in the view of God's mercy, to offer your bodies as a living sacrifice, holy and pleasing to God — this is your true and proper worship." (Romans 12:1)\n\n"Come unto me, all ye that labor and are heavy laden, and I will give you rest. Take my yoke upon you and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls. For my yoke is easy and my burden is light." (Matthew 11:28-30)\n\n**The Core Truth:** These things DO hold you down. But HE HOLDS YOU TOGETHER. Release/Cast it ALL on Jesus — for He CARES FOR YOU.`,
     reflectionQuestions: [
-      'Who in your life can you trust with your struggles and victories?',
-      'How often are you connecting with other believers?',
-      'What steps will you take to strengthen your fellowship connections?'
+      'What specific burdens are you still carrying that you need to physically cast onto Christ today?',
+      'What does surrendering control of your life to God actually look like practically?',
+      'How does the Laminin revelation deepen your understanding that God holds you together?'
     ]
   },
   {
     id: 6,
     stepNumber: 3,
-    stepTitle: 'Release to God',
-    title: 'Family & Parents Restoration',
-    content: `**Healing Family Relationships Through Christ**\n\nSubstance use and life struggles often strain family relationships. Step 3 involves releasing these strained relationships to God and seeking restoration where possible.\n\n**Biblical Foundation:**\n\n*"Honor your father and mother"—which is the first commandment with a promise—"so that it may go well with you."* (Ephesians 6:2-3)\n\n**Restoring Trust:**\n\n1. **Acknowledge the hurt:** Your choices may have caused pain. Own it without excuse.\n2. **Apologize sincerely:** A real apology includes changed behavior.\n3. **Be patient:** Trust takes time to rebuild.\n4. **Stay consistent:** Daily faithfulness speaks louder than grand gestures.\n\n**For Those with Unsupportive Families:**\n\nSometimes family is not supportive of your freedom journey. In such cases:\n- Pray for them without ceasing\n- Set healthy boundaries\n- Find your "spiritual family" in the church\n- Forgive even when they don\'t understand\n- Trust God to work in their hearts\n\n**Key Truth:** Your family situation does not disqualify you from God\'s love or freedom. He is the Father to the fatherless and defender of the vulnerable (Psalm 68:5).`,
+    stepTitle: 'Release',
+    title: 'Fellowship & Releasing Independence',
+    content: `**Freedom Is Not a Solo Journey**\n\nGod designed us for relationship — with Him AND with others. Releasing independence and embracing community is part of Step 3.\n\n"Two are better than one... if either of them falls down, one can help the other up." (Ecclesiastes 4:9-10)\n\n**Community Provides:**\n- Accountability in love\n- Encouragement during hard times\n- Celebration of victories\n- Wisdom and perspective\n- Prayer support\n- A witness to your transformation\n\n**Warning Signs of Dangerous Isolation:**\n- Pulling away from community\n- Thinking "no one understands me"\n- Skipping church or OverComer meetings\n- Keeping secrets from trusted people\n- Believing you can handle this alone\n\n**Finding Your Fellowship:**\n1. Connect with a local Bible-believing church\n2. Come to OverComer Thursdays 7PM-9PM at The Refuge, Conway SC\n3. Find a spiritual mentor — someone who lives by Scripture\n4. Join a Celebrate Recovery group near you\n5. Build accountability with mature believers\n\n**Key Truth:**\nWe cannot control how others act or whether they accept us as a New Creation. We can only control ourselves and influence others by our changed behavior. An OverComer is NOT the same person they used to be.`,
     reflectionQuestions: [
-      'What family relationships need healing?',
-      'How can you extend grace to family members who may not understand?',
-      'What boundaries do you need to set for your own spiritual health?'
+      'Who in your life can you trust with your honest struggles and victories?',
+      'What area of independence do you need to release and allow others into?',
+      'What steps will you take this week to strengthen your fellowship connections?'
     ]
   },
   {
     id: 7,
     stepNumber: 4,
-    stepTitle: 'Examine Yourself',
-    title: 'I Can\'t Catch My Breath',
-    content: `**When Anxiety Overwhelms**\n\nPanic attacks and overwhelming anxiety are real experiences for many. This lesson addresses breathing techniques and grounding from a Christ-centered perspective.\n\n**The Physical Reality:**\n\nAnxiety manifests physically—racing heart, shortness of breath, chest tightness. These symptoms, while frightening, are manageable with both physical and spiritual practices.\n\n**Stop and Breathe Practice:**\n\nWhen anxiety rises:\n\n1. **STOP:** Pause everything. Close your eyes if helpful.\n2. **INHALE:** Breathe in slowly through your nose for 4 seconds. Think: "God\'s peace"\n3. **HOLD:** Hold for 4 seconds. Think: "Is within me"\n4. **EXHALE:** Release slowly through mouth for 6 seconds. Think: "Casting all cares"\n5. **REPEAT:** Continue for 3-5 cycles.\n\n**Spiritual Grounding:**\n\n*"Be anxious for nothing, but in everything by prayer and supplication, with thanksgiving, let your requests be made known to God; and the peace of God, which surpasses all understanding, will guard your hearts and minds through Christ Jesus."* (Philippians 4:6-7)\n\n**Remember:** You are not alone in these moments. God is with you, His peace is available, and this feeling will pass.`,
+    stepTitle: 'Examine',
+    title: 'Step 4 — Examine Yourself',
+    content: `**3 Effective Ways to Examine Yourself**\n\nStep 4 requires courage — the courage to look honestly in the mirror. The Bible itself is that mirror.\n\n**Point 1: Examine Your Faith**\n"Examine yourselves as to whether you are in the faith. Test yourselves." (2 Corinthians 13:5)\nThe Greek word for "examine" is *peirazo* — to scrutinize and try. Be like the Bereans who received God's Word with readiness AND searched the scriptures daily (Acts 17:11). We must prove all things rather than blindly believe.\n\n**Point 2: Examine Your Works**\n"But let each one examine his own work, and then he will have rejoicing in himself alone, and not in another." (Galatians 6:3-5)\nIt is not what we KNOW that saves us — it is what we DO with what we know. Ensure your actions align with your faith. We don't do good works to impress others; we do them out of love for God.\n\n**Point 3: Examine Yourself Through God's Perspective**\n"Search me, O God, and know my heart; test me and know my anxious thoughts. Point out anything in me that offends you, and lead me along the path of everlasting life." (Psalm 139:23-24)\nWe CANNOT properly examine ourselves without God's help. Do NOT use other people as your standard. Ask: "Do I see myself becoming more like God and less like myself?"\n\n**The Mirror Principle:**\nThe Bible is like a mirror. You don't examine the mirror — you examine yourself IN it. Look honestly. Identify faults. Change them.`,
     reflectionQuestions: [
-      'When do you most often feel overwhelmed or anxious?',
-      'How can you practice the breathing exercise in calm moments to prepare for hard ones?',
-      'What Scriptures can you memorize for moments of anxiety?'
+      'When you honestly examine your faith, works, and life — what do you see?',
+      'Are you spiritually growing or spiritually stagnating compared to when you began?',
+      'What specific area is God pointing out that needs to change?'
     ]
   },
   {
     id: 8,
     stepNumber: 4,
-    stepTitle: 'Examine Yourself',
-    title: 'Freedom from Fear (Nakia\'s Miracle)',
-    content: `**A Testimony of Divine Deliverance**\n\n*Note: This lesson shares a testimony of God\'s power to deliver completely from fear and its grip.*\n\n**The Struggle:**\n\nFear can become a prison. debilitating anxiety, panic attacks, and a constant sense of dread can make life feel impossible. Left untreated, fear controls every decision.\n\n**Nakia\'s Story:**\n\n"I lived in constant fear for years. Fear of everything—failure, judgment, the future, even fear of my own thoughts. I couldn\'t sleep, couldn\'t eat properly, couldn\'t function. Then I encountered the truth of 2 Timothy 1:7: \'For God has not given us a spirit of fear, but of power and of love and of a sound mind.\'\n\nI realized fear wasn\'t from God. It was an impostor trying to steal my life. I began declaring that truth daily. I prayed. I asked mature believers to pray with me. And gradually, then suddenly, the fear lost its grip. I was free.\n\nGod didn\'t just help me manage fear—He delivered me FROM fear. The same God who delivered me wants to deliver you."\n\n**Your Miracle:**\n\nWhat fear has held you captive? Name it. Then declare God\'s truth over it. He is able to do exceedingly abundantly above all we ask or think (Ephesians 3:20).`,
+    stepTitle: 'Examine',
+    title: 'Avoiding Triggers & What To Do When Hit',
+    content: `**Examine Your Patterns — Then Flee**\n\nStep 4 examination includes taking inventory of your trigger patterns — the people, places, emotions, and situations that pull you back toward your struggle.\n\n**AVOID TRIGGERS (Scripture Commands):**\n"Abstain from all appearance of evil." (1 Thessalonians 5:22)\n"Flee the evil desires of youth and pursue righteousness, faith, love and peace." (2 Timothy 2:22)\n"Watch and pray so that you will not fall into temptation. The spirit is willing, but the flesh is weak." (Matthew 26:41)\n\n**Common Triggers to Examine:**\n- HALT: Hungry, Angry, Lonely, Tired\n- Stress and unresolved emotional pain\n- Certain people, places, or situations from your old life\n- Celebrations and "victory" moments (pride leads to a fall)\n- Isolation and keeping secrets\n\n**WHAT TO DO WHEN TRIGGERED:**\n1. James 4:7 — Submit to God. RESIST the devil and he WILL flee.\n2. 1 Corinthians 10:13 — God is faithful; He will provide a way of escape.\n3. 2 Peter 2:9 — The Lord knows how to rescue the godly from trials.\n4. 2 Timothy 4:18 — The Lord will rescue from every evil attack.\n5. 1 Peter 5:8-9 — Be alert. Stand firm in faith.\n\n**Your Emergency Response Plan:**\n- Immediately call out to God\n- Remove yourself from the situation if possible\n- Call a support person from your network\n- Declare Scripture aloud over yourself\n- Use grounding: cold water, deep breathing, plant your feet`,
     reflectionQuestions: [
-      'What fears have controlled you?',
-      'How does knowing fear is not from God change your perspective?',
-      'What step of faith is God asking you to take today?'
+      'What are your top 3 personal triggers you need to flee or plan around?',
+      'Do you have an emergency response plan for your highest-risk situations?',
+      'Which scripture will you memorize to declare immediately when triggered?'
     ]
   },
   {
     id: 9,
     stepNumber: 5,
-    stepTitle: 'Acknowledge & Apologize',
-    title: 'Overcoming Guilt & Shame',
-    content: `**The Difference Between Godly Sorrow and Shame**\n\n**Step 5: Acknowledge & Apologize** addresses the proper role of sorrow for sin and the dangerous trap of shame.\n\n**Guilt vs. Shame:**\n\n- **Guilt:** "I DID something wrong" (Leads to repentance)\n- **Shame:** "I AM wrong" (Leads to hiding and despair)\n\nGod uses godly sorrow to lead us to repentance. The enemy uses shame to paralyze us in defeat.\n\n**Biblical Truth:**\n\n*"If we confess our sins, He is faithful and just and will forgive us our sins and purify us from all unrighteousness."* (1 John 1:9)\n\n**Therefore, there is now no condemnation for those who are in Christ Jesus."* (Romans 8:1)\n\n**Processing Guilt Properly:**\n\n1. **Confess:** Agree with God about your sin\n2. **Receive Forgiveness:** Accept His cleansing\n3. **Repent:** Turn in the opposite direction\n4. **Move Forward:** Don\'t keep rehearsing what God has forgiven\n\n**The Enemy\'s Trap:**\n\nThe accuser whispers: "How could you do that again? You\'re such a failure." The Holy Spirit says: "That was wrong. Let\'s address it and move forward together."\n\nLearn to distinguish these voices. One leads to death; the Other leads to life.`,
+    stepTitle: 'Acknowledge',
+    title: 'Step 5 — Acknowledge & Admit to Others',
+    content: `**Confession Breaks the Shame Cycle**\n\nStep 5 goes beyond confessing to God alone — it means admitting our wrong doings to God, to ourselves, AND to another trusted person. This is where healing accelerates.\n\n**The Shame Cycle:**\nMany enter OverComer carrying deep shame. The cycle works like this: you struggle → you feel shame → to combat shame, you return to the struggle → the struggle increases shame. Sharing your wrongs with another trusted person breaks this cycle and opens the door to genuine self-forgiveness.\n\n**Key Scripture:**\n"Therefore, confess your sins to each other and pray for each other so that you may be healed." (James 5:16)\n\n"Whoever conceals their sins does not prosper, but the one who confesses and renounces them finds mercy." (Proverbs 28:13)\n\n**The Healing Power of Acknowledgment:**\n- Breaks secrecy — sin thrives in darkness; confession brings light\n- Removes shame — naming it releases its power over you\n- Invites accountability — others stand with you in prayer\n- Opens the door to restoration — broken relationships can heal\n- Promotes self-forgiveness — confession reduces guilt and increases freedom\n\n**Practical Steps:**\n1. Write down the people you have offended\n2. Write down what you want to say to them\n3. Call or meet with them and apologize sincerely\n4. Confess to a trustworthy, mature believer who will respond with grace and truth\n\n**Guilt vs. Shame:**\nGuilt says "I DID something wrong" → leads to repentance.\nShame says "I AM wrong" → leads to hiding and despair.\nGod works through guilt; the enemy works through shame.`,
     reflectionQuestions: [
-      'What past sins are you still rehearsing that God has already forgiven?',
-      'How can you practice receiving God\'s forgiveness instead of wallowing in shame?',
-      'What\'s the difference between conviction and condemnation?'
+      'Is there someone you need to go to and make things right with?',
+      'Who is the trustworthy, mature believer you can confess to without fear of judgment?',
+      'What secret are you still carrying that shame is using to hold you captive?'
     ]
   },
   {
     id: 10,
     stepNumber: 5,
-    stepTitle: 'Acknowledge & Apologize',
-    title: 'The Emotions of the Journey',
-    content: `**Navigating the Emotional Landscape of Recovery**\n\nRecovery involves a complex emotional journey. Suppressing emotions leads to relapse; processing them with God leads to freedom.\n\n**Emotions You\'ll Encounter:**\n\n1. **Grief:** Loss of the "relationship" with substances/behaviors\n2. **Anger:** At self, others, circumstances, even God\n3. **Fear:** Of the future, of failure, of freedom itself\n4. **Joy:** Victory moments and spiritual breakthroughs\n5. **Confusion:** When things don\'t go as expected\n6. **Peace:** Despite circumstances\n\n**Processing Emotions Biblically:**\n\n*"Be angry and do not sin."* (Ephesians 4:26)\n\nEmotions are not sinful; what we DO with them matters. Feel them, name them, bring them to God, and let Him speak truth into them.\n\n**Emotional Regulation Tools:**\n\n- Journal your feelings honestly\n- Talk to God about everything (Philippians 4:6-7)\n- Share with safe people\n- Practice self-compassion\n- Use physical outlets (exercise, creativity)\n- Rest when tired\n\n**The Promise:**\n\nThe Holy Spirit produces peace, patience, kindness, gentleness, and self-control in us (Galatians 5:22-23). As we walk with Him, our emotions become less volatile and more grounded in His truth.`,
+    stepTitle: 'Acknowledge',
+    title: 'Lessen Shame by Admitting Your Wrongs',
+    content: `**Shame Is a Chain — Confession Is the Key**\n\nMany people struggling with substance misuse or other weights do things they would never do otherwise: lie, steal, cheat, and act contrary to who they are or want to be. This creates a deep, compounding shame that becomes one of the greatest obstacles to lasting freedom.\n\n**How Shame Perpetuates the Cycle:**\nA person feels shame → they use the struggle to combat that shame → the struggle produces more undesired behaviors → more shame. It's a vicious — though understandable — cycle.\n\n**The Research Confirms What the Bible Declares:**\nSharing your struggles and admitting your wrongs to another person helps you gain perspective and begin to forgive yourself. Self-forgiveness reduces feelings of guilt and shame and helps promote sustained freedom.\n\n**God's Design for Breaking Shame:**\n"If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness." (1 John 1:9)\n\n"There is therefore now no condemnation for those who are in Christ Jesus." (Romans 8:1)\n\n"My sacrifice, O God, is a broken spirit; a broken and contrite heart you, God, will not despise." (Psalm 51:17)\n\n**Practical Application:**\n- Complete a personal moral inventory (your Step 4 examination)\n- Share it with a trusted mentor or accountability partner (Step 5)\n- Receive God's forgiveness FULLY — don't keep rehearsing what He has already washed clean\n- Replace shame with your identity declarations: "I AM a new creation. I AM loved. I AM chosen."`,
     reflectionQuestions: [
-      'What emotion have you been avoiding?',
-      'How can you create space to process emotions in a healthy way?',
-      'What Scripture speaks to your current emotional state?'
+      'What shame have you been carrying that needs to be released through confession?',
+      'Do you genuinely believe God\'s forgiveness is complete, or are you still punishing yourself?',
+      'How can completing a moral inventory and sharing it help you break free from shame?'
     ]
   },
   {
     id: 11,
     stepNumber: 6,
-    stepTitle: 'Seek God\'s Presence',
-    title: 'True Repentance & Your Value',
-    content: `**Understanding Repentance and Embracing Your Worth**\n\n**Step 6: Seek God\'s Presence** involves understanding true repentance as returning to the Father, not running from Him in shame.\n\n**True Repentance:**\n\nRepentance is not self-punishment or groveling. It is:\n- Agreeing with God about sin\n- Turning away from it\n- Turning TO the Father\n- Trusting His forgiveness\n- Walking in newness of life\n\n**Your Inestimable Value:**\n\n*"For you created my inmost being; you knit me together in my mother\'s womb. I praise you because I am fearfully and wonderfully made."* (Psalm 139:13-14)\n\n*\n"You are precious and honored in my sight, and... I love you."* (Isaiah 43:4)\n\n**The Lie:** "I\'ve messed up too many times. I\'m too far gone."\n\n**The Truth:** It is never too late to return. The Father\'s arms are always open. He runs TO the repentant (Luke 15:20).\n\n**Practical Steps:**\n\n1. Confess quickly when you stumble\n2. Receive His forgiveness immediately\n3. Don\'t let shame keep you from His presence\n4. Abide in Him daily through prayer and Word\n5. Trust His finished work on the cross`,
+    stepTitle: 'Seek',
+    title: 'Step 6 — Seek God First',
+    content: `**Seeking God Is Having a Love and Passion for God**\n\nStep 6 is about building a lifestyle of seeking God — not as a religious duty, but as a passionate pursuit of the One who loves you most.\n\n**Matthew 6:33:** "Seek first the kingdom of God and His righteousness, and all these things will be added to you."\n\n**What "Seeking God" Means:**\n- To seek the face of God\n- To desire and crave His presence\n- To diligently search His Word\n- To pursue His will above your own\n- To wish for His Kingdom to advance\n\n**God's Promises to Those Who Seek Him:**\n"But from there you will seek the LORD your God, and you will find Him if you seek Him with all your heart and with all your soul." (Deuteronomy 4:29)\n\n"Draw near to God and He will draw near to you." (James 4:8)\n\n"So I say to you, ask, and it will be given to you; seek, and you will find; knock, and it will be opened to you." (Luke 11:9-10)\n\n"For I know the plans I have for you, plans to prosper you and not to harm you, plans to give you hope and a future. You will seek me and find me when you seek me with all your heart." (Jeremiah 29:11-13)\n\n**Practical Seeking:**\n- Daily prayer — not just speaking but listening\n- Daily Scripture — His living, active Word (Hebrews 4:12)\n- Worship through song and meditation on His works\n- Community — seek Him alongside other believers\n- "Colossians 3:16 — Let the message of Christ dwell among you richly"`,
     reflectionQuestions: [
-      'What does true repentance look like in your daily life?',
-      'Do you believe you are precious to God? Why or why not?',
-      'What keeps you from running TO the Father rather than FROM Him?'
+      'Is seeking God a passionate pursuit or a religious duty for you right now?',
+      'What does your daily practice of seeking God currently look like?',
+      'What specific change will you make this week to seek God more intentionally?'
     ]
   },
   {
     id: 12,
     stepNumber: 6,
-    stepTitle: 'Seek God\'s Presence',
-    title: 'Facing Your Faults & Confession',
-    content: `**The Power and Practice of Confession**\n\n**Confession is Spiritual Medicine**\n\nConfession is not about shame; it\'s about freedom. Unconfessed sin festers. Confessed sin is cleansed.\n\n**Step 6: Seek God\'s Presence** includes regular, honest confession—both to God and, when appropriate, to others.\n\n**Confession to God:**\n\nThis is primary and constant. Every sin, no matter how small, should be brought to the Father.\n\n*"If we walk in the light, as he is in the light, we have fellowship with one another, and the blood of Jesus, his Son, purifies us from all sin."* (1 John 1:7)\n\n**Confession to Others:**\n\n*"Confess your sins to each other and pray for each other so that you may be healed."* (James 5:16)\n\nSome sins, especially those involving others, require confession to those we\'ve wronged.\n\n**Why Confession Heals:**\n\n1. **Breaks secrecy:** Sin thrives in darkness; confession brings light\n2. **Removes shame:** Naming it releases its power\n3. **Invites prayer:** Others can stand with you\n4. **Builds humility:** We realize our need for grace\n5. **Opens the door to restoration:** Relationships can heal\n\n**Safe Confession:**\n\nConfess to trustworthy, mature believers—not everyone you meet. Choose those who respond with grace and truth.`,
+    stepTitle: 'Seek',
+    title: 'God as Your First Love, Treasure & Passion',
+    content: `**When God Is Our First Love, Everything Changes**\n\nSeeking God with all your heart is ultimately about LOVE — placing God as your First Love, your greatest Treasure, and your deepest Passion.\n\n**When God Is Your First Love:**\nGod loves us as His first love — more than anything else He has created. He wants us to love Him back the same way: more than anyone else, more than our comfort, more than our struggle.\n\n**When God Is Your Treasure:**\nGod sees you as precious and valuable — more special to Him than anything else in creation. He wants to be YOUR treasure, so that you value Him above everything else, including your struggle.\n\n**When God Is Your Passion:**\nGod is passionate about YOU. He desires close fellowship with you. He wants to be your passion — that which you are most devoted to pursuing.\n\n**David's Heart:**\n"One thing I ask of the Lord, this is what I seek; that I may dwell in the house (presence) of the Lord all the days of my life." (Psalm 27:4)\n\n"O God, you are my God, earnestly I seek you; my soul thirsts for you, my body longs for you, in a dry and weary land where there is no water." (Psalm 63:1)\n\n**God Needs to Touch Our Hearts:**\n"I will give them a heart to know me." (Jeremiah 24:7)\n"For it is God who works in you to will and act according to His good purpose." (Philippians 2:13)\n\nOnly God can give you the deep desire to seek Him. Pray: "Lord, give me a heart that yearns for You above everything else."`,
     reflectionQuestions: [
-      'What unconfessed sin do you need to bring to God today?',
-      'Is there anyone you need to confess to or ask forgiveness from?',
-      'How can you practice regular confession in your walk with God?'
+      'Honestly: is God currently your First Love, or does something else occupy that place?',
+      'What would it look like for your desire for God to be greater than your desire for your struggle?',
+      'What can you do daily to fan the flame of passion for God in your heart?'
     ]
   },
   {
     id: 13,
     stepNumber: 7,
     stepTitle: 'Help Others',
-    title: 'Overcoming Temptation',
-    content: `**The Promise of Escape**\n\n**Step 7: Help Others** is birthed from your own victory. You overcome to help others overcome. But first, you must stand firm yourself.\n\n**The Promise:**\n\n*"No temptation has overtaken you except what is common to mankind. And God is faithful; he will not let you be tempted beyond what you can bear. But when you are tempted, he will also provide a way out so that you can endure it."* (1 Corinthians 10:13)\n\n**This verse promises:**\n1. Your temptation is common—you\'re not alone\n2. God is faithful—He CAN be trusted\n3. He limits temptation—it\'s never beyond what you can bear\n4. He provides an escape—always\n5. You CAN endure—with His help\n\n**Practical Escape Routes:**\n\nWhen temptation hits:\n\n1. **Call out to God** immediately\n2. **Remove yourself** from the situation if possible\n3. **Call a support person**\n4. **Declare Scripture** aloud\n5. **Engage a healthy distraction** (exercise, cold water, prayer)\n6. **Remember your "why"**—your freedom and your calling\n\n**The Enemy\'s Tactics:**\n\nHe tempts when you\'re weakest (tired, hungry, lonely, stressed). He uses your patterns and habits. He whispers rationalizations. Recognize his schemes and stand firm.`,
+    title: 'Step 7 — Help Others the Same Way You Were Helped',
+    content: `**Your Victory Is Not Just for You — It Is for Others**\n\nStep 7 is the overflow of Steps 1-6. Once Christ has transformed your life, you are commissioned to help others the same way you were helped. This is discipleship. This is the Kingdom advancing.\n\n**Key Scripture:**\n"Brothers and sisters, if someone is caught in a sin, you who live by the Spirit should restore that person gently. But watch yourselves, or you also may be tempted." (Galatians 6:1)\n\n**The OverComer Mission in Step 7:**\n1. Be a safe place for those struggling with issues controlling their lives\n2. Lead those struggling into a life-transforming relationship with Christ\n3. Make Disciples for The Kingdom of God\n4. Reproduce the life-transforming relationship with Christ in others\n\n**Revelation 12:11:**\n"And they overcame him by the blood of the Lamb, and by the word of their testimony; and they loved not their lives unto the death."\n\nYour TESTIMONY is a weapon. Your story of what God did in you is the evidence that destroys the lies the enemy tells someone else who is where you once were.\n\n**Practical Ways to Help:**\n- Share your story honestly at OverComer meetings or with someone who is struggling\n- Become an accountability partner for someone newer in their journey\n- Serve in the OverComer ministry or your local church\n- Pray specifically for others walking through what you have overcome\n- Reach out to someone in your life who is where you once were\n\n**The Promise:** What God did IN you, He will do THROUGH you.`,
     reflectionQuestions: [
-      'What is your escape plan when temptation arises?',
-      'What Scriptures will you memorize for battle?',
-      'How will you help others once you\'ve walked through this victory?'
+      'Who is in your life right now who is struggling where you once were?',
+      'Are you ready to share your testimony? What holds you back?',
+      'How can you get involved in helping others as part of your ongoing freedom walk?'
     ]
   },
   {
     id: 14,
     stepNumber: 7,
     stepTitle: 'Help Others',
-    title: 'Follow the Voice (Anchorage Storm)',
-    content: `**Walking in Obedience Through Life\'s Storms**\n\nThe final lesson of the OverComer Obedience Academy addresses following God\'s voice faithfully, even when life storms rage.\n\n**The Anchorage Storm Testimony:**\n\n*This lesson draws from the testimony of believers who walked through Alaska\'s worst storms—both physical and spiritual—and found God faithful in every tempest.*\n\n**When Storms Hit:**\n\nLife will bring storms. Relapse cravings, relationship breakdowns, health issues, financial struggles, persecution—storms are guaranteed. What matters is Whom you follow through them.\n\n**Following the Voice:**\n\nJesus said: *"My sheep hear my voice, and I know them, and they follow me."* (John 10:27)\n\n**How to Hear His Voice:**\n\n1. **Through Scripture:** His primary, clear communication\n2. **Through Prayer:** Listening, not just speaking\n3. **Through Counsel:** Godly advisors\n4. **Through Circumstances:** Doors He opens or closes\n5. **Through the Holy Spirit:** That inner witness\n\n**Storm Survival Skills:**\n\n- Stay anchored in His Word daily\n- Maintain prayer communication\n- Keep fellowship active\n- Review your identity in Christ\n- Remember past victories\n- Help others through their storms\n\n**Your Commission:**\n\nYou\'ve been trained to help others. Step 7 is not just about your victory; it\'s about multiplied freedom. Who is God calling you to help?`,
+    title: 'Overcoming Temptation — The Promise of Escape',
+    content: `**You Are Never Without a Way Out**\n\nBefore you can help others overcome temptation, you must walk in consistent victory yourself. God has already made this possible through His faithfulness.\n\n**The Greatest Promise in Recovery:**\n"No temptation has overtaken you except what is common to mankind. And God is faithful; he will not let you be tempted beyond what you can bear. But when you are tempted, he will also provide a way out so that you can endure it." (1 Corinthians 10:13)\n\n**This Verse Guarantees:**\n1. Your temptation is common — you are NOT uniquely broken or hopeless\n2. God is FAITHFUL — He can be completely trusted\n3. He limits what reaches you — it is never beyond what you can bear WITH Him\n4. He ALWAYS provides a way of escape\n5. You CAN endure — with His help, always\n\n**The Enemy's Playbook:**\nHe tempts when you're weakest: tired, hungry, lonely, stressed. He uses familiar patterns, past relationships, and whispered rationalizations. He knows your history. But greater is He who is in you (1 John 4:4).\n\n**Your Escape Route Plan:**\n1. Call out to God the moment temptation rises\n2. Remove yourself physically from the situation if possible\n3. Call your accountability partner or support person\n4. Declare Scripture aloud over yourself and against the temptation\n5. Use grounding: cold water, paced breathing, physical movement\n6. Remember WHO you are: an OverComer, not a victim\n\n**The Goal of Step 7:** You have walked through this. Now walk others through it. The Kingdom multiplies through your testimony.`,
     reflectionQuestions: [
-      'What storms are you currently walking through?',
-      'How clearly do you hear God\'s voice? What practices can sharpen your hearing?',
-      'Who is God calling you to help with the freedom He\'s given you?'
+      'What is your concrete escape plan for your highest-risk temptation situations?',
+      'Which scriptures have you memorized to declare in moments of battle?',
+      'Who can you walk alongside right now who is fighting the same battle you have won?'
     ]
   }
 ]
@@ -272,100 +272,237 @@ export const biblePassages = [
 ]
 
 export const inspirationQuotes = [
+  // OVERCOMING — FIGHT FROM VICTORY
   {
     id: '1',
     category: 'OVERCOMING_CRAVINGS' as const,
-    text: 'I can do all this through him who gives me strength.',
-    reference: 'Philippians 4:13 (NIV)'
+    text: 'So if the Son sets you free, you will be unquestionably free.',
+    reference: 'John 8:36 (AMP)'
   },
   {
     id: '2',
-    category: 'OVERCOMING_CRAVINGS' as const,
-    text: 'So if the Son sets you free, you will be free indeed.',
-    reference: 'John 8:36 (NIV)'
-  },
-  {
-    id: '3',
     category: 'OVERCOMING_CRAVINGS' as const,
     text: 'Submit yourselves, then, to God. Resist the devil, and he will flee from you.',
     reference: 'James 4:7 (NIV)'
   },
   {
-    id: '4',
+    id: '3',
     category: 'OVERCOMING_CRAVINGS' as const,
-    text: 'No temptation has overtaken you except what is common to mankind. And God is faithful; he will not let you be tempted beyond what you can bear.',
+    text: 'No temptation has overtaken you except what is common to mankind. And God is faithful; he will not let you be tempted beyond what you can bear. But when you are tempted, he will also provide a way out so that you can endure it.',
     reference: '1 Corinthians 10:13 (NIV)'
   },
   {
+    id: '4',
+    category: 'OVERCOMING_CRAVINGS' as const,
+    text: 'I can do all this through him who gives me strength.',
+    reference: 'Philippians 4:13 (NIV)'
+  },
+  {
     id: '5',
+    category: 'OVERCOMING_CRAVINGS' as const,
+    text: 'Greater is he that is in you, than he that is in the world.',
+    reference: '1 John 4:4 (KJV)'
+  },
+  {
+    id: '6',
+    category: 'OVERCOMING_CRAVINGS' as const,
+    text: 'They overcame him by the blood of the Lamb and by the word of their testimony; and they loved not their lives unto the death.',
+    reference: 'Revelation 12:11 (KJV)'
+  },
+  {
+    id: '7',
+    category: 'OVERCOMING_CRAVINGS' as const,
+    text: 'The LORD knows how to rescue the godly from trials.',
+    reference: '2 Peter 2:9 (NIV)'
+  },
+  // PEACE & ANXIETY
+  {
+    id: '8',
     category: 'PEACE_ANXIETY' as const,
     text: 'Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.',
     reference: 'Philippians 4:6 (NIV)'
   },
   {
-    id: '6',
+    id: '9',
     category: 'PEACE_ANXIETY' as const,
     text: 'And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.',
     reference: 'Philippians 4:7 (NIV)'
   },
   {
-    id: '7',
+    id: '10',
     category: 'PEACE_ANXIETY' as const,
     text: 'For God has not given us a spirit of fear, but of power and of love and of a sound mind.',
     reference: '2 Timothy 1:7 (NKJV)'
   },
   {
-    id: '8',
+    id: '11',
     category: 'PEACE_ANXIETY' as const,
     text: 'Cast all your anxiety on him because he cares for you.',
     reference: '1 Peter 5:7 (NIV)'
   },
   {
-    id: '9',
+    id: '12',
+    category: 'PEACE_ANXIETY' as const,
+    text: 'Are you tired? Worn out? Come to me. Get away with me and you\'ll recover your life. I\'ll show you how to take a real rest.',
+    reference: 'Matthew 11:28-29 (MSG)'
+  },
+  {
+    id: '13',
+    category: 'PEACE_ANXIETY' as const,
+    text: 'Be still, and know that I am God.',
+    reference: 'Psalm 46:10 (NIV)'
+  },
+  // STRENGTH & FAITH
+  {
+    id: '14',
     category: 'STRENGTH_FAITH' as const,
     text: 'Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.',
     reference: 'Joshua 1:9 (NIV)'
   },
   {
-    id: '10',
+    id: '15',
     category: 'STRENGTH_FAITH' as const,
     text: 'No, in all these things we are more than conquerors through him who loved us.',
     reference: 'Romans 8:37 (NIV)'
   },
   {
-    id: '11',
+    id: '16',
     category: 'STRENGTH_FAITH' as const,
     text: 'So do not fear, for I am with you; do not be dismayed, for I am your God. I will strengthen you and help you.',
     reference: 'Isaiah 41:10 (NIV)'
   },
   {
-    id: '12',
+    id: '17',
     category: 'STRENGTH_FAITH' as const,
     text: 'Those who hope in the LORD will renew their strength. They will soar on wings like eagles.',
     reference: 'Isaiah 40:31 (NIV)'
   },
   {
-    id: '13',
+    id: '18',
+    category: 'STRENGTH_FAITH' as const,
+    text: 'In him all things hold together.',
+    reference: 'Colossians 1:17 (NIV)'
+  },
+  {
+    id: '19',
+    category: 'STRENGTH_FAITH' as const,
+    text: 'Seek first the kingdom of God and His righteousness, and all these things will be added to you.',
+    reference: 'Matthew 6:33 (NKJV)'
+  },
+  // GRACE & FORGIVENESS
+  {
+    id: '20',
     category: 'GRACE_FORGIVENESS' as const,
     text: 'If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness.',
     reference: '1 John 1:9 (NIV)'
   },
   {
-    id: '14',
+    id: '21',
     category: 'GRACE_FORGIVENESS' as const,
     text: 'Therefore, there is now no condemnation for those who are in Christ Jesus.',
     reference: 'Romans 8:1 (NIV)'
   },
   {
-    id: '15',
+    id: '22',
     category: 'GRACE_FORGIVENESS' as const,
-    text: 'Therefore, if anyone is in Christ, the new creation has come: The old has gone, the new is here!',
-    reference: '2 Corinthians 5:17 (NIV)'
+    text: 'This means that anyone who belongs to Christ has become a new person. The old life is gone; a new life has begun!',
+    reference: '2 Corinthians 5:17 (NLT)'
   },
   {
-    id: '16',
+    id: '23',
     category: 'GRACE_FORGIVENESS' as const,
-    text: 'as far as the east is from the west, so far has he removed our transgressions from us.',
+    text: 'As far as the east is from the west, so far has he removed our transgressions from us.',
     reference: 'Psalm 103:12 (NIV)'
+  },
+  {
+    id: '24',
+    category: 'GRACE_FORGIVENESS' as const,
+    text: 'My grace is sufficient for you, for my power is made perfect in weakness.',
+    reference: '2 Corinthians 12:9 (NIV)'
+  },
+  {
+    id: '25',
+    category: 'GRACE_FORGIVENESS' as const,
+    text: 'Repent, then, and turn to God, so that your sins may be wiped out, that times of refreshing may come from the Lord.',
+    reference: 'Acts 3:19 (NIV)'
+  },
+  // I AM DECLARATIONS
+  {
+    id: '26',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I AM Loved By God. I AM NOT Who Others Say I Am. I AM NOT Who I Used To Be. I AM Who God Says I Am.',
+    reference: 'OverComer Identity Declaration'
+  },
+  {
+    id: '27',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am created in the image of God.',
+    reference: 'Genesis 1:27'
+  },
+  {
+    id: '28',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am the apple of God\'s Eye.',
+    reference: 'Psalm 17:8'
+  },
+  {
+    id: '29',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am known by Him, set apart, and appointed before I was born.',
+    reference: 'Jeremiah 1:5'
+  },
+  {
+    id: '30',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am the light of the world.',
+    reference: 'Matthew 5:14'
+  },
+  {
+    id: '31',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am a saint, called to belong to Jesus Christ.',
+    reference: 'Romans 1:7'
+  },
+  {
+    id: '32',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am the recipient of a glorious future. I consider that my present sufferings are not worth comparing with the glory that will be revealed.',
+    reference: 'Romans 8:18'
+  },
+  {
+    id: '33',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am victorious. Thanks be to God! He gives me the victory through our Lord Jesus Christ.',
+    reference: '1 Corinthians 15:57'
+  },
+  {
+    id: '34',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am a new creation. The old has gone, the new is here!',
+    reference: '2 Corinthians 5:17'
+  },
+  {
+    id: '35',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am an ambassador of Christ. God is making His appeal through me.',
+    reference: '2 Corinthians 5:20'
+  },
+  {
+    id: '36',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am a citizen of heaven.',
+    reference: 'Philippians 3:20'
+  },
+  {
+    id: '37',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am Blessed, Chosen, Adopted, Redeemed, Forgiven, Sealed, Loved, Saved — God\'s own child.',
+    reference: 'Ephesians 1 & 2'
+  },
+  {
+    id: '38',
+    category: 'IAM_DECLARATIONS' as const,
+    text: 'I am a chosen people, a royal priesthood, a holy nation, God\'s special possession.',
+    reference: '1 Peter 2:9'
   }
 ]

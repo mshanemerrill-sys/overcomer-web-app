@@ -22,10 +22,10 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
   const path = userPath || 'SUBSTANCE_RECOVERY'
 
   const defaultDeclaration = {
-    SUBSTANCE_RECOVERY: 'An OverComer has submitted their life wholly to Christ and no longer fights FOR victory over addiction but rather FROM a position of victory!',
-    MENTAL_HEALTH: 'In Christ, my mind is filled with quietness and stability. I declare that worry has no dominion over my thoughts.',
-    TOUGH_DAY: 'Today might feel tough, but God is my present help. His grace carries my load.',
-    TESTIMONY_VICTORY: 'I am more than a conqueror through Him who loved me! Today, I walk in absolute victory!'
+    SUBSTANCE_RECOVERY: 'An OverComer has submitted their life wholly to Christ and no longer fights FOR victory over addiction — rather FROM a position of victory. I AM Loved By God. I AM NOT Who Others Say I Am. I AM NOT Who I Used To Be. I AM Who God Says I Am.',
+    MENTAL_HEALTH: 'My mind belongs to Christ. God has not given me a spirit of fear, but of power, love, and a sound mind. I cast every anxious thought on Him, for He cares for me. I AM NOT Who I Used To Be — I AM a New Creation.',
+    TOUGH_DAY: 'This day does not define me. Greater is He that is in me than he that is in the world. I choose to seek God first today. His grace is sufficient for me.',
+    TESTIMONY_VICTORY: 'I am more than a conqueror through Christ who loves me! They overcame him by the blood of the Lamb and by the word of their testimony. My story is not over — God is still writing it!'
   }
 
   useEffect(() => {
@@ -238,11 +238,13 @@ function DeclarationCard({
 
 function AffirmationsCard({ path: _path }: { path: FocusPath }) {
   const affirmations = [
-    { text: 'I am a new creation in Christ', reference: '2 Corinthians 5:17' },
-    { text: 'I am more than a conqueror', reference: 'Romans 8:37' },
-    { text: 'I am free indeed', reference: 'John 8:36' },
-    { text: 'I have a sound mind', reference: '2 Timothy 1:7' },
-    { text: 'I am deeply loved by God', reference: 'John 3:16' }
+    { text: 'I AM Loved By God — I AM NOT Who Others Say I Am', reference: 'OverComer Declaration' },
+    { text: 'I AM a New Creation — the old is gone, the new has come', reference: '2 Corinthians 5:17' },
+    { text: 'I AM unquestionably free — the Son has set me free', reference: 'John 8:36 AMP' },
+    { text: 'I AM more than a conqueror through Him who loved me', reference: 'Romans 8:37' },
+    { text: 'I AM victorious — God gives me the victory through Christ', reference: '1 Corinthians 15:57' },
+    { text: 'I AM chosen, a royal priesthood, God\'s special possession', reference: '1 Peter 2:9' },
+    { text: 'I AM held together by Christ — the Cross is in my very cells', reference: 'Colossians 1:17' }
   ]
 
   return (

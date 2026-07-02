@@ -108,7 +108,7 @@ export interface InspirationQuote {
   id: string
   text: string
   reference: string
-  category: 'OVERCOMING_CRAVINGS' | 'PEACE_ANXIETY' | 'STRENGTH_FAITH' | 'GRACE_FORGIVENESS'
+  category: 'OVERCOMING_CRAVINGS' | 'PEACE_ANXIETY' | 'STRENGTH_FAITH' | 'GRACE_FORGIVENESS' | 'IAM_DECLARATIONS'
 }
 
 // API usage tracking

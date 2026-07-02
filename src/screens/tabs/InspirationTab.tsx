@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { inspirationQuotes } from '../../lib/data'
-import { Quote, Heart, RefreshCw, Moon, Shield, Sparkles } from 'lucide-react'
+import { Quote, Heart, RefreshCw, Moon, Shield, Sparkles, Crown } from 'lucide-react'
 import type { InspirationQuote } from '../../lib/types'
 
-type Category = 'OVERCOMING_CRAVINGS' | 'PEACE_ANXIETY' | 'STRENGTH_FAITH' | 'GRACE_FORGIVENESS'
+type Category = 'OVERCOMING_CRAVINGS' | 'PEACE_ANXIETY' | 'STRENGTH_FAITH' | 'GRACE_FORGIVENESS' | 'IAM_DECLARATIONS'
 
 const categoryInfo: Record<Category, { label: string; icon: React.ReactNode; color: string }> = {
-  OVERCOMING_CRAVINGS: { label: 'Overcoming Cravings', icon: <Shield className="w-5 h-5" />, color: 'bg-accent-teal' },
+  IAM_DECLARATIONS: { label: 'I AM Declarations', icon: <Crown className="w-5 h-5" />, color: 'bg-accent-gold' },
+  OVERCOMING_CRAVINGS: { label: 'Fight From Victory', icon: <Shield className="w-5 h-5" />, color: 'bg-accent-teal' },
   PEACE_ANXIETY: { label: 'Peace & Anxiety', icon: <Moon className="w-5 h-5" />, color: 'bg-primary-400' },
-  STRENGTH_FAITH: { label: 'Strength & Faith', icon: <Sparkles className="w-5 h-5" />, color: 'bg-accent-gold' },
+  STRENGTH_FAITH: { label: 'Strength & Faith', icon: <Sparkles className="w-5 h-5" />, color: 'bg-secondary-500' },
   GRACE_FORGIVENESS: { label: 'Grace & Forgiveness', icon: <Heart className="w-5 h-5" />, color: 'bg-accent-coral' }
 }
 
@@ -26,7 +27,7 @@ export default function InspirationTab() {
       {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Inspiration</h1>
-        <p className="text-sm text-gray-600 mt-1">Scripture for renewal and strength</p>
+        <p className="text-sm text-gray-600 mt-1">Declare who God says you are. Renew your mind in His truth.</p>
       </div>
 
       {/* Category Filters */}
@@ -56,6 +57,25 @@ export default function InspirationTab() {
           </button>
         ))}
       </div>
+
+      {/* I AM Banner (shown when that category is selected or at top of All) */}
+      {(selectedCategory === 'IAM_DECLARATIONS' || !selectedCategory) && (
+        <div className="bg-gradient-to-br from-accent-gold/20 to-primary-50 rounded-2xl p-5 mb-4 border border-accent-gold/30">
+          <p className="text-center font-black text-lg text-gray-900 leading-snug">
+            I AM Loved By God.
+          </p>
+          <p className="text-center font-bold text-gray-700 text-sm mt-1">
+            I AM NOT Who Others Say I Am.
+          </p>
+          <p className="text-center font-bold text-gray-700 text-sm">
+            I AM NOT Who I Used To Be.
+          </p>
+          <p className="text-center font-black text-primary-600 text-sm mt-1">
+            I AM Who God Says I Am.
+          </p>
+          <p className="text-center text-xs text-gray-500 mt-2">OverComer Identity Declaration</p>
+        </div>
+      )}
 
       {/* Quotes Grid */}
       <div className="space-y-4">
@@ -93,3 +113,4 @@ function QuoteCard({ quote }: { quote: InspirationQuote }) {
     </div>
   )
 }
+

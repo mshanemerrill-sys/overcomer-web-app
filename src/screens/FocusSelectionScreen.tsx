@@ -26,7 +26,7 @@ export default function FocusSelectionScreen({ onSelect }: FocusSelectionScreenP
           </h1>
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mt-4">
             <p className="text-white/90 font-semibold leading-relaxed">
-              Are you having a tough day, struggling with substance recovery, or working on your mental health wellness?
+              An OverComer submits their life wholly to Christ and no longer fights FOR victory — but FROM a position of victory. Where are you today?
             </p>
           </div>
           <p className="text-white/70 text-sm mt-4">
@@ -37,15 +37,15 @@ export default function FocusSelectionScreen({ onSelect }: FocusSelectionScreenP
         <div className="space-y-4">
           <FocusOptionCard
             title="All Around Tough Day"
-            description="Direct encouragement, simplified calming breathing, and a compassionate space to vent your stress instantly."
+            description="God is your present help in trouble. Direct encouragement, calming breath exercises, and a compassionate space to bring your burdens to Christ."
             icon={<Cloud className="w-6 h-6" />}
             color="bg-red-500"
             onClick={() => onSelect('TOUGH_DAY')}
           />
 
           <FocusOptionCard
-            title="Substance Recovery"
-            description="Our core Christian choice-based freedom theology, sobriety tracker, and relapse prevention thought reframing logs."
+            title="Substance Recovery Freedom"
+            description="Complete deliverance is possible through Christ. Sobriety tracker, I AM identity declarations, thought reframing, and the OverComer 7-Step obedience program."
             icon={<Shield className="w-6 h-6" />}
             color="bg-primary-400"
             onClick={() => onSelect('SUBSTANCE_RECOVERY')}
@@ -53,7 +53,7 @@ export default function FocusSelectionScreen({ onSelect }: FocusSelectionScreenP
 
           <FocusOptionCard
             title="Mental Health Wellness"
-            description="Peace scriptures, anxiety logs, emotional distress resources, and beautiful breath exercises."
+            description="God has not given you a spirit of fear, but of power, love, and a sound mind. Peace scriptures, anxiety logs, grounding tools, and breath exercises."
             icon={<Heart className="w-6 h-6" />}
             color="bg-accent-teal"
             onClick={() => onSelect('MENTAL_HEALTH')}
