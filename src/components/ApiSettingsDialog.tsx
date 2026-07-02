@@ -1,0 +1,143 @@
+import { useState } from 'react'
+import { X, Key, Eye, EyeOff, Info } from 'lucide-react'
+import { useAppStore } from '../store/useAppStore'
+import { isCustomKeyActive, getTodayUsageCount } from '../lib/geminiClient'
+
+export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) {
+  const { customApiKey, setCustomApiKey } = useAppStore()
+  const [keyInput, setKeyInput] = useState(customApiKey || '')
+  const [showKey, setShowKey] = useState(false)
+
+  const customActive = isCustomKeyActive()
+  const dailyCount = getTodayUsageCount()
+
+  const handleSave = () => {
+    setCustomApiKey(keyInput.trim() || null)
+    onClose()
+  }
+
+  const handleClear = () => {
+    setKeyInput('')
+    setCustomApiKey(null)
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
+      <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl animate-slide-up">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
+                <Key className="w-5 h-5 text-primary-500" />
+              </div>
+              <h2 className="font-bold text-gray-900">Secure API Settings</h2>
+            </div>
+            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
+              <X className="w-5 h-5 text-gray-400" />
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 space-y-6">
+          {/* Info Card */}
+          <div className="bg-secondary-50 border border-secondary-100 rounded-xl p-4">
+            <div className="flex items-start gap-3">
+              <Info className="w-5 h-5 text-primary-500 flex-shrink-0 mt-0.5" />
+              <div className="space-y-3">
+                <p className="text-sm font-semibold text-secondary-800">100% Free & Secure</p>
+                <ul className="text-xs text-secondary-700 space-y-2">
+                  <li>No cost: Google AI Studio API keys are completely free.</li>
+                  <li>Private: Your key is stored only on this device.</li>
+                  <li>Unlimited: Your own key bypasses the 30 requests/day shared limit.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Status */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-600">Connection Status:</span>
+            <div className="flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full ${customActive ? 'bg-green-500' : 'bg-primary-400'}`} />
+              <span className={`text-sm font-semibold ${customActive ? 'text-green-600' : 'text-primary-500'}`}>
+                {customActive ? 'Custom Key Active' : 'System Fallback Active'}
+              </span>
+            </div>
+          </div>
+
+          {/* Usage Info */}
+          {!customActive && (
+            <div className="bg-gray-50 rounded-xl p-4">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-gray-600">Daily Usage</span>
+                <span className="font-semibold text-gray-900">{dailyCount} / 30</span>
+              </div>
+              <div className="mt-2 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary-400 rounded-full transition-all"
+                  style={{ width: `${(dailyCount / 30) * 100}%` }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* API Key Input */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Gemini API Key</label>
+            <div className="relative">
+              <input
+                type={showKey ? 'text' : 'password'}
+                value={keyInput}
+                onChange={(e) => setKeyInput(e.target.value)}
+                placeholder="Enter your API key (AIzaSy...)"
+                className="input-field pr-12"
+              />
+              <button
+                type="button"
+                onClick={() => setShowKey(!showKey)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 rounded"
+              >
+                {showKey ? (
+                  <EyeOff className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <Eye className="w-5 h-5 text-gray-400" />
+                )}
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 mt-2">
+              Get a free key at{' '}
+              <a
+                href="https://aistudio.google.com/apikey"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary-500 hover:underline"
+              >
+                aistudio.google.com/apikey
+              </a>
+            </p>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="p-6 border-t border-gray-100 flex gap-3">
+          {(customApiKey || keyInput) && (
+            <button
+              onClick={handleClear}
+              className="flex-1 flex items-center justify-center gap-2 border border-red-200 text-red-600 hover:bg-red-50 font-semibold py-3 px-6 rounded-xl transition-colors"
+            >
+              Clear Key
+            </button>
+          )}
+          <button
+            onClick={handleSave}
+            className="flex-1 btn-primary"
+          >
+            Save Settings
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}

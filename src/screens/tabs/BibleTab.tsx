@@ -1,0 +1,273 @@
+import { useState } from 'react'
+import { biblePassages } from '../../lib/data'
+import { lookupScripture } from '../../lib/geminiClient'
+import { BookOpen, Search, Shield, Loader as Loader2, ChevronRight, ExternalLink } from 'lucide-react'
+import type { ScriptureResult } from '../../lib/types'
+
+type BibleSubTab = 'reader' | 'study' | 'creed'
+
+export default function BibleTab() {
+  const [activeSubTab, setActiveSubTab] = useState<BibleSubTab>('reader')
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Sub-tabs */}
+      <div className="bg-white border-b border-gray-200 px-4 pt-4">
+        <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
+          {[
+            { key: 'reader', label: 'Bible Reader', icon: <BookOpen className="w-4 h-4" /> },
+            { key: 'study', label: 'AI Study Guide', icon: <Search className="w-4 h-4" /> },
+            { key: 'creed', label: 'Creed & Shield', icon: <Shield className="w-4 h-4" /> }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveSubTab(tab.key as BibleSubTab)}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg font-medium text-sm transition-colors ${
+                activeSubTab === tab.key
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-4 pb-8">
+        {activeSubTab === 'reader' && <BibleReader />}
+        {activeSubTab === 'study' && <AIStudyGuide />}
+        {activeSubTab === 'creed' && <CreedAndShield />}
+      </div>
+    </div>
+  )
+}
+
+function BibleReader() {
+  const [selectedPassage, setSelectedPassage] = useState<typeof biblePassages[0] | null>(null)
+
+  return (
+    <div>
+      {!selectedPassage ? (
+        <>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Select a Passage</h2>
+          <div className="space-y-3">
+            {biblePassages.map((passage, index) => (
+              <button
+                key={index}
+                onClick={() => setSelectedPassage(passage)}
+                className="w-full bg-white rounded-2xl p-4 shadow-md border border-gray-100 text-left hover:shadow-lg transition-all"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-bold text-gray-900">{passage.book} {passage.chapter}</h3>
+                    <p className="text-sm text-gray-500">{passage.title}</p>
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {passage.themes.map((theme, i) => (
+                        <span
+                          key={i}
+                          className="text-xs bg-primary-100 text-primary-600 px-2 py-0.5 rounded-full"
+                        >
+                          {theme}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                </div>
+              </button>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div>
+          <button
+            onClick={() => setSelectedPassage(null)}
+            className="flex items-center gap-1 text-primary-500 font-medium text-sm mb-4"
+          >
+            <ChevronRight className="w-4 h-4 rotate-180" />
+            Back to passages
+          </button>
+
+          <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+            <div className="bg-gradient-to-r from-primary-400 to-primary-600 p-4 text-white">
+              <h2 className="text-xl font-bold">{selectedPassage.book} {selectedPassage.chapter}</h2>
+              <p className="text-sm text-white/80">{selectedPassage.title}</p>
+            </div>
+
+            <div className="p-5 space-y-4">
+              {selectedPassage.verses.map(verse => (
+                <p key={verse.number} className="text-gray-700 leading-relaxed">
+                  <sup className="text-primary-500 font-semibold text-sm">{verse.number}</sup>{' '}
+                  {verse.text}
+                </p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function AIStudyGuide() {
+  const [searchInput, setSearchInput] = useState('')
+  const [result, setResult] = useState<ScriptureResult | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleSearch = async () => {
+    if (!searchInput.trim()) return
+    setIsLoading(true)
+    try {
+      const res = await lookupScripture(searchInput.trim())
+      setResult(res)
+    } catch {
+      setResult({
+        reference: searchInput,
+        text: 'Failed to load scripture.',
+        explanation: 'Please check your connection and try again.'
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div>
+      <h2 className="text-xl font-bold text-gray-900 mb-4">AI Study Guide</h2>
+
+      <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-4 mb-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Enter scripture reference (e.g., John 8:36)"
+            className="flex-1 input-field"
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          />
+          <button
+            onClick={handleSearch}
+            disabled={isLoading || !searchInput.trim()}
+            className="bg-primary-400 hover:bg-primary-500 disabled:bg-gray-200 text-white p-3 rounded-xl transition-colors"
+          >
+            {isLoading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <Search className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {result && (
+        <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+          <div className="p-4 bg-primary-50 border-b border-primary-100">
+            <h3 className="font-bold text-primary-700">{result.reference}</h3>
+          </div>
+          <div className="p-4">
+            <p className="text-gray-800 italic text-lg leading-relaxed mb-4">
+              "{result.text}"
+            </p>
+            <div className="bg-accent-teal/10 rounded-xl p-4">
+              <h4 className="font-semibold text-accent-teal mb-2">OverComer Study Notes</h4>
+              <p className="text-gray-700 leading-relaxed">{result.explanation}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function CreedAndShield() {
+  return (
+    <div className="space-y-6">
+      {/* The Creed */}
+      <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl p-6 text-white shadow-lg">
+        <h2 className="text-xl font-bold mb-4">The OverComer Creed</h2>
+        <div className="space-y-4 text-white/90 leading-relaxed">
+          <p>
+            <strong>I believe</strong> that through Christ's finished work on the cross, I have been set completely free from every chain, every habit, and every bondage.
+          </p>
+          <p>
+            <strong>I am</strong> a NEW creation in Christ Jesus. The old has passed away; the new has come!
+          </p>
+          <p>
+            <strong>I do not fight</strong> FOR victory—I fight FROM victory. I am already more than a conqueror through Him who loved me.
+          </p>
+          <p>
+            <strong>I reject</strong> the label "addict" or "recovering." I am an OVERCOMER, walking in the fullness of my inheritance in Christ.
+          </p>
+          <p>
+            <strong>When I stumble,</strong> I receive His grace. I confess quickly, repent fully, and move forward in His unconditional love.
+          </p>
+        </div>
+      </div>
+
+      {/* The Shield - Theological Foundation */}
+      <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+        <div className="p-4 bg-gray-900 text-white">
+          <h3 className="font-bold flex items-center gap-2">
+            <Shield className="w-5 h-5" />
+            The Shield: Our Theological Foundation
+          </h3>
+        </div>
+        <div className="p-5 space-y-4">
+          <div className="border-l-4 border-primary-400 pl-4">
+            <h4 className="font-semibold text-gray-900">Choice is the Root; Dependence is the Fruit</h4>
+            <p className="text-sm text-gray-600 mt-1">
+              Addiction manifests through choices, not destiny. Genetics and environment are vulnerabilities, not life sentences. In Christ, you have the power to choose.
+            </p>
+          </div>
+
+          <div className="border-l-4 border-accent-teal pl-4">
+            <h4 className="font-semibold text-gray-900">Complete Freedom in Christ</h4>
+            <p className="text-sm text-gray-600 mt-1">
+              "So if the Son sets you free, you will be free indeed." (John 8:36) Freedom is not a process—it's a promise fulfilled in Christ.
+            </p>
+          </div>
+
+          <div className="border-l-4 border-accent-gold pl-4">
+            <h4 className="font-semibold text-gray-900">New Creation Identity</h4>
+            <p className="text-sm text-gray-600 mt-1">
+              "Therefore, if anyone is in Christ, the new creation has come: The old has gone, the new is here!" (2 Corinthians 5:17)
+            </p>
+          </div>
+
+          <div className="border-l-4 border-accent-coral pl-4">
+            <h4 className="font-semibold text-gray-900">Grace When We Fall</h4>
+            <p className="text-sm text-gray-600 mt-1">
+              "If we confess our sins, He is faithful and just and will forgive us our sins and purify us from all unrighteousness." (1 John 1:9)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Motto */}
+      <div className="text-center py-6 bg-accent-gold/10 rounded-2xl">
+        <p className="text-2xl font-black text-gray-900 italic">
+          "I AM a OverComer"
+        </p>
+        <p className="text-sm text-gray-600 mt-2">Revelation 12:11</p>
+      </div>
+
+      {/* The Faith Connection */}
+      <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-5 text-center">
+        <h3 className="font-bold text-gray-900 mb-2">A Ministry of</h3>
+        <a
+          href="https://www.thefaithconnection.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-primary-500 font-semibold hover:text-primary-600 transition-colors"
+        >
+          The Faith Connection
+          <ExternalLink className="w-4 h-4" />
+        </a>
+        <p className="text-sm text-gray-500 mt-2">www.thefaithconnection.org</p>
+      </div>
+    </div>
+  )
+}
