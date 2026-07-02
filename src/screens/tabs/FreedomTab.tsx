@@ -492,6 +492,3 @@ function SettingsModal({
     </div>
   )
 }
-
-
-export default FreedomTab
