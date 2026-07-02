@@ -4,7 +4,7 @@ import { generateVerseOfTheDay } from '../../lib/geminiClient'
 import { academyLessons } from '../../lib/data'
 import {
   Target, Star, BookOpen, ChevronDown, ChevronUp, Check,
-  Wind, MapPin, Phone, ExternalLink, MessageCircle, RefreshCw
+  Wind, MapPin, Phone, ExternalLink, MessageCircle, RefreshCw, Download
 } from 'lucide-react'
 import type { FocusPath, VerseOfTheDay } from '../../lib/types'
 import ReentrySection from '../../components/ReentrySection'
@@ -266,6 +266,16 @@ function AffirmationsCard({ path: _path }: { path: FocusPath }) {
   )
 }
 
+const stepWorksheets: Record<number, { pdf: string; notes?: string }> = {
+  1: { pdf: '/philosophy/Step_1_Worksheet.pdf' },
+  2: { pdf: '/philosophy/Step_2_Worksheet.pdf', notes: '/philosophy/Step_2_Notes.pdf' },
+  3: { pdf: '/philosophy/Step_3_Worksheet.pdf' },
+  4: { pdf: '/philosophy/Step_4_Worksheet.pdf' },
+  5: { pdf: '/philosophy/Step_5_worksheet.pdf' },
+  6: { pdf: '/philosophy/Step_6_Worksheet.pdf' },
+  7: { pdf: '/philosophy/Step_7_Worksheet.pdf' }
+}
+
 function AcademyCard({
   isExpanded,
   onToggle
@@ -305,44 +315,74 @@ function AcademyCard({
       </button>
 
       {isExpanded && (
-        <div className="border-t border-gray-100 p-4 space-y-4 max-h-96 overflow-y-auto">
-          {Object.entries(groupedLessons).map(([stepNum, lessons]) => (
-            <div key={stepNum}>
-              <h4 className="font-bold text-sm text-primary-600 mb-2">
-                Step {stepNum}: {lessons[0].stepTitle}
-              </h4>
-              <div className="space-y-2">
-                {lessons.map(lesson => (
-                  <button
-                    key={lesson.id}
-                    onClick={() => {
-                      // Navigator to lesson detail - implement modal or navigation
-                    }}
-                    className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors ${
-                      completedLessons.includes(lesson.id)
-                        ? 'bg-accent-teal/10 border border-accent-teal/20'
-                        : 'bg-gray-50 hover:bg-gray-100'
-                    }`}
-                  >
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                      completedLessons.includes(lesson.id)
-                        ? 'bg-accent-teal text-white'
-                        : 'bg-gray-200 text-gray-400'
-                    }`}>
-                      {completedLessons.includes(lesson.id) ? (
-                        <Check className="w-4 h-4" />
-                      ) : (
-                        <span className="text-xs font-bold">{lesson.id}</span>
+        <div className="border-t border-gray-100 p-4 space-y-4 max-h-[32rem] overflow-y-auto">
+          {Object.entries(groupedLessons).map(([stepNum, lessons]) => {
+            const stepN = Number(stepNum)
+            const worksheet = stepWorksheets[stepN]
+            return (
+              <div key={stepNum}>
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-sm text-primary-600">
+                    Step {stepNum}: {lessons[0].stepTitle}
+                  </h4>
+                  {worksheet && (
+                    <div className="flex items-center gap-1.5">
+                      <a
+                        href={worksheet.pdf}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-xs bg-primary-50 hover:bg-primary-100 text-primary-600 font-semibold px-2 py-1 rounded-lg transition-colors"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <Download className="w-3 h-3" />
+                        Worksheet
+                      </a>
+                      {worksheet.notes && (
+                        <a
+                          href={worksheet.notes}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-xs bg-accent-teal/10 hover:bg-accent-teal/20 text-accent-teal font-semibold px-2 py-1 rounded-lg transition-colors"
+                          onClick={e => e.stopPropagation()}
+                        >
+                          <Download className="w-3 h-3" />
+                          Notes
+                        </a>
                       )}
                     </div>
-                    <span className="text-sm font-medium text-gray-700">
-                      {lesson.title}
-                    </span>
-                  </button>
-                ))}
+                  )}
+                </div>
+                <div className="space-y-2">
+                  {lessons.map(lesson => (
+                    <button
+                      key={lesson.id}
+                      onClick={() => {}}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors ${
+                        completedLessons.includes(lesson.id)
+                          ? 'bg-accent-teal/10 border border-accent-teal/20'
+                          : 'bg-gray-50 hover:bg-gray-100'
+                      }`}
+                    >
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        completedLessons.includes(lesson.id)
+                          ? 'bg-accent-teal text-white'
+                          : 'bg-gray-200 text-gray-400'
+                      }`}>
+                        {completedLessons.includes(lesson.id) ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          <span className="text-xs font-bold">{lesson.id}</span>
+                        )}
+                      </div>
+                      <span className="text-sm font-medium text-gray-700">
+                        {lesson.title}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

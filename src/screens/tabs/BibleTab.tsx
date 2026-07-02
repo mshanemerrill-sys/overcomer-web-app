@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { biblePassages } from '../../lib/data'
 import { lookupScripture } from '../../lib/geminiClient'
-import { BookOpen, Search, Shield, Loader as Loader2, ChevronRight, ExternalLink } from 'lucide-react'
+import { BookOpen, Search, Shield, Loader as Loader2, ChevronRight, ExternalLink, FileText, Download } from 'lucide-react'
 import type { ScriptureResult } from '../../lib/types'
 
-type BibleSubTab = 'reader' | 'study' | 'creed'
+type BibleSubTab = 'reader' | 'study' | 'creed' | 'philosophy'
 
 export default function BibleTab() {
   const [activeSubTab, setActiveSubTab] = useState<BibleSubTab>('reader')
@@ -13,16 +13,17 @@ export default function BibleTab() {
     <div className="flex flex-col h-full">
       {/* Sub-tabs */}
       <div className="bg-white border-b border-gray-200 px-4 pt-4">
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
+        <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto scrollbar-hide">
           {[
             { key: 'reader', label: 'Bible Reader', icon: <BookOpen className="w-4 h-4" /> },
             { key: 'study', label: 'AI Study Guide', icon: <Search className="w-4 h-4" /> },
-            { key: 'creed', label: 'Creed & Shield', icon: <Shield className="w-4 h-4" /> }
+            { key: 'creed', label: 'Creed & Shield', icon: <Shield className="w-4 h-4" /> },
+            { key: 'philosophy', label: 'Philosophy', icon: <FileText className="w-4 h-4" /> }
           ].map(tab => (
             <button
               key={tab.key}
               onClick={() => setActiveSubTab(tab.key as BibleSubTab)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg font-medium text-sm transition-colors ${
+              className={`flex-shrink-0 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg font-medium text-sm transition-colors ${
                 activeSubTab === tab.key
                   ? 'bg-white text-gray-900 shadow-sm'
                   : 'text-gray-500 hover:text-gray-700'
@@ -40,6 +41,7 @@ export default function BibleTab() {
         {activeSubTab === 'reader' && <BibleReader />}
         {activeSubTab === 'study' && <AIStudyGuide />}
         {activeSubTab === 'creed' && <CreedAndShield />}
+        {activeSubTab === 'philosophy' && <PhilosophyResources />}
       </div>
     </div>
   )
@@ -267,6 +269,186 @@ function CreedAndShield() {
           <ExternalLink className="w-4 h-4" />
         </a>
         <p className="text-sm text-gray-500 mt-2">www.thefaithconnection.org</p>
+      </div>
+    </div>
+  )
+}
+
+interface PhilosophyResource {
+  title: string
+  description: string
+  pdf: string
+  category: 'theology' | 'devotional' | 'testimony' | 'resources'
+}
+
+const philosophyResources: PhilosophyResource[] = [
+  {
+    title: 'Is Addiction a Disease or a Choice?',
+    description: 'A biblical examination of the disease model versus personal responsibility — foundational to the OverComer framework.',
+    pdf: '/philosophy/Is_addiction_a_disease_or_a_choice_.pdf',
+    category: 'theology'
+  },
+  {
+    title: 'The Ultimate Danger of the Disease Model',
+    description: 'How removing personal accountability through the disease model undermines genuine transformation in Christ.',
+    pdf: '/philosophy/The_ultimate_danger_of_the_disease_model-_the_total_removal_of_personal_accountability.pdf',
+    category: 'theology'
+  },
+  {
+    title: 'Seek God With All Your Heart',
+    description: 'A devotional study on what it truly means to pursue God wholeheartedly in your recovery and daily life.',
+    pdf: '/philosophy/Seek_God_With_All_Your_Heart.pdf',
+    category: 'devotional'
+  },
+  {
+    title: 'Seek First the Kingdom of God',
+    description: 'Deep study on Matthew 6:33 — making God\'s Kingdom your first priority in everything.',
+    pdf: '/philosophy/Seek_1st_The_Kingdom_Of_God.pdf',
+    category: 'devotional'
+  },
+  {
+    title: 'Tell Your Story: 10 Tips for Sharing Your Testimony',
+    description: 'Practical guidance on how to share your testimony effectively to help others and glorify God.',
+    pdf: '/philosophy/Tell_Your_Story__10_Tips_for_Sharing_Your_Testimony_With_Others.pdf',
+    category: 'testimony'
+  },
+  {
+    title: '3 Effective Ways to Examine Ourselves',
+    description: 'A guide to honest self-examination through faith, works, and God\'s perspective — essential for Step 4.',
+    pdf: '/philosophy/3_Effective_Ways_To_Examine_Ourselves.pdf',
+    category: 'theology'
+  },
+  {
+    title: 'Lessen Shame and Fear by Admitting Your Wrongs',
+    description: 'Understanding how confession breaks the shame cycle and opens the door to genuine freedom.',
+    pdf: '/philosophy/Lessen_Shame_and_Fear_by_Admitting_Your_Wrongs.pdf',
+    category: 'devotional'
+  },
+  {
+    title: 'Repentance Verses',
+    description: 'A curated collection of scriptures on repentance, turning to God, and receiving His mercy.',
+    pdf: '/philosophy/Repent_Verses.pdf',
+    category: 'devotional'
+  },
+  {
+    title: 'Laminin — Held Together by the Cross',
+    description: 'The remarkable discovery that the protein holding your body together is shaped like a cross — God\'s design in your cells.',
+    pdf: '/philosophy/Laminin.pdf',
+    category: 'theology'
+  },
+  {
+    title: 'OverComer Program Overview',
+    description: 'The complete overview of the OverComer ministry, its mission, and biblical foundations.',
+    pdf: '/philosophy/OverComer.pdf',
+    category: 'resources'
+  },
+  {
+    title: '7 Steps — Detailed Guide',
+    description: 'In-depth notes and teaching material for all 7 steps of the OverComer Obedience Academy.',
+    pdf: '/philosophy/7_Steps_Details_(1st_revision).pdf',
+    category: 'resources'
+  },
+  {
+    title: 'Ministry Notes',
+    description: 'Additional teaching notes and supplementary material from The Faith Connection ministry.',
+    pdf: '/philosophy/Notes.pdf',
+    category: 'resources'
+  },
+  {
+    title: 'Website Resources',
+    description: 'Curated list of trusted online resources for recovery, faith, and ongoing support.',
+    pdf: '/philosophy/Website_Resources.pdf',
+    category: 'resources'
+  },
+  {
+    title: 'Additional Web Resources',
+    description: 'More helpful websites and online tools to support your OverComer journey.',
+    pdf: '/philosophy/Websites_Resources.pdf',
+    category: 'resources'
+  }
+]
+
+const philosophyCategoryInfo: Record<PhilosophyResource['category'], { label: string; color: string }> = {
+  theology: { label: 'Theology', color: 'bg-primary-500' },
+  devotional: { label: 'Devotional', color: 'bg-accent-teal' },
+  testimony: { label: 'Testimony', color: 'bg-accent-gold' },
+  resources: { label: 'Resources', color: 'bg-secondary-500' }
+}
+
+function PhilosophyResources() {
+  const [activeCategory, setActiveCategory] = useState<PhilosophyResource['category'] | 'all'>('all')
+
+  const filtered = activeCategory === 'all'
+    ? philosophyResources
+    : philosophyResources.filter(r => r.category === activeCategory)
+
+  const categories: Array<PhilosophyResource['category'] | 'all'> = ['all', 'theology', 'devotional', 'testimony', 'resources']
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-gradient-to-br from-gray-900 to-primary-700 rounded-2xl p-5 text-white shadow-lg">
+        <h2 className="text-xl font-bold mb-1">Philosophy & Resources</h2>
+        <p className="text-sm text-white/80 leading-relaxed">
+          Foundational articles, devotionals, and ministry documents to deepen your understanding of freedom in Christ.
+        </p>
+      </div>
+
+      {/* Category filter */}
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        {categories.map(cat => {
+          const info = cat === 'all' ? null : philosophyCategoryInfo[cat]
+          const isActive = activeCategory === cat
+          return (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`flex-shrink-0 px-3 py-1.5 rounded-full font-semibold text-xs transition-colors capitalize ${
+                isActive
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              {cat === 'all' ? 'All Resources' : info?.label}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="space-y-3">
+        {filtered.map((resource, i) => {
+          const catInfo = philosophyCategoryInfo[resource.category]
+          return (
+            <div key={i} className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+              <div className="p-4">
+                <div className="flex items-start gap-3">
+                  <div className={`w-10 h-10 ${catInfo.color} rounded-xl flex items-center justify-center text-white flex-shrink-0`}>
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <span className={`text-xs font-bold uppercase tracking-wide text-white ${catInfo.color} px-2 py-0.5 rounded-full`}>
+                          {catInfo.label}
+                        </span>
+                        <h4 className="font-bold text-gray-900 text-sm mt-1.5 leading-snug">{resource.title}</h4>
+                        <p className="text-xs text-gray-500 mt-1 leading-relaxed">{resource.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <a
+                  href={resource.pdf}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 w-full flex items-center justify-center gap-2 bg-primary-50 hover:bg-primary-100 text-primary-600 font-semibold text-sm py-2.5 rounded-xl transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  Open PDF
+                </a>
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

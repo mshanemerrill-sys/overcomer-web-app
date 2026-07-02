@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { inspirationQuotes } from '../../lib/data'
-import { Quote, Heart, RefreshCw, Moon, Shield, Sparkles, Crown } from 'lucide-react'
+import { Quote, Heart, RefreshCw, Moon, Shield, Sparkles, Crown, FileText, Download } from 'lucide-react'
 import type { InspirationQuote } from '../../lib/types'
 
 type Category = 'OVERCOMING_CRAVINGS' | 'PEACE_ANXIETY' | 'STRENGTH_FAITH' | 'GRACE_FORGIVENESS' | 'IAM_DECLARATIONS'
@@ -83,6 +83,52 @@ export default function InspirationTab() {
           <QuoteCard key={quote.id} quote={quote} />
         ))}
       </div>
+
+      {/* Devotional Resources */}
+      {(!selectedCategory || selectedCategory === 'STRENGTH_FAITH' || selectedCategory === 'IAM_DECLARATIONS') && (
+        <div className="mt-6 space-y-3">
+          <h3 className="font-bold text-gray-900 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-primary-500" />
+            Devotional Reading
+          </h3>
+          {[
+            {
+              title: 'Seek God With All Your Heart',
+              description: 'A deep devotional on pursuing God wholeheartedly in your recovery walk.',
+              pdf: '/philosophy/Seek_God_With_All_Your_Heart.pdf'
+            },
+            {
+              title: 'Seek First the Kingdom of God',
+              description: 'Study guide on Matthew 6:33 — making God\'s Kingdom your daily priority.',
+              pdf: '/philosophy/Seek_1st_The_Kingdom_Of_God.pdf'
+            },
+            {
+              title: 'Tell Your Story: 10 Tips for Sharing Your Testimony',
+              description: 'How to share what God has done in your life to help and inspire others.',
+              pdf: '/philosophy/Tell_Your_Story__10_Tips_for_Sharing_Your_Testimony_With_Others.pdf'
+            }
+          ].map((doc, i) => (
+            <div key={i} className="bg-white rounded-2xl p-4 shadow-md border border-gray-100 flex items-start gap-3">
+              <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <FileText className="w-5 h-5 text-primary-500" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-bold text-gray-900 text-sm leading-snug">{doc.title}</h4>
+                <p className="text-xs text-gray-500 mt-1 leading-relaxed">{doc.description}</p>
+                <a
+                  href={doc.pdf}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1.5 text-xs text-primary-600 font-semibold hover:text-primary-700 transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Open PDF
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
