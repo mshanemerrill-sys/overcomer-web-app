@@ -399,32 +399,12 @@ function AcademyCard({
   )
 }
 
-// Horry County zip codes and identifiers
-const HORRY_ZIPS = new Set([
-  '29526','29527','29528','29566','29568','29569','29572','29575',
-  '29576','29577','29578','29579','29582','29583','29585','29588'
-])
-const HORRY_NAMES = [
-  'horry','oury','conway','myrtle beach','north myrtle','surfside',
-  'garden city','loris','aynor','socastee','carolina forest','longs',
-  'little river','murrells inlet','pawleys island'
-]
-
-function detectHorryCounty(query: string): boolean {
-  const q = query.toLowerCase().replace(/\./g, '').trim()
-  // Check if any token is a known Horry zip
-  const tokens = q.split(/[\s,]+/)
-  if (tokens.some(t => HORRY_ZIPS.has(t))) return true
-  // Check city/county name substrings
-  return HORRY_NAMES.some(name => q.includes(name))
-}
-
-type LocatorTab = 'recovery' | 'groups' | 'churches'
+type LocatorCategory = 'recovery' | 'groups' | 'churches'
 
 function SupportLocatorCard() {
   const [zip, setZip] = useState('')
   const [submitted, setSubmitted] = useState('')
-  const [activeTab, setActiveTab] = useState<LocatorTab>('recovery')
+  const [category, setCategory] = useState<LocatorCategory>('recovery')
 
   const handleSearch = () => {
     const cleaned = zip.trim()
@@ -432,20 +412,6 @@ function SupportLocatorCard() {
   }
 
   const enc = (s: string) => encodeURIComponent(s)
-  const isHorry = submitted ? detectHorryCounty(submitted) : false
-
-  const theRefuge = {
-    name: 'The Refuge — OverComer Recovery Ministry',
-    address: '290 Dun Shortcut Rd, Conway, SC 29527',
-    detail: 'Thursdays 7–9 PM · Christ-centered recovery & restoration',
-    contact: 'outreach@therefugesc.org',
-    mapUrl: 'https://www.google.com/maps/search/?api=1&query=290+Dun+Shortcut+Rd+Conway+SC+29527',
-    typeByTab: {
-      recovery: 'Celebrate Recovery & Restoration Community',
-      groups: 'Christian Support Group & Fellowship',
-      churches: 'Christian Church & Restoration Community'
-    }
-  }
 
   type LinkItem = {
     name: string
@@ -453,11 +419,9 @@ function SupportLocatorCard() {
     website?: string
     mapUrl?: string
     phone?: string
-    email?: string
-    highlight?: boolean
   }
 
-  const tabContent: Record<LocatorTab, LinkItem[]> = {
+  const categoryContent: Record<LocatorCategory, LinkItem[]> = {
     recovery: [
       {
         name: 'Celebrate Recovery',
@@ -509,7 +473,6 @@ function SupportLocatorCard() {
       }
     ],
     churches: [
-      // Denominational biasing: AG, CoG, IPHC first — no labels revealing the priority
       {
         name: 'Assemblies of God Churches',
         desc: 'Spirit-filled, Bible-believing congregations near you',
@@ -520,7 +483,7 @@ function SupportLocatorCard() {
         name: 'Church of God Congregations',
         desc: 'Pentecostal, Christ-centered churches near you',
         website: `https://www.churchofgod.org/find-a-church/?zip=${enc(submitted)}`,
-        mapUrl: `https://www.google.com/maps/search/?api=1&query=Church+of+God+Cleveland+Tennessee+near+${enc(submitted)}`
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=Church+of+God+near+${enc(submitted)}`
       },
       {
         name: 'IPHC — Pentecostal Holiness Churches',
@@ -536,24 +499,43 @@ function SupportLocatorCard() {
     ]
   }
 
-  const tabs: { id: LocatorTab; label: string }[] = [
-    { id: 'recovery', label: 'Recovery' },
-    { id: 'groups', label: 'Groups' },
-    { id: 'churches', label: 'Churches' }
+  const categories: { id: LocatorCategory; label: string; icon: string }[] = [
+    { id: 'recovery', label: 'Recovery Groups', icon: '🙏' },
+    { id: 'groups', label: 'Support Groups', icon: '🤝' },
+    { id: 'churches', label: 'Churches', icon: '✝️' }
   ]
 
   return (
     <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
-      <div className="p-5 pb-3">
+      <div className="p-5 pb-4">
         <h3 className="font-bold text-gray-900 mb-1 flex items-center gap-2">
           <MapPin className="w-5 h-5 text-primary-500" />
           Find Support Near You
         </h3>
         <p className="text-xs text-gray-500 mb-4">
-          Enter your zip code or city to find churches, recovery groups, and support near you.
+          Choose what you're looking for, then enter your zip code or city.
         </p>
 
-        <div className="flex gap-2 mb-4">
+        {/* Category picker — always visible */}
+        <div className="flex gap-1.5 mb-4">
+          {categories.map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => { setCategory(cat.id); setSubmitted('') }}
+              className={`flex-1 flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border text-xs font-bold transition-all ${
+                category === cat.id
+                  ? 'bg-primary-500 border-primary-500 text-white shadow-sm'
+                  : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-primary-50 hover:border-primary-200'
+              }`}
+            >
+              <span className="text-base leading-none">{cat.icon}</span>
+              <span className="leading-tight text-center">{cat.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Search input */}
+        <div className="flex gap-2">
           <input
             type="text"
             value={zip}
@@ -571,72 +553,16 @@ function SupportLocatorCard() {
             Find
           </button>
         </div>
-
-        {/* Tab bar */}
-        {submitted && (
-          <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-colors ${
-                  activeTab === tab.id
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
+      {/* Results */}
       {submitted && (
-        <div className="px-5 pb-5 space-y-2.5">
+        <div className="px-5 pb-5 space-y-2.5 border-t border-gray-50 pt-4">
           <p className="text-xs text-gray-400 font-semibold">
-            Showing results near <span className="text-gray-700">"{submitted}"</span>
+            {categories.find(c => c.id === category)?.label} near{' '}
+            <span className="text-gray-700">"{submitted}"</span>
           </p>
-
-          {/* Horry County: The Refuge pinned at top */}
-          {isHorry && (
-            <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl p-4 text-white">
-              <div className="flex items-start justify-between gap-2 mb-1">
-                <div>
-                  <span className="text-xs font-bold text-white/70 uppercase tracking-wide">
-                    {theRefuge.typeByTab[activeTab]}
-                  </span>
-                  <h4 className="font-bold text-white text-sm mt-0.5">{theRefuge.name}</h4>
-                </div>
-                <span className="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
-                  Local
-                </span>
-              </div>
-              <p className="text-white/80 text-xs mb-1">{theRefuge.address}</p>
-              <p className="text-white/80 text-xs mb-3">{theRefuge.detail}</p>
-              <div className="flex gap-2 flex-wrap">
-                <a
-                  href={theRefuge.mapUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white font-semibold text-xs py-1.5 px-3 rounded-lg transition-colors"
-                >
-                  <MapPin className="w-3 h-3" />
-                  Directions
-                </a>
-                <a
-                  href={`mailto:${theRefuge.contact}`}
-                  className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white font-semibold text-xs py-1.5 px-3 rounded-lg transition-colors"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  Email Us
-                </a>
-              </div>
-            </div>
-          )}
-
-          {/* Tab results */}
-          {tabContent[activeTab].map((item, i) => (
+          {categoryContent[category].map((item, i) => (
             <div key={i} className="bg-gray-50 border border-gray-100 rounded-xl p-3">
               <p className="font-bold text-gray-800 text-sm">{item.name}</p>
               <p className="text-xs text-gray-500 mt-0.5 mb-2.5">{item.desc}</p>
@@ -678,8 +604,9 @@ function SupportLocatorCard() {
         </div>
       )}
 
+      {/* Pre-search defaults */}
       {!submitted && (
-        <div className="px-5 pb-5 space-y-2">
+        <div className="px-5 pb-5 space-y-2 border-t border-gray-50 pt-3">
           <a
             href="https://www.celebraterecovery.com/crgroups"
             target="_blank"
@@ -699,20 +626,6 @@ function SupportLocatorCard() {
               <a href="tel:18006624357" className="text-xs text-primary-600 font-bold">1-800-662-4357</a>
               <span className="text-xs text-gray-400"> · Free · 24/7 · Confidential</span>
             </div>
-          </div>
-          <div className="p-3 bg-primary-50 rounded-xl flex items-center justify-between">
-            <div>
-              <p className="font-bold text-primary-700 text-sm">OverComer Recovery Ministry</p>
-              <p className="text-xs text-primary-600">Thursdays 7–9 PM · The Refuge · Conway, SC</p>
-            </div>
-            <a
-              href="https://www.google.com/maps/search/?api=1&query=290+Dun+Shortcut+Rd+Conway+SC+29527"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 bg-white rounded-lg border border-primary-200 hover:bg-primary-50 transition-colors"
-            >
-              <MapPin className="w-4 h-4 text-primary-500" />
-            </a>
           </div>
         </div>
       )}

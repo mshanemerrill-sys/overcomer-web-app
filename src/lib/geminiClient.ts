@@ -448,49 +448,13 @@ Respond strictly in valid JSON format matching this exact schema:
   }
 }
 
-const HORRY_ZIPS_SET = new Set([
-  '29526','29527','29528','29566','29568','29569','29572','29575',
-  '29576','29577','29578','29579','29582','29583','29585','29588'
-])
-const HORRY_NAME_FRAGMENTS = [
-  'horry','oury','conway','myrtle beach','north myrtle','surfside',
-  'garden city','loris','aynor','socastee','carolina forest','longs',
-  'little river','murrells inlet'
-]
-
-function isHorryCountyLocation(location: string): boolean {
-  const q = location.toLowerCase().trim()
-  const tokens = q.split(/[\s,]+/)
-  if (tokens.some(t => HORRY_ZIPS_SET.has(t))) return true
-  return HORRY_NAME_FRAGMENTS.some(f => q.includes(f))
-}
-
-function getTheRefugeEntry(searchType: 'Celebrate Recovery' | 'Christian Support Groups' | 'Churches'): LocalResource {
-  const typeLabel = searchType === 'Celebrate Recovery'
-    ? 'Celebrate Recovery & Restoration Community'
-    : searchType === 'Christian Support Groups'
-      ? 'Christian Support Group & Fellowship'
-      : 'Christian Church & Restoration Community'
-  return {
-    name: 'The Refuge — OverComer Recovery Ministry',
-    type: typeLabel,
-    address: '290 Dun Shortcut Rd, Conway, SC 29527',
-    details: 'Thursdays 7–9 PM. Christ-centered recovery, discipleship, and restoration community. All are welcome.',
-    contact: 'outreach@therefugesc.org',
-    directionUrl: 'https://www.google.com/maps/search/?api=1&query=290+Dun+Shortcut+Rd+Conway+SC+29527'
-  }
-}
-
 export async function searchLocalResources(
   location: string,
   searchType: 'Celebrate Recovery' | 'Christian Support Groups' | 'Churches',
   prioritizeAlignment: boolean = true
 ): Promise<LocalResource[]> {
-  const horryInjection = isHorryCountyLocation(location) ? [getTheRefugeEntry(searchType)] : []
-
   if (checkDailyLimit()) {
-    const fallback = getFallbackResources(location, searchType, prioritizeAlignment)
-    return [...horryInjection, ...fallback.filter(r => r.name !== 'The Refuge — OverComer Recovery Ministry')]
+    return getFallbackResources(location, searchType, prioritizeAlignment)
   }
 
   const alignmentInstructions = prioritizeAlignment
@@ -540,11 +504,9 @@ Respond strictly in valid JSON format matching this exact schema:
     const response = await safeCallGemini(request)
     incrementUsageCount()
     const cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-    const results = JSON.parse(cleaned) as LocalResource[]
-    return [...horryInjection, ...results]
+    return JSON.parse(cleaned) as LocalResource[]
   } catch {
-    const fallback = getFallbackResources(location, searchType, prioritizeAlignment)
-    return [...horryInjection, ...fallback.filter(r => r.name !== 'The Refuge — OverComer Recovery Ministry')]
+    return getFallbackResources(location, searchType, prioritizeAlignment)
   }
 }
 
