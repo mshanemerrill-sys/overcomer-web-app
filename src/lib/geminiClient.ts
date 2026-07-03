@@ -262,13 +262,18 @@ export async function generateSupportResponse(
     return response
   } catch (error) {
     const errorMessage = (error as Error).message
-    if (errorMessage === 'NO_API_KEY') {
-      return `To use the AI Companion, you need a free Gemini API key from Google.\n\nTap the Key icon at the top of the screen, then visit aistudio.google.com/apikey to get your free key. It takes under a minute and requires no credit card — it is completely free.`
+    const isKeyError = errorMessage === 'NO_API_KEY' ||
+      errorMessage.toLowerCase().includes('api key') ||
+      errorMessage.includes('API_KEY_INVALID') ||
+      errorMessage.includes('INVALID_ARGUMENT') ||
+      errorMessage.includes('403')
+    if (isKeyError) {
+      return `NO_API_KEY_SETUP`
     }
     if (errorMessage.includes('429')) {
-      return `We reached a temporary rate limit. Let's take a deep breath, wait 10-15 seconds, and continue. Remember Psalm 27:14: "Wait for the Lord; be strong and take heart and wait for the Lord."`
+      return `We reached a temporary rate limit. Take a deep breath — wait 10-15 seconds and try again. Remember Psalm 27:14: "Wait for the Lord; be strong and take heart."`
     }
-    return `I am here for you. Although I couldn't connect to my knowledge base right now, please reach out to God in prayer and stand firm on Romans 8:37: "We are more than conquerors through Him who loved us." Error: ${errorMessage}`
+    return `I am here for you. I had trouble connecting right now — please try again in a moment. While you wait, stand firm on Romans 8:37: "We are more than conquerors through Him who loved us."`
   }
 }
 
