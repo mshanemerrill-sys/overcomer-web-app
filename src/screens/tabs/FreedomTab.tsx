@@ -4,9 +4,10 @@ import { generateVerseOfTheDay } from '../../lib/geminiClient'
 import { academyLessons } from '../../lib/data'
 import {
   Target, Star, BookOpen, ChevronDown, ChevronUp, Check,
-  Wind, MapPin, Phone, ExternalLink, MessageCircle, RefreshCw, Download
+  Wind, MapPin, Phone, ExternalLink, MessageCircle, RefreshCw, Download,
+  X, Search, ArrowRight
 } from 'lucide-react'
-import type { FocusPath, VerseOfTheDay } from '../../lib/types'
+import type { FocusPath, VerseOfTheDay, AcademyLesson } from '../../lib/types'
 
 interface FreedomTabProps {
   onNavigateToCompanion: () => void
@@ -17,6 +18,7 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
   const [showSettings, setShowSettings] = useState(false)
   const [showAcademy, setShowAcademy] = useState(false)
   const [isLoadingVerse, setIsLoadingVerse] = useState(false)
+  const [selectedLesson, setSelectedLesson] = useState<AcademyLesson | null>(null)
 
   const path = userPath || 'SUBSTANCE_RECOVERY'
 
@@ -79,6 +81,7 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
       <AcademyCard
         isExpanded={showAcademy}
         onToggle={() => setShowAcademy(!showAcademy)}
+        onSelectLesson={setSelectedLesson}
       />
 
       {/* Support & Church Locator */}
@@ -111,6 +114,14 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
             setShowSettings(false)
           }}
           onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {/* Lesson Detail Modal */}
+      {selectedLesson && (
+        <LessonModal
+          lesson={selectedLesson}
+          onClose={() => setSelectedLesson(null)}
         />
       )}
     </div>
@@ -274,10 +285,12 @@ const stepWorksheets: Record<number, { pdf: string; notes?: string }> = {
 
 function AcademyCard({
   isExpanded,
-  onToggle
+  onToggle,
+  onSelectLesson
 }: {
   isExpanded: boolean
   onToggle: () => void
+  onSelectLesson: (lesson: AcademyLesson) => void
 }) {
   const { completedLessons } = useAppStore()
   const completed = completedLessons.length
@@ -352,11 +365,11 @@ function AcademyCard({
                   {lessons.map(lesson => (
                     <button
                       key={lesson.id}
-                      onClick={() => {}}
+                      onClick={() => onSelectLesson(lesson)}
                       className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-colors ${
                         completedLessons.includes(lesson.id)
                           ? 'bg-accent-teal/10 border border-accent-teal/20'
-                          : 'bg-gray-50 hover:bg-gray-100'
+                          : 'bg-gray-50 hover:bg-primary-50'
                       }`}
                     >
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
@@ -370,9 +383,10 @@ function AcademyCard({
                           <span className="text-xs font-bold">{lesson.id}</span>
                         )}
                       </div>
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="flex-1 text-sm font-medium text-gray-700">
                         {lesson.title}
                       </span>
+                      <ArrowRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
                     </button>
                   ))}
                 </div>
@@ -386,26 +400,320 @@ function AcademyCard({
 }
 
 function SupportLocatorCard() {
+  const [zip, setZip] = useState('')
+  const [submitted, setSubmitted] = useState('')
+
+  const handleSearch = () => {
+    const cleaned = zip.trim()
+    if (cleaned.length >= 4) setSubmitted(cleaned)
+  }
+
+  const enc = (s: string) => encodeURIComponent(s)
+
+  const links = submitted ? [
+    {
+      label: 'Celebrate Recovery',
+      desc: 'Christ-centered recovery groups near you',
+      url: `https://www.celebraterecovery.com/crgroups`,
+      mapUrl: `https://www.google.com/maps/search/?api=1&query=Celebrate+Recovery+near+${enc(submitted)}`,
+      color: 'bg-primary-50 border-primary-100',
+      labelColor: 'text-primary-700'
+    },
+    {
+      label: 'Christian Churches',
+      desc: 'Bible-believing churches near your zip code',
+      url: null,
+      mapUrl: `https://www.google.com/maps/search/?api=1&query=Christian+Church+near+${enc(submitted)}`,
+      color: 'bg-green-50 border-green-100',
+      labelColor: 'text-green-700'
+    },
+    {
+      label: 'Assemblies of God Churches',
+      desc: 'Spirit-filled AG churches near you',
+      url: `https://ag.org/churches/find-a-church?zip=${enc(submitted)}`,
+      mapUrl: `https://www.google.com/maps/search/?api=1&query=Assemblies+of+God+near+${enc(submitted)}`,
+      color: 'bg-blue-50 border-blue-100',
+      labelColor: 'text-blue-700'
+    },
+    {
+      label: 'Teen Challenge',
+      desc: 'Faith-based addiction recovery programs',
+      url: `https://teenchallengeusa.org/find-a-center`,
+      mapUrl: `https://www.google.com/maps/search/?api=1&query=Teen+Challenge+near+${enc(submitted)}`,
+      color: 'bg-amber-50 border-amber-100',
+      labelColor: 'text-amber-700'
+    },
+    {
+      label: 'SAMHSA Treatment Locator',
+      desc: 'Free substance use treatment near you',
+      url: `https://findtreatment.gov/?location=${enc(submitted)}`,
+      mapUrl: null,
+      color: 'bg-rose-50 border-rose-100',
+      labelColor: 'text-rose-700'
+    },
+    {
+      label: 'Salvation Army Services',
+      desc: 'Local emergency help, shelter & recovery',
+      url: `https://www.salvationarmyusa.org/usn/locate-a-center/`,
+      mapUrl: `https://www.google.com/maps/search/?api=1&query=Salvation+Army+near+${enc(submitted)}`,
+      color: 'bg-red-50 border-red-100',
+      labelColor: 'text-red-700'
+    }
+  ] : []
+
   return (
     <div className="bg-white rounded-2xl p-5 shadow-md border border-gray-100">
-      <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+      <h3 className="font-bold text-gray-900 mb-1 flex items-center gap-2">
         <MapPin className="w-5 h-5 text-primary-500" />
-        Support & Church Locator
+        Find Support Near You
       </h3>
-      <p className="text-sm text-gray-600 mb-4">Find Celebrate Recovery, support groups, and churches near you.</p>
+      <p className="text-xs text-gray-500 mb-4">
+        Enter your zip code to find local churches, Celebrate Recovery groups, and treatment programs.
+      </p>
 
-      <a
-        href="https://www.thefaithconnection.org"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center justify-between p-3 bg-primary-50 rounded-xl hover:bg-primary-100 transition-colors"
-      >
-        <div>
-          <p className="font-semibold text-primary-700">The Faith Connection</p>
-          <p className="text-xs text-primary-600">Our Ministry Home</p>
+      <div className="flex gap-2 mb-4">
+        <input
+          type="text"
+          inputMode="numeric"
+          value={zip}
+          onChange={e => setZip(e.target.value.replace(/\D/g, '').slice(0, 10))}
+          onKeyDown={e => e.key === 'Enter' && handleSearch()}
+          placeholder="Enter zip code..."
+          className="flex-1 input-field"
+          maxLength={10}
+        />
+        <button
+          onClick={handleSearch}
+          disabled={zip.trim().length < 4}
+          className="bg-primary-500 hover:bg-primary-600 disabled:bg-gray-200 text-white font-semibold px-4 py-2.5 rounded-xl transition-colors flex items-center gap-1.5"
+        >
+          <Search className="w-4 h-4" />
+          Find
+        </button>
+      </div>
+
+      {submitted && (
+        <div className="space-y-2">
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+            Results for "{submitted}"
+          </p>
+          {links.map((link, i) => (
+            <div key={i} className={`${link.color} border rounded-xl overflow-hidden`}>
+              <div className="p-3">
+                <p className={`font-bold text-sm ${link.labelColor}`}>{link.label}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{link.desc}</p>
+                <div className="flex gap-2 mt-2.5">
+                  {link.mapUrl && (
+                    <a
+                      href={link.mapUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 font-semibold text-xs py-1.5 px-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <MapPin className="w-3 h-3" />
+                      Map Search
+                    </a>
+                  )}
+                  {link.url && (
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 font-semibold text-xs py-1.5 px-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      Website
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Always-visible ministry link */}
+          <div className="mt-3 p-3 bg-primary-50 border border-primary-100 rounded-xl flex items-center justify-between">
+            <div>
+              <p className="font-bold text-primary-700 text-sm">OverComer Recovery Ministry</p>
+              <p className="text-xs text-primary-600">Thursdays 7–9 PM · The Refuge · Conway, SC</p>
+            </div>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=The+Refuge+Conway+SC"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 bg-white rounded-lg border border-primary-200 hover:bg-primary-50 transition-colors"
+            >
+              <MapPin className="w-4 h-4 text-primary-500" />
+            </a>
+          </div>
         </div>
-        <ExternalLink className="w-4 h-4 text-primary-500" />
-      </a>
+      )}
+
+      {!submitted && (
+        <div className="space-y-2">
+          <a
+            href="https://www.celebraterecovery.com/crgroups"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between p-3 bg-primary-50 rounded-xl hover:bg-primary-100 transition-colors"
+          >
+            <div>
+              <p className="font-semibold text-primary-700 text-sm">Celebrate Recovery Directory</p>
+              <p className="text-xs text-primary-600">Find a CR group anywhere in the US</p>
+            </div>
+            <ExternalLink className="w-4 h-4 text-primary-500 flex-shrink-0" />
+          </a>
+          <div className="p-3 bg-gray-50 rounded-xl flex items-center gap-3">
+            <Phone className="w-4 h-4 text-primary-400 flex-shrink-0" />
+            <div>
+              <p className="font-semibold text-gray-700 text-sm">SAMHSA Helpline</p>
+              <a href="tel:18006624357" className="text-xs text-primary-600 font-bold">1-800-662-4357</a>
+              <span className="text-xs text-gray-400"> · Free · 24/7 · Confidential</span>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────────────────────────────────── */
+/* Lesson content renderer — converts the markdown-ish content to JSX     */
+/* ─────────────────────────────────────────────────────────────────────── */
+function renderLessonContent(content: string) {
+  return content.split('\n\n').map((block, i) => {
+    if (block.startsWith('**') && block.endsWith('**') && !block.slice(2).includes('**')) {
+      return <h3 key={i} className="font-bold text-primary-700 text-base mt-4 mb-1">{block.replace(/\*\*/g, '')}</h3>
+    }
+    // Bold headings inside a paragraph
+    const parts = block.split(/(\*\*[^*]+\*\*)/)
+    return (
+      <p key={i} className="text-gray-700 text-sm leading-relaxed">
+        {parts.map((part, j) =>
+          part.startsWith('**') && part.endsWith('**')
+            ? <strong key={j} className="text-gray-900">{part.replace(/\*\*/g, '')}</strong>
+            : part
+        )}
+      </p>
+    )
+  })
+}
+
+function LessonModal({
+  lesson,
+  onClose
+}: {
+  lesson: AcademyLesson
+  onClose: () => void
+}) {
+  const { completedLessons, toggleLessonComplete } = useAppStore()
+  const isCompleted = completedLessons.includes(lesson.id)
+
+  const worksheetPdf: Record<number, string> = {
+    1: '/philosophy/Step_1_Worksheet.pdf',
+    2: '/philosophy/Step_2_Worksheet.pdf',
+    4: '/philosophy/Step_4_Worksheet.pdf',
+    5: '/philosophy/Step_5_worksheet.pdf',
+    6: '/philosophy/Step_6_Worksheet.pdf',
+    7: '/philosophy/Step_7_Worksheet.pdf',
+  }
+  const shameDoc = lesson.id === 10 ? '/philosophy/Lessen_Shame_and_Fear_by_Admitting_Your_Wrongs.pdf' : null
+  const worksheet = worksheetPdf[lesson.stepNumber]
+
+  return (
+    <div className="fixed inset-0 bg-black/60 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 animate-fade-in">
+      <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl animate-slide-up">
+        {/* Header */}
+        <div className="flex items-start justify-between p-5 border-b border-gray-100 flex-shrink-0">
+          <div className="flex-1 pr-3">
+            <span className="text-xs font-bold text-primary-500 uppercase tracking-wide">
+              Step {lesson.stepNumber} · {lesson.stepTitle}
+            </span>
+            <h2 className="font-bold text-gray-900 text-base mt-0.5 leading-snug">{lesson.title}</h2>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl flex-shrink-0">
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
+
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto p-5 space-y-2">
+          {renderLessonContent(lesson.content)}
+
+          {/* Reflection Questions */}
+          {lesson.reflectionQuestions.length > 0 && (
+            <div className="mt-5 bg-primary-50 rounded-2xl p-4 space-y-3">
+              <h4 className="font-bold text-primary-700 text-sm">Reflection Questions</h4>
+              {lesson.reflectionQuestions.map((q, i) => (
+                <div key={i} className="flex items-start gap-2">
+                  <span className="w-5 h-5 bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5">
+                    {i + 1}
+                  </span>
+                  <p className="text-sm text-gray-700 leading-relaxed">{q}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Document downloads */}
+          {(worksheet || shameDoc) && (
+            <div className="mt-4 space-y-2">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Downloads</p>
+              {worksheet && (
+                <a
+                  href={worksheet}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                >
+                  <Download className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                  <span className="text-sm font-semibold text-gray-700">Step {lesson.stepNumber} Worksheet (PDF)</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-gray-400 ml-auto flex-shrink-0" />
+                </a>
+              )}
+              {shameDoc && (
+                <a
+                  href={shameDoc}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                >
+                  <Download className="w-4 h-4 text-primary-500 flex-shrink-0" />
+                  <span className="text-sm font-semibold text-gray-700">Lessen Shame by Admitting Your Wrongs (PDF)</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-gray-400 ml-auto flex-shrink-0" />
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Footer actions */}
+        <div className="p-5 border-t border-gray-100 flex gap-3 flex-shrink-0">
+          <button
+            onClick={onClose}
+            className="flex-1 btn-outline py-3"
+          >
+            Close
+          </button>
+          {!isCompleted && (
+            <button
+              onClick={() => {
+                toggleLessonComplete(lesson.id)
+                onClose()
+              }}
+              className="flex-1 btn-primary py-3 flex items-center justify-center gap-2"
+            >
+              <Check className="w-4 h-4" />
+              Mark Complete
+            </button>
+          )}
+          {isCompleted && (
+            <div className="flex-1 flex items-center justify-center gap-2 bg-accent-teal/10 text-accent-teal font-bold py-3 rounded-xl text-sm">
+              <Check className="w-4 h-4" />
+              Completed
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
