@@ -213,7 +213,6 @@ export const useAppStore = create<AppState>()(
       name: 'overcomer-storage',
       partialize: (state) => ({
         user: state.user,
-        userPath: state.userPath,
         victoryLogs: state.victoryLogs,
         freedomGoal: state.freedomGoal,
         savedChats: state.savedChats,
