@@ -399,157 +399,287 @@ function AcademyCard({
   )
 }
 
+// Horry County zip codes and identifiers
+const HORRY_ZIPS = new Set([
+  '29526','29527','29528','29566','29568','29569','29572','29575',
+  '29576','29577','29578','29579','29582','29583','29585','29588'
+])
+const HORRY_NAMES = [
+  'horry','oury','conway','myrtle beach','north myrtle','surfside',
+  'garden city','loris','aynor','socastee','carolina forest','longs',
+  'little river','murrells inlet','pawleys island'
+]
+
+function detectHorryCounty(query: string): boolean {
+  const q = query.toLowerCase().replace(/\./g, '').trim()
+  // Check if any token is a known Horry zip
+  const tokens = q.split(/[\s,]+/)
+  if (tokens.some(t => HORRY_ZIPS.has(t))) return true
+  // Check city/county name substrings
+  return HORRY_NAMES.some(name => q.includes(name))
+}
+
+type LocatorTab = 'recovery' | 'groups' | 'churches'
+
 function SupportLocatorCard() {
   const [zip, setZip] = useState('')
   const [submitted, setSubmitted] = useState('')
+  const [activeTab, setActiveTab] = useState<LocatorTab>('recovery')
 
   const handleSearch = () => {
     const cleaned = zip.trim()
-    if (cleaned.length >= 4) setSubmitted(cleaned)
+    if (cleaned.length >= 3) setSubmitted(cleaned)
   }
 
   const enc = (s: string) => encodeURIComponent(s)
+  const isHorry = submitted ? detectHorryCounty(submitted) : false
 
-  const links = submitted ? [
-    {
-      label: 'Celebrate Recovery',
-      desc: 'Christ-centered recovery groups near you',
-      url: `https://www.celebraterecovery.com/crgroups`,
-      mapUrl: `https://www.google.com/maps/search/?api=1&query=Celebrate+Recovery+near+${enc(submitted)}`,
-      color: 'bg-primary-50 border-primary-100',
-      labelColor: 'text-primary-700'
-    },
-    {
-      label: 'Christian Churches',
-      desc: 'Bible-believing churches near your zip code',
-      url: null,
-      mapUrl: `https://www.google.com/maps/search/?api=1&query=Christian+Church+near+${enc(submitted)}`,
-      color: 'bg-green-50 border-green-100',
-      labelColor: 'text-green-700'
-    },
-    {
-      label: 'Assemblies of God Churches',
-      desc: 'Spirit-filled AG churches near you',
-      url: `https://ag.org/churches/find-a-church?zip=${enc(submitted)}`,
-      mapUrl: `https://www.google.com/maps/search/?api=1&query=Assemblies+of+God+near+${enc(submitted)}`,
-      color: 'bg-blue-50 border-blue-100',
-      labelColor: 'text-blue-700'
-    },
-    {
-      label: 'Teen Challenge',
-      desc: 'Faith-based addiction recovery programs',
-      url: `https://teenchallengeusa.org/find-a-center`,
-      mapUrl: `https://www.google.com/maps/search/?api=1&query=Teen+Challenge+near+${enc(submitted)}`,
-      color: 'bg-amber-50 border-amber-100',
-      labelColor: 'text-amber-700'
-    },
-    {
-      label: 'SAMHSA Treatment Locator',
-      desc: 'Free substance use treatment near you',
-      url: `https://findtreatment.gov/?location=${enc(submitted)}`,
-      mapUrl: null,
-      color: 'bg-rose-50 border-rose-100',
-      labelColor: 'text-rose-700'
-    },
-    {
-      label: 'Salvation Army Services',
-      desc: 'Local emergency help, shelter & recovery',
-      url: `https://www.salvationarmyusa.org/usn/locate-a-center/`,
-      mapUrl: `https://www.google.com/maps/search/?api=1&query=Salvation+Army+near+${enc(submitted)}`,
-      color: 'bg-red-50 border-red-100',
-      labelColor: 'text-red-700'
+  const theRefuge = {
+    name: 'The Refuge — OverComer Recovery Ministry',
+    address: '290 Dun Shortcut Rd, Conway, SC 29527',
+    detail: 'Thursdays 7–9 PM · Christ-centered recovery & restoration',
+    contact: 'outreach@therefugesc.org',
+    mapUrl: 'https://www.google.com/maps/search/?api=1&query=290+Dun+Shortcut+Rd+Conway+SC+29527',
+    typeByTab: {
+      recovery: 'Celebrate Recovery & Restoration Community',
+      groups: 'Christian Support Group & Fellowship',
+      churches: 'Christian Church & Restoration Community'
     }
-  ] : []
+  }
+
+  type LinkItem = {
+    name: string
+    desc: string
+    website?: string
+    mapUrl?: string
+    phone?: string
+    email?: string
+    highlight?: boolean
+  }
+
+  const tabContent: Record<LocatorTab, LinkItem[]> = {
+    recovery: [
+      {
+        name: 'Celebrate Recovery',
+        desc: 'Christ-centered recovery groups nationwide',
+        website: 'https://www.celebraterecovery.com/crgroups',
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=Celebrate+Recovery+near+${enc(submitted)}`
+      },
+      {
+        name: 'Teen Challenge',
+        desc: 'Faith-based addiction recovery & discipleship',
+        website: 'https://teenchallengeusa.org/find-a-center',
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=Teen+Challenge+near+${enc(submitted)}`
+      },
+      {
+        name: 'SAMHSA Treatment Locator',
+        desc: 'Free, confidential substance use treatment finder',
+        website: `https://findtreatment.gov/?location=${enc(submitted)}`
+      },
+      {
+        name: 'Salvation Army Recovery',
+        desc: 'Faith-based rehabilitation & shelter programs',
+        website: 'https://www.salvationarmyusa.org/usn/locate-a-center/',
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=Salvation+Army+near+${enc(submitted)}`
+      }
+    ],
+    groups: [
+      {
+        name: 'Christian Support Groups',
+        desc: 'Bible-based peer support & fellowship near you',
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=Christian+support+group+near+${enc(submitted)}`
+      },
+      {
+        name: 'Celebrate Recovery Groups',
+        desc: 'Hurt, habit & hang-up recovery groups',
+        website: 'https://www.celebraterecovery.com/crgroups',
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=Celebrate+Recovery+near+${enc(submitted)}`
+      },
+      {
+        name: 'Teen Challenge Outreach',
+        desc: 'Christ-centered support groups & counseling',
+        website: 'https://teenchallengeusa.org/find-a-center',
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=Teen+Challenge+near+${enc(submitted)}`
+      },
+      {
+        name: 'SAMHSA Helpline',
+        desc: 'Free, confidential mental health & substance use support',
+        website: 'https://www.samhsa.gov/find-help/national-helpline',
+        phone: '1-800-662-4357'
+      }
+    ],
+    churches: [
+      // Denominational biasing: AG, CoG, IPHC first — no labels revealing the priority
+      {
+        name: 'Assemblies of God Churches',
+        desc: 'Spirit-filled, Bible-believing congregations near you',
+        website: `https://ag.org/churches/find-a-church?zip=${enc(submitted)}`,
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=Assemblies+of+God+church+near+${enc(submitted)}`
+      },
+      {
+        name: 'Church of God Congregations',
+        desc: 'Pentecostal, Christ-centered churches near you',
+        website: `https://www.churchofgod.org/find-a-church/?zip=${enc(submitted)}`,
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=Church+of+God+Cleveland+Tennessee+near+${enc(submitted)}`
+      },
+      {
+        name: 'IPHC — Pentecostal Holiness Churches',
+        desc: 'International Pentecostal Holiness congregations',
+        website: 'https://iphc.org/find-a-church/',
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=Pentecostal+Holiness+church+near+${enc(submitted)}`
+      },
+      {
+        name: 'Bible-Believing Churches',
+        desc: 'Non-denominational & evangelical churches near you',
+        mapUrl: `https://www.google.com/maps/search/?api=1&query=evangelical+Christian+church+near+${enc(submitted)}`
+      }
+    ]
+  }
+
+  const tabs: { id: LocatorTab; label: string }[] = [
+    { id: 'recovery', label: 'Recovery' },
+    { id: 'groups', label: 'Groups' },
+    { id: 'churches', label: 'Churches' }
+  ]
 
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-md border border-gray-100">
-      <h3 className="font-bold text-gray-900 mb-1 flex items-center gap-2">
-        <MapPin className="w-5 h-5 text-primary-500" />
-        Find Support Near You
-      </h3>
-      <p className="text-xs text-gray-500 mb-4">
-        Enter your zip code to find local churches, Celebrate Recovery groups, and treatment programs.
-      </p>
+    <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+      <div className="p-5 pb-3">
+        <h3 className="font-bold text-gray-900 mb-1 flex items-center gap-2">
+          <MapPin className="w-5 h-5 text-primary-500" />
+          Find Support Near You
+        </h3>
+        <p className="text-xs text-gray-500 mb-4">
+          Enter your zip code or city to find churches, recovery groups, and support near you.
+        </p>
 
-      <div className="flex gap-2 mb-4">
-        <input
-          type="text"
-          inputMode="numeric"
-          value={zip}
-          onChange={e => setZip(e.target.value.replace(/\D/g, '').slice(0, 10))}
-          onKeyDown={e => e.key === 'Enter' && handleSearch()}
-          placeholder="Enter zip code..."
-          className="flex-1 input-field"
-          maxLength={10}
-        />
-        <button
-          onClick={handleSearch}
-          disabled={zip.trim().length < 4}
-          className="bg-primary-500 hover:bg-primary-600 disabled:bg-gray-200 text-white font-semibold px-4 py-2.5 rounded-xl transition-colors flex items-center gap-1.5"
-        >
-          <Search className="w-4 h-4" />
-          Find
-        </button>
+        <div className="flex gap-2 mb-4">
+          <input
+            type="text"
+            value={zip}
+            onChange={e => setZip(e.target.value.slice(0, 30))}
+            onKeyDown={e => e.key === 'Enter' && handleSearch()}
+            placeholder="Zip code or city name..."
+            className="flex-1 input-field"
+          />
+          <button
+            onClick={handleSearch}
+            disabled={zip.trim().length < 3}
+            className="bg-primary-500 hover:bg-primary-600 disabled:bg-gray-200 text-white font-semibold px-4 py-2.5 rounded-xl transition-colors flex items-center gap-1.5"
+          >
+            <Search className="w-4 h-4" />
+            Find
+          </button>
+        </div>
+
+        {/* Tab bar */}
+        {submitted && (
+          <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex-1 py-2 rounded-lg text-xs font-bold transition-colors ${
+                  activeTab === tab.id
+                    ? 'bg-white text-primary-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {submitted && (
-        <div className="space-y-2">
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
-            Results for "{submitted}"
+        <div className="px-5 pb-5 space-y-2.5">
+          <p className="text-xs text-gray-400 font-semibold">
+            Showing results near <span className="text-gray-700">"{submitted}"</span>
           </p>
-          {links.map((link, i) => (
-            <div key={i} className={`${link.color} border rounded-xl overflow-hidden`}>
-              <div className="p-3">
-                <p className={`font-bold text-sm ${link.labelColor}`}>{link.label}</p>
-                <p className="text-xs text-gray-500 mt-0.5">{link.desc}</p>
-                <div className="flex gap-2 mt-2.5">
-                  {link.mapUrl && (
-                    <a
-                      href={link.mapUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 font-semibold text-xs py-1.5 px-3 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <MapPin className="w-3 h-3" />
-                      Map Search
-                    </a>
-                  )}
-                  {link.url && (
-                    <a
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 font-semibold text-xs py-1.5 px-3 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      Website
-                    </a>
-                  )}
+
+          {/* Horry County: The Refuge pinned at top */}
+          {isHorry && (
+            <div className="bg-gradient-to-br from-primary-500 to-primary-700 rounded-2xl p-4 text-white">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <div>
+                  <span className="text-xs font-bold text-white/70 uppercase tracking-wide">
+                    {theRefuge.typeByTab[activeTab]}
+                  </span>
+                  <h4 className="font-bold text-white text-sm mt-0.5">{theRefuge.name}</h4>
                 </div>
+                <span className="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0">
+                  Local
+                </span>
+              </div>
+              <p className="text-white/80 text-xs mb-1">{theRefuge.address}</p>
+              <p className="text-white/80 text-xs mb-3">{theRefuge.detail}</p>
+              <div className="flex gap-2 flex-wrap">
+                <a
+                  href={theRefuge.mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white font-semibold text-xs py-1.5 px-3 rounded-lg transition-colors"
+                >
+                  <MapPin className="w-3 h-3" />
+                  Directions
+                </a>
+                <a
+                  href={`mailto:${theRefuge.contact}`}
+                  className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white font-semibold text-xs py-1.5 px-3 rounded-lg transition-colors"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  Email Us
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Tab results */}
+          {tabContent[activeTab].map((item, i) => (
+            <div key={i} className="bg-gray-50 border border-gray-100 rounded-xl p-3">
+              <p className="font-bold text-gray-800 text-sm">{item.name}</p>
+              <p className="text-xs text-gray-500 mt-0.5 mb-2.5">{item.desc}</p>
+              <div className="flex gap-2 flex-wrap">
+                {item.mapUrl && (
+                  <a
+                    href={item.mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 font-semibold text-xs py-1.5 px-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <MapPin className="w-3 h-3" />
+                    Map Search
+                  </a>
+                )}
+                {item.website && (
+                  <a
+                    href={item.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 font-semibold text-xs py-1.5 px-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Website
+                  </a>
+                )}
+                {item.phone && (
+                  <a
+                    href={`tel:${item.phone.replace(/\D/g, '')}`}
+                    className="flex items-center gap-1.5 bg-white border border-gray-200 text-gray-700 font-semibold text-xs py-1.5 px-3 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <Phone className="w-3 h-3" />
+                    {item.phone}
+                  </a>
+                )}
               </div>
             </div>
           ))}
-
-          {/* Always-visible ministry link */}
-          <div className="mt-3 p-3 bg-primary-50 border border-primary-100 rounded-xl flex items-center justify-between">
-            <div>
-              <p className="font-bold text-primary-700 text-sm">OverComer Recovery Ministry</p>
-              <p className="text-xs text-primary-600">Thursdays 7–9 PM · The Refuge · Conway, SC</p>
-            </div>
-            <a
-              href="https://www.google.com/maps/search/?api=1&query=The+Refuge+Conway+SC"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2 bg-white rounded-lg border border-primary-200 hover:bg-primary-50 transition-colors"
-            >
-              <MapPin className="w-4 h-4 text-primary-500" />
-            </a>
-          </div>
         </div>
       )}
 
       {!submitted && (
-        <div className="space-y-2">
+        <div className="px-5 pb-5 space-y-2">
           <a
             href="https://www.celebraterecovery.com/crgroups"
             target="_blank"
@@ -562,13 +692,27 @@ function SupportLocatorCard() {
             </div>
             <ExternalLink className="w-4 h-4 text-primary-500 flex-shrink-0" />
           </a>
-          <div className="p-3 bg-gray-50 rounded-xl flex items-center gap-3">
+          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
             <Phone className="w-4 h-4 text-primary-400 flex-shrink-0" />
             <div>
               <p className="font-semibold text-gray-700 text-sm">SAMHSA Helpline</p>
               <a href="tel:18006624357" className="text-xs text-primary-600 font-bold">1-800-662-4357</a>
               <span className="text-xs text-gray-400"> · Free · 24/7 · Confidential</span>
             </div>
+          </div>
+          <div className="p-3 bg-primary-50 rounded-xl flex items-center justify-between">
+            <div>
+              <p className="font-bold text-primary-700 text-sm">OverComer Recovery Ministry</p>
+              <p className="text-xs text-primary-600">Thursdays 7–9 PM · The Refuge · Conway, SC</p>
+            </div>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=290+Dun+Shortcut+Rd+Conway+SC+29527"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 bg-white rounded-lg border border-primary-200 hover:bg-primary-50 transition-colors"
+            >
+              <MapPin className="w-4 h-4 text-primary-500" />
+            </a>
           </div>
         </div>
       )}
