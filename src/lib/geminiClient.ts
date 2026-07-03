@@ -1,7 +1,7 @@
 import type { ChatMessage, VerseOfTheDay, ScriptureResult, DistortionAnalysis, LocalResource, FocusPath } from './types'
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models'
-const DEFAULT_MODEL = 'gemini-1.5-flash'
+const DEFAULT_MODEL = 'gemini-2.0-flash'
 
 const SYSTEM_INSTRUCTION = `You are "OverComer Companion", a kind, deeply compassionate Christ-centered companion for individuals struggling with addiction, life struggles, anxiety, depression, mental health challenges, or any weight that is controlling their life. You serve under the OverComer Recovery Ministries, which meets at The Refuge, Conway SC — a Christ-centered safe place for those who are struggling.
 
@@ -174,7 +174,11 @@ async function safeCallGemini(
     throw new Error('NO_API_KEY')
   }
 
-  const modelsToTry = [model, 'gemini-1.5-flash', 'gemini-pro']
+  // Try current model first, then one fallback
+  const modelsToTry = model === 'gemini-2.0-flash'
+    ? ['gemini-2.0-flash', 'gemini-1.5-flash']
+    : [model, 'gemini-2.0-flash']
+
   let lastError: Error | null = null
 
   for (const modelToTry of modelsToTry) {
@@ -193,6 +197,10 @@ async function safeCallGemini(
 
         if (!response.ok) {
           const errorText = await response.text()
+          // Auth/key errors — no point retrying with same key
+          if (response.status === 400 || response.status === 401 || response.status === 403) {
+            throw new Error(`KEY_ERROR: ${response.status} - ${errorText}`)
+          }
           if (response.status === 503 || response.status === 429 || response.status === 500) {
             throw new Error(`Transient error: ${response.status}`)
           }
@@ -204,11 +212,17 @@ async function safeCallGemini(
         return text || 'I am here with you. Let us lean on God\'s word together.'
       } catch (error) {
         lastError = error as Error
-        const errorMessage = lastError.message
-        const isTransient = errorMessage.includes('503') ||
-          errorMessage.includes('429') ||
-          errorMessage.includes('500') ||
-          errorMessage.includes('Transient')
+        const msg = lastError.message
+
+        // Key errors — propagate immediately, no retry
+        if (msg.startsWith('KEY_ERROR')) {
+          throw lastError
+        }
+
+        const isTransient = msg.includes('503') ||
+          msg.includes('429') ||
+          msg.includes('500') ||
+          msg.includes('Transient')
 
         if (isTransient && attempt < 3) {
           await new Promise(resolve => setTimeout(resolve, delay))
@@ -263,10 +277,12 @@ export async function generateSupportResponse(
   } catch (error) {
     const errorMessage = (error as Error).message
     const isKeyError = errorMessage === 'NO_API_KEY' ||
+      errorMessage.startsWith('KEY_ERROR') ||
       errorMessage.toLowerCase().includes('api key') ||
       errorMessage.includes('API_KEY_INVALID') ||
       errorMessage.includes('INVALID_ARGUMENT') ||
-      errorMessage.includes('403')
+      errorMessage.includes('403') ||
+      errorMessage.includes('401')
     if (isKeyError) {
       return `NO_API_KEY_SETUP`
     }
