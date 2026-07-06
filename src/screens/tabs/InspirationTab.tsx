@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { inspirationQuotes } from '../../lib/data'
-import { Quote, Heart, RefreshCw, Moon, Shield, Sparkles, Crown, FileText, Download } from 'lucide-react'
+import { Quote, Heart, RefreshCw, Moon, Shield, Sparkles, Crown, FileText, Download, BookOpen, ChevronDown, ChevronUp, Users } from 'lucide-react'
 import { useAppStore } from '../../store/useAppStore'
 import type { InspirationQuote } from '../../lib/types'
 
@@ -138,6 +138,9 @@ export default function InspirationTab({ onNavigateToCompanion }: { onNavigateTo
           ))}
         </div>
       )}
+
+      {/* Trusted Voices Library */}
+      {(!selectedCategory) && <TrustedVoicesLibrary />}
     </div>
   )
 }
@@ -168,6 +171,208 @@ function QuoteCard({ quote, onRenewMind }: { quote: InspirationQuote; onRenewMin
         <RefreshCw className="w-4 h-4" />
         Renew My Mind
       </button>
+    </div>
+  )
+}
+
+interface TrustedBook {
+  title: string
+  author: string
+  description: string
+  tag: string
+  tagColor: string
+}
+
+const trustedVoicesData: Array<{ topic: string; color: string; books: TrustedBook[] }> = [
+  {
+    topic: 'Substance Recovery',
+    color: 'bg-accent-teal',
+    books: [
+      {
+        title: 'The Cross and the Switchblade',
+        author: 'David Wilkerson',
+        description: 'The story that launched Teen Challenge — the gold standard in faith-based recovery ministry.',
+        tag: 'Recovery',
+        tagColor: 'bg-accent-teal/10 text-accent-teal'
+      },
+      {
+        title: 'Run Baby Run',
+        author: 'Nicky Cruz',
+        description: 'From gang life to Christ — a raw, powerful testimony that addiction and violence have no hold on a life surrendered to Jesus.',
+        tag: 'Testimony',
+        tagColor: 'bg-accent-teal/10 text-accent-teal'
+      },
+      {
+        title: 'Crossroads: A Step-by-Step Guide Away from Addiction',
+        author: 'Edward T. Welch',
+        description: 'A strictly biblical workbook for recovery — addresses behavioral choices and personal accountability head-on.',
+        tag: 'Workbook',
+        tagColor: 'bg-accent-teal/10 text-accent-teal'
+      },
+    ],
+  },
+  {
+    topic: 'Mental Health & Faith',
+    color: 'bg-primary-400',
+    books: [
+      {
+        title: 'Grace for the Afflicted',
+        author: 'Dr. Matthew Stanford',
+        description: 'A Christian neuroscientist bridges faith and clinical care — the definitive guide for ministry leaders navigating mental illness.',
+        tag: 'Clinical + Faith',
+        tagColor: 'bg-primary-100 text-primary-600'
+      },
+      {
+        title: 'Blame It on the Brain?',
+        author: 'Edward T. Welch',
+        description: 'Helps leaders discern when a struggle is spiritual, behavioral, or requires professional clinical care.',
+        tag: 'Discernment',
+        tagColor: 'bg-primary-100 text-primary-600'
+      },
+      {
+        title: 'Boundaries: When to Say Yes, How to Say No',
+        author: 'Dr. Henry Cloud & Dr. John Townsend',
+        description: 'A theological and psychological framework for deep compassion paired with uncompromising accountability.',
+        tag: 'Relationships',
+        tagColor: 'bg-primary-100 text-primary-600'
+      },
+    ],
+  },
+  {
+    topic: 'Inner Healing & Transformation',
+    color: 'bg-secondary-500',
+    books: [
+      {
+        title: 'Instruments in the Redeemer\'s Hands',
+        author: 'Paul David Tripp',
+        description: 'How ordinary believers can engage in personal, transformative ministry — speaking truth into each other\'s lives.',
+        tag: 'Ministry',
+        tagColor: 'bg-secondary-100 text-secondary-600'
+      },
+      {
+        title: 'The Wounded Heart',
+        author: 'Dr. Dan B. Allender',
+        description: 'A landmark text in Christian trauma care — addresses the deep damage of abuse with immense empathy and theological depth.',
+        tag: 'Trauma',
+        tagColor: 'bg-secondary-100 text-secondary-600'
+      },
+      {
+        title: 'Connecting',
+        author: 'Dr. Larry Crabb',
+        description: 'True community as the vehicle for healing — where we are fully known and fully loved, mirroring God\'s heart.',
+        tag: 'Community',
+        tagColor: 'bg-secondary-100 text-secondary-600'
+      },
+    ],
+  },
+  {
+    topic: 'Marriage & Relationships',
+    color: 'bg-accent-coral',
+    books: [
+      {
+        title: 'Sacred Marriage',
+        author: 'Gary Thomas',
+        description: 'What if God designed marriage to make us holy more than to make us happy? A cornerstone shift in perspective.',
+        tag: 'Marriage',
+        tagColor: 'bg-red-50 text-red-500'
+      },
+      {
+        title: 'Love & Respect',
+        author: 'Dr. Emerson Eggerichs',
+        description: 'Grounded in Ephesians 5:33 — breaks down the communication cycles that destroy marriages with practical, actionable steps.',
+        tag: 'Communication',
+        tagColor: 'bg-red-50 text-red-500'
+      },
+      {
+        title: 'Vertical Marriage',
+        author: 'Dave & Ann Wilson',
+        description: 'Your horizontal relationship with your spouse can only be transformed by first fixing your vertical relationship with Christ.',
+        tag: 'Marriage',
+        tagColor: 'bg-red-50 text-red-500'
+      },
+    ],
+  },
+  {
+    topic: 'Pastoral & Christian Counseling',
+    color: 'bg-accent-gold',
+    books: [
+      {
+        title: 'Christian Counseling: A Comprehensive Guide',
+        author: 'Dr. Gary R. Collins',
+        description: 'The standard textbook for Christian counselors — covers a vast range of counseling scenarios with proven frameworks.',
+        tag: 'Counseling',
+        tagColor: 'bg-yellow-50 text-yellow-600'
+      },
+      {
+        title: 'Seeing with New Eyes',
+        author: 'Dr. David Powlison',
+        description: 'How Scripture diagnoses human motives and brings practical, grace-centered change to daily struggles.',
+        tag: 'Scripture',
+        tagColor: 'bg-yellow-50 text-yellow-600'
+      },
+      {
+        title: 'Dare to Discipline / The Strong-Willed Child',
+        author: 'Dr. James Dobson',
+        description: 'The foundational framework for loving, firm parenting rooted in biblical principles — essential for families in recovery.',
+        tag: 'Family',
+        tagColor: 'bg-yellow-50 text-yellow-600'
+      },
+    ],
+  },
+]
+
+function TrustedVoicesLibrary() {
+  const [expandedTopic, setExpandedTopic] = useState<string | null>(null)
+
+  return (
+    <div className="mt-8">
+      <div className="flex items-center gap-2 mb-4">
+        <Users className="w-5 h-5 text-primary-500" />
+        <h3 className="font-bold text-gray-900">Trusted Voices Library</h3>
+      </div>
+      <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+        Biblically vetted authors and resources — carefully selected to align with the OverComer worldview.
+      </p>
+
+      <div className="space-y-3">
+        {trustedVoicesData.map(section => (
+          <div key={section.topic} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <button
+              onClick={() => setExpandedTopic(expandedTopic === section.topic ? null : section.topic)}
+              className="w-full flex items-center justify-between p-4 text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 ${section.color} rounded-lg flex items-center justify-center`}>
+                  <BookOpen className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-bold text-gray-900 text-sm">{section.topic}</span>
+                <span className="text-xs text-gray-400">{section.books.length} resources</span>
+              </div>
+              {expandedTopic === section.topic
+                ? <ChevronUp className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                : <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              }
+            </button>
+
+            {expandedTopic === section.topic && (
+              <div className="border-t border-gray-100 divide-y divide-gray-50">
+                {section.books.map((book, i) => (
+                  <div key={i} className="p-4">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h4 className="font-bold text-gray-900 text-sm leading-snug">{book.title}</h4>
+                      <span className={`flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${book.tagColor}`}>
+                        {book.tag}
+                      </span>
+                    </div>
+                    <p className="text-xs font-semibold text-primary-500 mb-1">{book.author}</p>
+                    <p className="text-xs text-gray-500 leading-relaxed">{book.description}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

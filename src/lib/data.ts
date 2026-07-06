@@ -504,5 +504,111 @@ export const inspirationQuotes = [
     category: 'IAM_DECLARATIONS' as const,
     text: 'I am a chosen people, a royal priesthood, a holy nation, God\'s special possession.',
     reference: '1 Peter 2:9'
-  }
+  },
+  // OVERCOMING — TRUSTED VOICES
+  {
+    id: '39',
+    category: 'OVERCOMING_CRAVINGS' as const,
+    text: 'The beginning of anxiety is the end of faith, and the beginning of true faith is the end of anxiety.',
+    reference: '— David Wilkerson, Teen Challenge'
+  },
+  {
+    id: '40',
+    category: 'OVERCOMING_CRAVINGS' as const,
+    text: 'God can take the most broken life and turn it into a testimony that changes thousands. I am living proof.',
+    reference: '— Nicky Cruz, Run Baby Run'
+  },
+  {
+    id: '41',
+    category: 'OVERCOMING_CRAVINGS' as const,
+    text: 'When we think that desires and pleasures have power over us, we have forgotten that our Master is Christ — not our desires.',
+    reference: '— Edward T. Welch, Addictions: A Banquet in the Grave'
+  },
+  {
+    id: '42',
+    category: 'OVERCOMING_CRAVINGS' as const,
+    text: 'Celebrate Recovery is not a program — it is a place where broken people find the grace of a Savior who specializes in putting broken things back together.',
+    reference: '— John Baker, Celebrate Recovery'
+  },
+  {
+    id: '43',
+    category: 'OVERCOMING_CRAVINGS' as const,
+    text: 'Asking for help is not a sign of weakness. It is one of the bravest and most faithful steps you will ever take.',
+    reference: '— Dr. Jared Pingleton'
+  },
+  // PEACE & ANXIETY — TRUSTED VOICES
+  {
+    id: '44',
+    category: 'PEACE_ANXIETY' as const,
+    text: 'Feelings of worth can flourish only in an atmosphere where individual differences are appreciated, mistakes are tolerated, communication is open, and rules are flexible — the way it is in God\'s family.',
+    reference: '— Dr. James Dobson'
+  },
+  {
+    id: '45',
+    category: 'PEACE_ANXIETY' as const,
+    text: 'Pain is not the enemy. It is the signal that something needs to change — and God is the One who knows what that is.',
+    reference: '— Dr. Henry Cloud, Changes That Heal'
+  },
+  {
+    id: '46',
+    category: 'PEACE_ANXIETY' as const,
+    text: 'Mental illness does not define you. Your identity is found in Christ alone — and no diagnosis, no label, and no past can change that.',
+    reference: '— Dr. Matthew Stanford, Grace for the Afflicted'
+  },
+  {
+    id: '47',
+    category: 'PEACE_ANXIETY' as const,
+    text: 'True healing is possible when we bring the broken places of our heart into the light of God\'s grace and the warmth of authentic community.',
+    reference: '— Dr. Timothy Clinton, Competent Christian Counseling'
+  },
+  // STRENGTH & FAITH — TRUSTED VOICES
+  {
+    id: '48',
+    category: 'STRENGTH_FAITH' as const,
+    text: 'Your suffering is not evidence of God\'s absence. It is often the context for His most powerful work.',
+    reference: '— Paul David Tripp, Instruments in the Redeemer\'s Hands'
+  },
+  {
+    id: '49',
+    category: 'STRENGTH_FAITH' as const,
+    text: 'God often uses the challenges in our closest relationships to reveal what still needs to change in us. The friction is not a failure — it is formation.',
+    reference: '— Gary Thomas, Sacred Marriage'
+  },
+  {
+    id: '50',
+    category: 'STRENGTH_FAITH' as const,
+    text: 'The heart that is honest about its sin is the heart most prepared to receive God\'s transforming grace.',
+    reference: '— Dr. David Powlison, Seeing with New Eyes'
+  },
+  {
+    id: '51',
+    category: 'STRENGTH_FAITH' as const,
+    text: 'Nothing that has ever happened to you — no trauma, no failure, no loss — falls outside the reach of God\'s redemptive hand.',
+    reference: '— Dr. Dan B. Allender, The Wounded Heart'
+  },
+  // GRACE & FORGIVENESS — TRUSTED VOICES
+  {
+    id: '52',
+    category: 'GRACE_FORGIVENESS' as const,
+    text: 'Grace is not simply leniency when we have sinned. Grace is the enabling gift of God not to sin — and to walk in the freedom Christ has already purchased.',
+    reference: '— Paul David Tripp'
+  },
+  {
+    id: '53',
+    category: 'GRACE_FORGIVENESS' as const,
+    text: 'You cannot earn what has already been freely given. Forgiveness is not a reward for your best behavior — it is a gift from your Father who loves you.',
+    reference: '— Dr. Larry Crabb, Understanding People'
+  },
+  {
+    id: '54',
+    category: 'GRACE_FORGIVENESS' as const,
+    text: 'The most powerful thing a counselor — or a friend — can do is truly listen. When someone feels fully heard, they begin to believe they are worth something. That is grace in action.',
+    reference: '— Dr. Gary R. Collins, Christian Counseling'
+  },
+  {
+    id: '55',
+    category: 'GRACE_FORGIVENESS' as const,
+    text: 'Unconditional love and unconditional respect are not earned; they are given. That is what makes them Christ-like — and that is what makes them change everything.',
+    reference: '— Dr. Emerson Eggerichs, Love & Respect'
+  },
 ]
