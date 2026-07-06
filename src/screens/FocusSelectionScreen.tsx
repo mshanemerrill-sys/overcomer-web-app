@@ -9,7 +9,7 @@ interface FocusSelectionScreenProps {
 
 export default function FocusSelectionScreen({ onSelect }: FocusSelectionScreenProps) {
   const user = useAppStore(state => state.user)
-  const greeting = user?.displayName ? `Welcome back, ${user.displayName}` : 'Welcome to OverComer'
+  const greeting = user?.displayName ? `Welcome back, ${user.displayName}` : 'Welcome to OverComer — where we live from Christ\'s position of Victory'
 
   useEffect(() => {
     document.title = 'OverComer - Welcome'
@@ -26,7 +26,10 @@ export default function FocusSelectionScreen({ onSelect }: FocusSelectionScreenP
           </h1>
           <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mt-4">
             <p className="text-white/90 font-semibold leading-relaxed">
-              An OverComer submits their life wholly to Christ and no longer fights FOR victory — but FROM a position of victory. Where are you today?
+              This app is built to lift up those fighting addiction or mental health struggles, assist veterans processing service, or support individuals overcoming the weight of past incarceration. It is equally a refuge for anyone who doesn't face these specific battles but is simply having a rough day and needs a lift. Out of every struggle comes a story.
+            </p>
+            <p className="text-white/80 text-sm mt-3 leading-relaxed">
+              Step into your focus path, claim your peace, or simply log in to share your testimony and Victory Day.
             </p>
           </div>
           <p className="text-white/70 text-sm mt-4">
