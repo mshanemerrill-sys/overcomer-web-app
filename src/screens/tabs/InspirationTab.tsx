@@ -100,6 +100,10 @@ export default function InspirationTab({ onNavigateToCompanion }: { onNavigateTo
             <FileText className="w-5 h-5 text-primary-500" />
             Devotional Reading
           </h3>
+
+          {/* Trust The Process — inline devotional */}
+          <TrustTheProcessDevotional />
+
           {[
             {
               title: 'Seek God With All Your Heart',
@@ -171,6 +175,144 @@ function QuoteCard({ quote, onRenewMind }: { quote: InspirationQuote; onRenewMin
         <RefreshCw className="w-4 h-4" />
         Renew My Mind
       </button>
+    </div>
+  )
+}
+
+function TrustTheProcessDevotional() {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <div className="bg-white rounded-2xl shadow-md border border-primary-100 overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-primary-500 to-primary-700 p-4 text-white">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+            <BookOpen className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1">
+            <h4 className="font-black text-base leading-snug">Trust The Process</h4>
+            <p className="text-xs text-white/80 mt-0.5">Proverbs 13:12 · The Story of David</p>
+            <p className="text-xs text-white/70 mt-1">Shane Merrill & Micah Cartee</p>
+          </div>
+        </div>
+
+        {/* Key verse */}
+        <div className="mt-3 bg-white/10 rounded-xl p-3">
+          <p className="text-sm italic text-white leading-relaxed">
+            "Hope deferred makes the heart sick, but a longing fulfilled is a tree of life."
+          </p>
+          <p className="text-xs text-white/70 mt-1 font-semibold">Proverbs 13:12 (NIV)</p>
+        </div>
+      </div>
+
+      {/* Preview / Read More */}
+      {!expanded ? (
+        <div className="p-4">
+          <p className="text-sm text-gray-600 leading-relaxed">
+            There are times when God puts things in our hearts — dreams, aspirations, goals — and makes us wait. During that waiting, God prepares us for His promise. The question is: <strong className="text-gray-800">Will you trust the process?</strong>
+          </p>
+          <button
+            onClick={() => setExpanded(true)}
+            className="mt-3 w-full flex items-center justify-center gap-2 bg-primary-50 hover:bg-primary-100 text-primary-600 font-semibold text-sm py-2.5 rounded-xl transition-colors"
+          >
+            <ChevronDown className="w-4 h-4" />
+            Read Full Devotional
+          </button>
+        </div>
+      ) : (
+        <div className="p-4 space-y-5 text-sm text-gray-700 leading-relaxed">
+
+          {/* Section 1 */}
+          <div>
+            <p>There are times when God puts things in our hearts — dreams, aspirations, goals — and He gives them to us right away. There are other times, and this seems to be the majority, when God puts things in our hearts and then makes us wait.</p>
+            <p className="mt-2">Often, we can wonder what God is doing. We can begin to ask, <em>"Did I really hear from God?"</em> Or perhaps the biggest question: <em>"God, what is taking You so long?"</em></p>
+            <p className="mt-2">I have found that during those times of waiting, God prepares us for His promise. During our waiting, He teaches us things. He grows our character, our faith, and our ability to do what He has called us to do. God takes us through a process.</p>
+          </div>
+
+          {/* Callout */}
+          <div className="bg-primary-50 border-l-4 border-primary-400 rounded-r-xl p-3">
+            <p className="font-bold text-primary-700 text-base">Will You Trust the Process?</p>
+          </div>
+
+          {/* Section 2 — Samuel & David */}
+          <div>
+            <p className="font-bold text-gray-900">Chosen By God</p>
+            <p className="mt-1">In 1 Samuel 16, God came to Samuel and told him to go to Jesse's tribe, where He had chosen one of his sons to be king. When Samuel arrived, he looked at Eliab — the oldest, probably the tallest — and thought, <em>"Surely this is the one."</em></p>
+            <p className="mt-2">But God said:</p>
+            <div className="my-2 bg-gray-50 rounded-xl p-3 italic text-gray-600">
+              "Do not consider his appearance or his height, for I have rejected him. The Lord does not look at the things people look at. People look at the outward appearance, but the <strong>Lord looks at the heart.</strong>" — 1 Samuel 16:7 (NIV)
+            </div>
+            <p>One by one, Jesse's seven sons passed before Samuel. Each time: No. No. No. Finally Samuel asked, "Are there any more?" Jesse answered, "There is still the youngest — he is tending the sheep." So they sent for David.</p>
+            <p className="mt-2">Samuel anointed David — and then the story stops. David went back to watching the sheep.</p>
+          </div>
+
+          {/* Callout 2 */}
+          <div className="bg-secondary-50 border-l-4 border-secondary-400 rounded-r-xl p-3">
+            <p className="font-semibold text-secondary-700">God anointed David long before he became king because God wanted to take David through a <em>process</em> — and the anointing was a reminder of the promise that the process would bring.</p>
+          </div>
+
+          {/* Chinese Bamboo */}
+          <div>
+            <p className="font-bold text-gray-900">Things Have To Change</p>
+            <p className="mt-1">A process is a series of actions or steps taken in order to achieve a particular end. God knew that things needed to happen in David's life before he could be king. Likewise, there are things that need to happen in our lives before we can step into what God has for us.</p>
+            <p className="mt-2">The Chinese Bamboo Tree is planted as a nut and must be watered and fertilized every single day for five years before it breaks through the ground. All that time, it spreads its roots. Then in the fifth year, it breaks through and grows to nearly ninety feet tall in just six weeks.</p>
+            <p className="mt-2 font-medium text-gray-800">We tend to get frustrated when we don't get five-year results immediately. But the process is essential — and everyone must go through it.</p>
+            <p className="mt-2">The question is: <strong>will you allow the waiting to develop you, or embitter you?</strong></p>
+          </div>
+
+          {/* Callout 3 */}
+          <div className="bg-accent-coral/10 border-l-4 border-accent-coral rounded-r-xl p-3">
+            <p className="font-bold text-accent-coral">Bitterness is unbelief in the promises of God.</p>
+            <p className="mt-1 text-gray-600 text-xs">Faith is what keeps you going until you see God do what He has promised. "I may not have seen it yet — but if God promised it, I am sure I will!"</p>
+          </div>
+
+          {/* Anointed vs Appointed */}
+          <div>
+            <p className="font-bold text-gray-900">Anointed, Not Yet Appointed</p>
+            <p className="mt-1">David had the <em>anointing</em> to be king — but not yet the <em>appointment</em>. Sometimes you can have an anointing on your life to do something, but not the appointing.</p>
+            <p className="mt-2">The danger is tunnel vision — being so focused on the light at the end of the tunnel that you miss what God is doing in and around you right now. You can miss learning experiences and opportunities because all you can see is the future dream.</p>
+          </div>
+
+          {/* Preparation */}
+          <div>
+            <p className="font-bold text-gray-900">Preparation is Key</p>
+            <div className="my-2 bg-primary-50 rounded-xl p-3">
+              <p className="font-bold text-primary-700 text-center">Preparation must come before the opportunity.</p>
+            </div>
+            <p>After his anointing, David's appointment was to watch the sheep. It was there that he developed his ability to play the lyre — and wrote Psalm 19:1. When Saul needed someone to soothe his tormented spirit, a servant said: "I have seen a son of Jesse who knows how to play the lyre. He is a brave man and a warrior... and the Lord is with him." (1 Samuel 16:18)</p>
+            <p className="mt-2">Then came Goliath. When Saul said David was too young, David responded: <em>"Your servant used to keep sheep for his father. And when there came a lion, or a bear, and took a lamb from the flock, I went after him and struck him... Your servant has struck down both lions and bears."</em> (1 Samuel 17:34-36)</p>
+            <p className="mt-2 font-medium text-gray-800">The preparation had to come before the opportunity — every single time.</p>
+          </div>
+
+          {/* Callout 4 */}
+          <div className="bg-accent-gold/15 border-l-4 border-accent-gold rounded-r-xl p-3">
+            <p className="font-bold text-gray-800">If You Shortcut the Process, You Short-Circuit the Product.</p>
+            <p className="mt-1 text-gray-600 text-xs">If David had never mastered the lyre, he never would have been chosen to play for Saul. If he had never killed the lion and the bear, Saul would not have let him face Goliath. Preparation opened every door.</p>
+          </div>
+
+          {/* Conclusion */}
+          <div>
+            <p className="font-bold text-gray-900">You Can Trust the Process</p>
+            <p className="mt-1">You may be in a season of waiting. Maybe you have been waiting for a long time and are starting to wonder if God will ever bring about His promise. The fact is — <strong className="text-primary-600">you can trust the process.</strong></p>
+            <p className="mt-2">Let your faith be strengthened. Know that God is preparing you today for what He wants to do through you in the future. He's teaching you to trust Him, to be bold in your faith, growing your character, and fine-tuning your gifts.</p>
+            <div className="mt-3 bg-primary-500 rounded-xl p-3 text-white text-center">
+              <p className="font-black text-base">Trust Him.</p>
+              <p className="text-sm text-white/90 mt-0.5">The process is bringing about the promise.</p>
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-400 text-right">— Shane Merrill & Micah Cartee · James River College</p>
+
+          <button
+            onClick={() => setExpanded(false)}
+            className="w-full flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-600 font-semibold text-sm py-2.5 rounded-xl transition-colors"
+          >
+            <ChevronUp className="w-4 h-4" />
+            Collapse
+          </button>
+        </div>
+      )}
     </div>
   )
 }
