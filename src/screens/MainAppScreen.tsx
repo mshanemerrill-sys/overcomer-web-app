@@ -94,7 +94,7 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
 
       {/* Bottom Navigation */}
       <nav className="bg-white border-t border-gray-200 safe-bottom sticky bottom-0">
-        <div className="grid grid-cols-6 py-1">
+        <div className="grid grid-cols-6 py-1.5">
           <NavButton
             icon={<Home className="w-5 h-5" />}
             label="Freedom"
@@ -109,7 +109,7 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
           />
           <NavButton
             icon={<MessageCircle className="w-5 h-5" />}
-            label="Chat"
+            label={["Overcomer's", "Companion"]}
             active={activeTab === 'companion'}
             onClick={() => setActiveTab('companion')}
           />
@@ -158,23 +158,31 @@ function NavButton({
   onClick
 }: {
   icon: React.ReactNode
-  label: string
+  label: string | string[]
   active: boolean
   onClick: () => void
 }) {
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col items-center justify-center py-2 transition-colors ${
+      className={`flex flex-col items-center justify-center py-2 px-0.5 transition-colors ${
         active
           ? 'text-primary-500'
           : 'text-gray-400 hover:text-gray-600'
       }`}
     >
       {icon}
-      <span className={`text-xs mt-1 font-medium ${active ? 'font-bold' : ''}`}>
-        {label}
-      </span>
+      {Array.isArray(label) ? (
+        <span className={`flex flex-col items-center mt-0.5 leading-tight ${active ? 'font-bold' : 'font-medium'}`}>
+          {label.map((line, i) => (
+            <span key={i} className="text-[10px] block text-center">{line}</span>
+          ))}
+        </span>
+      ) : (
+        <span className={`text-xs mt-1 font-medium ${active ? 'font-bold' : ''}`}>
+          {label}
+        </span>
+      )}
     </button>
   )
 }

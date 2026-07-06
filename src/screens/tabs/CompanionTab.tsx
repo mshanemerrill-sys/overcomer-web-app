@@ -116,17 +116,18 @@ export default function CompanionTab() {
   return (
     <div className="flex flex-col h-full bg-background-light">
       {/* Header */}
-      <div className="bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
-        <div>
-          <h2 className="font-bold text-gray-900">OverComer's Companion</h2>
-          <p className="text-xs text-gray-500">
-            {customKeyActive
-              ? 'Unlimited AI Support'
-              : `${30 - dailyCount}/30 requests today`
-            }
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
+      <div className="bg-white border-b border-gray-100 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="font-bold text-gray-900">OverComer's Companion</h2>
+            <p className="text-xs text-gray-500">
+              {customKeyActive
+                ? 'Unlimited AI Support'
+                : `${30 - dailyCount}/30 requests today`
+              }
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
           <button
             onClick={() => setShowApiDialog(true)}
             className={`p-2 rounded-lg transition-colors ${hasApiKey ? 'hover:bg-gray-100 text-gray-500' : 'bg-primary-100 text-primary-600 hover:bg-primary-200'}`}
@@ -158,7 +159,15 @@ export default function CompanionTab() {
           >
             <History className="w-5 h-5" />
           </button>
+          </div>
         </div>
+      </div>
+
+      {/* Legal micro-copy */}
+      <div className="bg-amber-50 border-b border-amber-100 px-4 py-2">
+        <p className="text-xs text-amber-700 leading-relaxed">
+          Your AI OverComer's Companion for biblical encouragement. For professional medical or clinical crisis support, please see the <strong>Re-entry</strong> resource tab.
+        </p>
       </div>
 
       {/* Daily limit warning */}
