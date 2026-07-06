@@ -262,82 +262,68 @@ function getTodayUsageCount(): number {
 
 export { getTodayUsageCount, isCustomKeyActive }
 
+async function callGemini(
+  request: unknown,
+  apiKey: string,
+  model: string
+): Promise<string> {
+  const response = await fetch(
+    `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+    }
+  )
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    if (response.status === 429) throw new Error('RATE_LIMIT')
+    if (response.status === 401 || response.status === 403 ||
+      (response.status === 400 && (
+        errorText.includes('API_KEY_INVALID') ||
+        errorText.includes('API key not valid') ||
+        errorText.includes('INVALID_API_KEY')
+      ))) {
+      throw new Error('KEY_ERROR')
+    }
+    throw new Error(`API_ERROR:${response.status}`)
+  }
+
+  const data = await response.json()
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text
+  return text || 'I am here with you. Let us lean on God\'s word together.'
+}
+
 async function safeCallGemini(
   request: unknown,
   model: string = DEFAULT_MODEL
 ): Promise<string> {
   const apiKey = getApiKey()
-  if (!apiKey) {
-    throw new Error('NO_API_KEY')
-  }
+  if (!apiKey) throw new Error('NO_API_KEY')
 
-  // Try current model first, then one fallback
-  const modelsToTry = model === 'gemini-2.0-flash'
-    ? ['gemini-2.0-flash', 'gemini-1.5-flash']
-    : [model, 'gemini-2.0-flash']
+  // Try primary model, then fallback
+  const models = model === DEFAULT_MODEL
+    ? [DEFAULT_MODEL, 'gemini-1.5-flash']
+    : [model, DEFAULT_MODEL]
 
-  let lastError: Error | null = null
+  let lastErr: Error = new Error('UNKNOWN')
 
-  for (const modelToTry of modelsToTry) {
-    let delay = 1500
-
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        const response = await fetch(
-          `${GEMINI_API_BASE}/${modelToTry}:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(request),
-          }
-        )
-
-        if (!response.ok) {
-          const errorText = await response.text()
-          // True auth/key errors — check status AND body content
-          const isAuthError = response.status === 401 || response.status === 403 ||
-            (response.status === 400 && (
-              errorText.includes('API_KEY_INVALID') ||
-              errorText.includes('API key not valid') ||
-              errorText.includes('INVALID_API_KEY')
-            ))
-          if (isAuthError) {
-            throw new Error(`KEY_ERROR: ${response.status} - ${errorText}`)
-          }
-          if (response.status === 503 || response.status === 429 || response.status === 500) {
-            throw new Error(`Transient error: ${response.status}`)
-          }
-          throw new Error(`API error: ${response.status} - ${errorText}`)
-        }
-
-        const data = await response.json()
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text
-        return text || 'I am here with you. Let us lean on God\'s word together.'
-      } catch (error) {
-        lastError = error as Error
-        const msg = lastError.message
-
-        // Key errors — propagate immediately, no retry
-        if (msg.startsWith('KEY_ERROR')) {
-          throw lastError
-        }
-
-        const isTransient = msg.includes('503') ||
-          msg.includes('429') ||
-          msg.includes('500') ||
-          msg.includes('Transient')
-
-        if (isTransient && attempt < 3) {
-          await new Promise(resolve => setTimeout(resolve, delay))
-          delay *= 2
-        } else {
-          break
-        }
+  for (const m of models) {
+    try {
+      return await callGemini(request, apiKey, m)
+    } catch (err) {
+      lastErr = err as Error
+      const msg = lastErr.message
+      // Key errors and rate limits — no point trying another model
+      if (msg === 'NO_API_KEY' || msg === 'KEY_ERROR' || msg === 'RATE_LIMIT') {
+        throw lastErr
       }
+      // Server error on first model → try fallback
     }
   }
 
-  throw lastError || new Error('Failed to connect after multiple attempts')
+  throw lastErr
 }
 
 export async function generateSupportResponse(
@@ -392,22 +378,12 @@ export async function generateSupportResponse(
     incrementUsageCount()
     return response
   } catch (error) {
-    const errorMessage = (error as Error).message
-    const isKeyError = errorMessage === 'NO_API_KEY' ||
-      errorMessage.startsWith('KEY_ERROR') ||
-      errorMessage.toLowerCase().includes('api key not valid') ||
-      errorMessage.includes('API_KEY_INVALID') ||
-      errorMessage.includes('INVALID_API_KEY') ||
-      errorMessage.includes('403') ||
-      errorMessage.includes('401')
-    if (isKeyError) {
+    const msg = (error as Error).message
+    if (msg === 'NO_API_KEY' || msg === 'KEY_ERROR') {
       return `NO_API_KEY_SETUP`
     }
-    if (errorMessage.includes('429')) {
-      return `We reached a temporary rate limit. Take a deep breath — wait 10-15 seconds and try again. Remember Psalm 27:14: "Wait for the Lord; be strong and take heart."`
-    }
-    if (errorMessage.includes('400')) {
-      return `I received an unexpected response. Please try rephrasing your message. If the issue continues, tap the Key icon to verify your API key is entered correctly.`
+    if (msg === 'RATE_LIMIT') {
+      return `Google is briefly throttling your new key. This is normal and clears within a minute. Please wait 60 seconds and try again. Remember Psalm 27:14: "Wait for the Lord; be strong and take heart."`
     }
     return `I am here for you. I had trouble connecting right now — please try again in a moment. While you wait, stand firm on Romans 8:37: "We are more than conquerors through Him who loved us."`
   }
