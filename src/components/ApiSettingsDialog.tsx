@@ -7,7 +7,7 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
   const { customApiKey, setCustomApiKey } = useAppStore()
   const [keyInput, setKeyInput] = useState(customApiKey || '')
   const [showKey, setShowKey] = useState(false)
-  const [testState, setTestState] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle')
+  const [testState, setTestState] = useState<'idle' | 'testing' | 'ok' | 'ratelimit' | 'fail'>('idle')
   const [testError, setTestError] = useState('')
 
   const keyActive = isCustomKeyActive()
@@ -17,7 +17,9 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
     setTestState('testing')
     setTestError('')
     const result = await testApiConnection(keyInput.trim())
-    if (result.ok) {
+    if (result.ok && result.rateLimit) {
+      setTestState('ratelimit')
+    } else if (result.ok) {
       setTestState('ok')
     } else {
       setTestState('fail')
@@ -36,7 +38,6 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
     setTestState('idle')
     setTestError('')
   }
-
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fade-in">
       <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl animate-slide-up">
@@ -129,15 +130,27 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
                 className="w-full flex items-center justify-center gap-2 border border-primary-200 text-primary-600 hover:bg-primary-50 disabled:opacity-50 font-semibold py-2.5 rounded-xl transition-colors text-sm"
               >
                 {testState === 'testing' && <Loader className="w-4 h-4 animate-spin" />}
-                {testState === 'ok' && <CheckCircle className="w-4 h-4 text-green-500" />}
+                {(testState === 'ok' || testState === 'ratelimit') && <CheckCircle className="w-4 h-4 text-green-500" />}
                 {testState === 'fail' && <XCircle className="w-4 h-4 text-red-500" />}
                 {testState === 'idle' && <Key className="w-4 h-4" />}
-                {testState === 'testing' ? 'Testing...' : testState === 'ok' ? 'Connection Successful!' : testState === 'fail' ? 'Test Failed' : 'Test Connection'}
+                {testState === 'testing' ? 'Testing...'
+                  : testState === 'ok' ? 'Key Verified!'
+                  : testState === 'ratelimit' ? 'Key is Valid!'
+                  : testState === 'fail' ? 'Test Failed'
+                  : 'Test Connection'}
               </button>
               {testState === 'ok' && (
                 <p className="text-xs text-green-600 font-semibold mt-1.5 text-center">
                   Your key is working. Tap Save Settings to activate it.
                 </p>
+              )}
+              {testState === 'ratelimit' && (
+                <div className="mt-1.5 bg-amber-50 border border-amber-100 rounded-xl p-3">
+                  <p className="text-xs text-amber-800 font-semibold">Your key is valid and ready to use.</p>
+                  <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+                    Google is briefly throttling new keys — this clears within a minute. Save your key now and start chatting. It will work.
+                  </p>
+                </div>
               )}
               {testState === 'fail' && testError && (
                 <p className="text-xs text-red-600 mt-1.5 text-center">{testError}</p>

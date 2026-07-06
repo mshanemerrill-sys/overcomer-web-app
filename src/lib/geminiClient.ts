@@ -413,7 +413,7 @@ export async function generateSupportResponse(
   }
 }
 
-export async function testApiConnection(key: string): Promise<{ ok: boolean; error?: string }> {
+export async function testApiConnection(key: string): Promise<{ ok: boolean; rateLimit?: boolean; error?: string }> {
   try {
     const response = await fetch(
       `${GEMINI_API_BASE}/${DEFAULT_MODEL}:generateContent?key=${key.trim()}`,
@@ -421,18 +421,22 @@ export async function testApiConnection(key: string): Promise<{ ok: boolean; err
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
-          generationConfig: { maxOutputTokens: 10 }
+          contents: [{ role: 'user', parts: [{ text: 'Hi' }] }],
+          generationConfig: { maxOutputTokens: 5 }
         })
       }
     )
     if (response.ok) return { ok: true }
     const body = await response.text()
+    // 429 = rate limited — key IS valid, Google just throttles new keys briefly
+    if (response.status === 429) {
+      return { ok: true, rateLimit: true }
+    }
     if (response.status === 401 || response.status === 403 ||
-      (response.status === 400 && (body.includes('API_KEY_INVALID') || body.includes('API key not valid')))) {
+      (response.status === 400 && (body.includes('API_KEY_INVALID') || body.includes('API key not valid') || body.includes('INVALID_API_KEY')))) {
       return { ok: false, error: 'Invalid API key. Please check that you copied it correctly from Google AI Studio.' }
     }
-    return { ok: false, error: `API returned status ${response.status}. Please try again.` }
+    return { ok: false, error: `Unexpected status ${response.status}. Please try again in a moment.` }
   } catch {
     return { ok: false, error: 'Could not reach the API. Check your internet connection and try again.' }
   }
