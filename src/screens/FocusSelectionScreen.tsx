@@ -1,5 +1,5 @@
 import { type FocusPath } from '../lib/types'
-import { Cloud, Shield, Heart, Star, ChevronRight, ExternalLink } from 'lucide-react'
+import { Cloud, Shield, Heart, Star, ChevronRight, ExternalLink, Medal } from 'lucide-react'
 import { useAppStore } from '../store/useAppStore'
 import { useEffect } from 'react'
 
@@ -68,6 +68,14 @@ export default function FocusSelectionScreen({ onSelect }: FocusSelectionScreenP
             icon={<Star className="w-6 h-6" />}
             color="bg-accent-amber"
             onClick={() => onSelect('TESTIMONY_VICTORY')}
+          />
+
+          <FocusOptionCard
+            title="Veteran Support & Transition"
+            description="You served with honor — God sees every sacrifice. Biblical healing for PTSD, military-to-civilian transition, moral injury, and the invisible wounds of service. You are not alone."
+            icon={<Medal className="w-6 h-6" />}
+            color="bg-green-700"
+            onClick={() => onSelect('VETERANS')}
           />
         </div>
 

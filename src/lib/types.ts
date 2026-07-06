@@ -6,7 +6,7 @@ export interface User {
 }
 
 // Focus path types
-export type FocusPath = 'TOUGH_DAY' | 'SUBSTANCE_RECOVERY' | 'MENTAL_HEALTH' | 'TESTIMONY_VICTORY'
+export type FocusPath = 'TOUGH_DAY' | 'SUBSTANCE_RECOVERY' | 'MENTAL_HEALTH' | 'TESTIMONY_VICTORY' | 'VETERANS'
 
 // Chat message types
 export interface ChatMessage {

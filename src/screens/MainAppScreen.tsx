@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Chrome as Home, Quote, MessageCircle, BookOpen, ScrollText, TriangleAlert as AlertTriangle, User, Settings, ExternalLink, DoorOpen } from 'lucide-react'
+import { Chrome as Home, Quote, MessageCircle, BookOpen, ScrollText, TriangleAlert as AlertTriangle, User, Settings, ExternalLink, DoorOpen, Medal } from 'lucide-react'
 import { useAppStore } from '../store/useAppStore'
 import FreedomTab from './tabs/FreedomTab'
 import InspirationTab from './tabs/InspirationTab'
@@ -7,6 +7,7 @@ import CompanionTab from './tabs/CompanionTab'
 import JournalTab from './tabs/JournalTab'
 import BibleTab from './tabs/BibleTab'
 import ReentryTab from './tabs/ReentryTab'
+import VeteransTab from './tabs/VeteransTab'
 import SOSOverlay from '../components/SOSOverlay'
 import type { FocusPath } from '../lib/types'
 
@@ -28,6 +29,7 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
       case 'MENTAL_HEALTH': return 'Wellness'
       case 'TOUGH_DAY': return 'Tough Day'
       case 'TESTIMONY_VICTORY': return 'Victory'
+      case 'VETERANS': return 'Veteran'
       default: return 'Select'
     }
   }
@@ -89,7 +91,7 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
         {activeTab === 'companion' && <CompanionTab />}
         {activeTab === 'journal' && <JournalTab />}
         {activeTab === 'bible' && <BibleTab />}
-        {activeTab === 'reentry' && <ReentryTab />}
+        {activeTab === 'reentry' && (userPath === 'VETERANS' ? <VeteransTab /> : <ReentryTab />)}
       </main>
 
       {/* Bottom Navigation */}
@@ -126,8 +128,8 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
             onClick={() => setActiveTab('bible')}
           />
           <NavButton
-            icon={<DoorOpen className="w-5 h-5" />}
-            label="Re-entry"
+            icon={userPath === 'VETERANS' ? <Medal className="w-5 h-5" /> : <DoorOpen className="w-5 h-5" />}
+            label={userPath === 'VETERANS' ? ['Veteran', 'Support'] : 'Re-entry'}
             active={activeTab === 'reentry'}
             onClick={() => setActiveTab('reentry')}
           />

@@ -5,7 +5,7 @@ import { academyLessons } from '../../lib/data'
 import {
   Target, Star, BookOpen, ChevronDown, ChevronUp, Check,
   Wind, MapPin, Phone, ExternalLink, MessageCircle, RefreshCw, Download,
-  X, Search, ArrowRight
+  X, Search, ArrowRight, Medal
 } from 'lucide-react'
 import type { FocusPath, VerseOfTheDay, AcademyLesson } from '../../lib/types'
 
@@ -26,7 +26,8 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
     SUBSTANCE_RECOVERY: 'An OverComer has submitted their life wholly to Christ and no longer fights FOR victory over addiction — rather FROM a position of victory. I AM Loved By God. I AM NOT Who Others Say I Am. I AM NOT Who I Used To Be. I AM Who God Says I Am.',
     MENTAL_HEALTH: 'My mind belongs to Christ. God has not given me a spirit of fear, but of power, love, and a sound mind. I cast every anxious thought on Him, for He cares for me. I AM NOT Who I Used To Be — I AM a New Creation.',
     TOUGH_DAY: 'This day does not define me. Greater is He that is in me than he that is in the world. I choose to seek God first today. His grace is sufficient for me.',
-    TESTIMONY_VICTORY: 'I am more than a conqueror through Christ who loves me! They overcame him by the blood of the Lamb and by the word of their testimony. My story is not over — God is still writing it!'
+    TESTIMONY_VICTORY: 'I am more than a conqueror through Christ who loves me! They overcame him by the blood of the Lamb and by the word of their testimony. My story is not over — God is still writing it!',
+    VETERANS: 'I served with honor and I carry that honor still. My battles do not define me — my Creator does. The Lord is my strength and my shield. He has not given me a spirit of fear, but of power, love, and a sound mind. I am still being shaped by the God who knew me before I put on the uniform.'
   }
 
   useEffect(() => {
@@ -87,6 +88,9 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
       {/* Support & Church Locator */}
       <SupportLocatorCard />
 
+      {/* Veteran Crisis Banner */}
+      {path === 'VETERANS' && <VeteranCrisisBanner />}
+
       {/* Calming Breathing Support */}
       <BreathingCard />
 
@@ -133,6 +137,7 @@ function getDefaultStruggle(path: FocusPath): string {
     case 'MENTAL_HEALTH': return 'Anxiety & Depression'
     case 'TESTIMONY_VICTORY': return 'Victorious Breakthrough'
     case 'TOUGH_DAY': return 'Daily Stress'
+    case 'VETERANS': return 'Military Transition & PTSD'
     default: return 'Substance Use'
   }
 }
@@ -195,7 +200,8 @@ function FreedomCounterCard({
     SUBSTANCE_RECOVERY: 'Days of Freedom',
     MENTAL_HEALTH: 'Days of Peace',
     TOUGH_DAY: 'Days of Strength',
-    TESTIMONY_VICTORY: 'Days of Victory'
+    TESTIMONY_VICTORY: 'Days of Victory',
+    VETERANS: 'Days of Healing'
   }
 
   return (
@@ -232,7 +238,8 @@ function DeclarationCard({
     SUBSTANCE_RECOVERY: 'My OverComer Creed',
     MENTAL_HEALTH: 'My Mental Peace Covenant',
     TOUGH_DAY: "Today's Declaration",
-    TESTIMONY_VICTORY: 'My Victory Declaration'
+    TESTIMONY_VICTORY: 'My Victory Declaration',
+    VETERANS: "My Warrior's Covenant"
   }
 
   return (
@@ -896,6 +903,63 @@ function SettingsModal({
           </button>
         </div>
       </div>
+    </div>
+  )
+}
+
+function VeteranCrisisBanner() {
+  return (
+    <div className="bg-gradient-to-br from-green-700 to-teal-700 rounded-2xl p-4 text-white">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+          <Medal className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <p className="font-bold text-sm">Veteran Support</p>
+          <p className="text-white/80 text-xs">Resources & crisis help — always available</p>
+        </div>
+      </div>
+      <div className="space-y-2">
+        <a
+          href="https://www.veteranscrisisline.net"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between p-3 bg-white/15 hover:bg-white/25 rounded-xl transition-colors"
+        >
+          <div>
+            <p className="font-bold text-sm">Veterans Crisis Line</p>
+            <p className="text-white/70 text-xs">Call/text 988, press 1 — 24/7 confidential</p>
+          </div>
+          <Phone className="w-4 h-4 text-white/70" />
+        </a>
+        <a
+          href="https://www.mentalhealth.va.gov"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between p-3 bg-white/15 hover:bg-white/25 rounded-xl transition-colors"
+        >
+          <div>
+            <p className="font-bold text-sm">VA Mental Health</p>
+            <p className="text-white/70 text-xs">Free care for eligible veterans — mentalhealth.va.gov</p>
+          </div>
+          <ExternalLink className="w-4 h-4 text-white/70" />
+        </a>
+        <a
+          href="https://www.mightyoaksprograms.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between p-3 bg-white/15 hover:bg-white/25 rounded-xl transition-colors"
+        >
+          <div>
+            <p className="font-bold text-sm">Mighty Oaks Foundation</p>
+            <p className="text-white/70 text-xs">Christ-centered warrior healing programs</p>
+          </div>
+          <ExternalLink className="w-4 h-4 text-white/70" />
+        </a>
+      </div>
+      <p className="text-white/60 text-xs mt-3 text-center">
+        Tap "Veteran Support" in the bottom nav for full resources + local zip code search
+      </p>
     </div>
   )
 }
