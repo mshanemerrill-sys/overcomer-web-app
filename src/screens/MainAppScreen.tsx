@@ -85,7 +85,7 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {activeTab === 'freedom' && <FreedomTab onNavigateToCompanion={() => setActiveTab('companion')} />}
-        {activeTab === 'inspiration' && <InspirationTab />}
+        {activeTab === 'inspiration' && <InspirationTab onNavigateToCompanion={() => setActiveTab('companion')} />}
         {activeTab === 'companion' && <CompanionTab />}
         {activeTab === 'journal' && <JournalTab />}
         {activeTab === 'bible' && <BibleTab />}

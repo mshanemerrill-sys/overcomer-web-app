@@ -17,7 +17,9 @@ export default function CompanionTab() {
     addChatMessage,
     clearChatMessages,
     saveCurrentChat,
-    userPath
+    userPath,
+    pendingCompanionMessage,
+    setPendingCompanionMessage,
   } = useAppStore()
 
   const hasApiKey = Boolean(getApiKey())
@@ -29,6 +31,30 @@ export default function CompanionTab() {
   useEffect(() => {
     scrollToBottom()
   }, [chatMessages])
+
+  // Auto-send a message injected by another tab (e.g. "Renew My Mind" from Inspiration)
+  useEffect(() => {
+    if (!pendingCompanionMessage) return
+    const message = pendingCompanionMessage
+    setPendingCompanionMessage(null)
+
+    addChatMessage({ text: message, isUser: true, timestamp: Date.now() })
+    setIsLoading(true)
+    generateSupportResponse(message, chatMessages, userPath || 'SUBSTANCE_RECOVERY')
+      .then(response => {
+        if (response === 'NO_API_KEY_SETUP') {
+          addChatMessage({ text: '__API_KEY_NEEDED__', isUser: false, timestamp: Date.now() })
+        } else {
+          addChatMessage({ text: response, isUser: false, timestamp: Date.now() })
+        }
+      })
+      .catch(() => {
+        addChatMessage({ text: 'I am here with you. Please try again in a moment.', isUser: false, timestamp: Date.now() })
+      })
+      .finally(() => setIsLoading(false))
+  // runs once on mount to consume the pending message
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { inspirationQuotes } from '../../lib/data'
 import { Quote, Heart, RefreshCw, Moon, Shield, Sparkles, Crown, FileText, Download } from 'lucide-react'
+import { useAppStore } from '../../store/useAppStore'
 import type { InspirationQuote } from '../../lib/types'
 
 type Category = 'OVERCOMING_CRAVINGS' | 'PEACE_ANXIETY' | 'STRENGTH_FAITH' | 'GRACE_FORGIVENESS' | 'IAM_DECLARATIONS'
@@ -13,14 +14,22 @@ const categoryInfo: Record<Category, { label: string; icon: React.ReactNode; col
   GRACE_FORGIVENESS: { label: 'Grace & Forgiveness', icon: <Heart className="w-5 h-5" />, color: 'bg-accent-coral' }
 }
 
-export default function InspirationTab() {
+export default function InspirationTab({ onNavigateToCompanion }: { onNavigateToCompanion: () => void }) {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
+  const { setPendingCompanionMessage } = useAppStore()
 
   const filteredQuotes = selectedCategory
     ? inspirationQuotes.filter(q => q.category === selectedCategory)
     : inspirationQuotes
 
   const categories = Object.keys(categoryInfo) as Category[]
+
+  const handleRenewMind = (quote: InspirationQuote) => {
+    setPendingCompanionMessage(
+      `I want to renew my mind on this scripture: "${quote.text}" — ${quote.reference}. Please help me by: (1) giving me a personal declaration I can speak aloud based on this truth, (2) a short reflection on how this applies to my life right now, and (3) a prayer I can pray to seal this truth in my heart.`
+    )
+    onNavigateToCompanion()
+  }
 
   return (
     <div className="p-4 pb-8">
@@ -80,7 +89,7 @@ export default function InspirationTab() {
       {/* Quotes Grid */}
       <div className="space-y-4">
         {filteredQuotes.map(quote => (
-          <QuoteCard key={quote.id} quote={quote} />
+          <QuoteCard key={quote.id} quote={quote} onRenewMind={handleRenewMind} />
         ))}
       </div>
 
@@ -133,7 +142,7 @@ export default function InspirationTab() {
   )
 }
 
-function QuoteCard({ quote }: { quote: InspirationQuote }) {
+function QuoteCard({ quote, onRenewMind }: { quote: InspirationQuote; onRenewMind: (quote: InspirationQuote) => void }) {
   const catInfo = categoryInfo[quote.category]
 
   return (
@@ -152,7 +161,10 @@ function QuoteCard({ quote }: { quote: InspirationQuote }) {
         </div>
       </div>
 
-      <button className="mt-4 w-full flex items-center justify-center gap-2 text-primary-500 font-semibold text-sm hover:bg-primary-50 py-2 rounded-xl transition-colors">
+      <button
+        onClick={() => onRenewMind(quote)}
+        className="mt-4 w-full flex items-center justify-center gap-2 text-primary-500 font-semibold text-sm hover:bg-primary-50 py-2 rounded-xl transition-colors"
+      >
         <RefreshCw className="w-4 h-4" />
         Renew My Mind
       </button>

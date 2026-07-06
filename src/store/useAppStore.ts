@@ -43,6 +43,10 @@ interface AppState {
   customApiKey: string | null
   setCustomApiKey: (key: string | null) => void
 
+  // Pending companion message (set by other tabs, cleared after use)
+  pendingCompanionMessage: string | null
+  setPendingCompanionMessage: (msg: string | null) => void
+
   // Support contacts
   supportContacts: SupportContact[]
   addSupportContact: (contact: Omit<SupportContact, 'id'>) => void
@@ -170,6 +174,10 @@ export const useAppStore = create<AppState>()(
         }
         set({ customApiKey: key })
       },
+
+      // Pending companion message
+      pendingCompanionMessage: null,
+      setPendingCompanionMessage: (msg) => set({ pendingCompanionMessage: msg }),
 
       // Support contacts
       supportContacts: [],
