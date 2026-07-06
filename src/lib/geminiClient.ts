@@ -294,8 +294,14 @@ async function safeCallGemini(
 
         if (!response.ok) {
           const errorText = await response.text()
-          // Auth/key errors — no point retrying with same key
-          if (response.status === 400 || response.status === 401 || response.status === 403) {
+          // True auth/key errors — check status AND body content
+          const isAuthError = response.status === 401 || response.status === 403 ||
+            (response.status === 400 && (
+              errorText.includes('API_KEY_INVALID') ||
+              errorText.includes('API key not valid') ||
+              errorText.includes('INVALID_API_KEY')
+            ))
+          if (isAuthError) {
             throw new Error(`KEY_ERROR: ${response.status} - ${errorText}`)
           }
           if (response.status === 503 || response.status === 429 || response.status === 500) {
@@ -375,9 +381,9 @@ export async function generateSupportResponse(
     const errorMessage = (error as Error).message
     const isKeyError = errorMessage === 'NO_API_KEY' ||
       errorMessage.startsWith('KEY_ERROR') ||
-      errorMessage.toLowerCase().includes('api key') ||
+      errorMessage.toLowerCase().includes('api key not valid') ||
       errorMessage.includes('API_KEY_INVALID') ||
-      errorMessage.includes('INVALID_ARGUMENT') ||
+      errorMessage.includes('INVALID_API_KEY') ||
       errorMessage.includes('403') ||
       errorMessage.includes('401')
     if (isKeyError) {
@@ -385,6 +391,9 @@ export async function generateSupportResponse(
     }
     if (errorMessage.includes('429')) {
       return `We reached a temporary rate limit. Take a deep breath — wait 10-15 seconds and try again. Remember Psalm 27:14: "Wait for the Lord; be strong and take heart."`
+    }
+    if (errorMessage.includes('400')) {
+      return `I received an unexpected response. Please try rephrasing your message. If the issue continues, tap the Key icon to verify your API key is entered correctly.`
     }
     return `I am here for you. I had trouble connecting right now — please try again in a moment. While you wait, stand firm on Romans 8:37: "We are more than conquerors through Him who loved us."`
   }

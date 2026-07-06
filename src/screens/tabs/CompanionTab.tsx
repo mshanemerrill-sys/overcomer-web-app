@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../../store/useAppStore'
-import { generateSupportResponse, checkDailyLimit, getTodayUsageCount, isCustomKeyActive, getApiKey } from '../../lib/geminiClient'
+import { generateSupportResponse, checkDailyLimit, getTodayUsageCount, isCustomKeyActive } from '../../lib/geminiClient'
 import { Send, Save, Trash2, History, Loader as Loader2, Key, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react'
 import ApiSettingsDialog from '../../components/ApiSettingsDialog'
 
@@ -20,9 +20,10 @@ export default function CompanionTab() {
     userPath,
     pendingCompanionMessage,
     setPendingCompanionMessage,
+    customApiKey,
   } = useAppStore()
 
-  const hasApiKey = Boolean(getApiKey())
+  const hasApiKey = Boolean(customApiKey?.trim())
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
