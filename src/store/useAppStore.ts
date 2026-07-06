@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User, FocusPath, VictoryLog, FreedomGoal, SavedChat, ChatMessage, VerseOfTheDay, SupportContact } from '../lib/types'
+import type { BibleVersion } from '../lib/bibleData'
 import { getFallbackVerse } from '../lib/geminiClient'
 
 interface AppState {
@@ -46,6 +47,10 @@ interface AppState {
   // Pending companion message (set by other tabs, cleared after use)
   pendingCompanionMessage: string | null
   setPendingCompanionMessage: (msg: string | null) => void
+
+  // Preferred Bible version
+  bibleVersion: BibleVersion
+  setBibleVersion: (version: BibleVersion) => void
 
   // Support contacts
   supportContacts: SupportContact[]
@@ -179,6 +184,10 @@ export const useAppStore = create<AppState>()(
       pendingCompanionMessage: null,
       setPendingCompanionMessage: (msg) => set({ pendingCompanionMessage: msg }),
 
+      // Preferred Bible version
+      bibleVersion: 'NIV',
+      setBibleVersion: (version) => set({ bibleVersion: version }),
+
       // Support contacts
       supportContacts: [],
       addSupportContact: (contact) => {
@@ -234,6 +243,7 @@ export const useAppStore = create<AppState>()(
         supportContacts: state.supportContacts,
         completedLessons: state.completedLessons,
         lessonAnswers: state.lessonAnswers,
+        bibleVersion: state.bibleVersion,
       }),
     }
   )

@@ -1,13 +1,16 @@
 import { useState } from 'react'
-import { biblePassages } from '../../lib/data'
 import { lookupScripture } from '../../lib/geminiClient'
-import { BookOpen, Search, Shield, Loader as Loader2, ChevronRight, ExternalLink, FileText, Download } from 'lucide-react'
+import { useAppStore } from '../../store/useAppStore'
+import { versionedBiblePassages, bibleVersionLabels } from '../../lib/bibleData'
+import type { BibleVersion } from '../../lib/bibleData'
+import { BookOpen, Search, Shield, Loader as Loader2, ChevronRight, ExternalLink, FileText, Download, BookMarked } from 'lucide-react'
 import type { ScriptureResult } from '../../lib/types'
 
 type BibleSubTab = 'reader' | 'study' | 'creed' | 'philosophy'
 
 export default function BibleTab() {
   const [activeSubTab, setActiveSubTab] = useState<BibleSubTab>('reader')
+  const { bibleVersion, setBibleVersion } = useAppStore()
 
   return (
     <div className="flex flex-col h-full">
@@ -38,7 +41,7 @@ export default function BibleTab() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 pb-8">
-        {activeSubTab === 'reader' && <BibleReader />}
+        {activeSubTab === 'reader' && <BibleReader version={bibleVersion} onVersionChange={setBibleVersion} />}
         {activeSubTab === 'study' && <AIStudyGuide />}
         {activeSubTab === 'creed' && <CreedAndShield />}
         {activeSubTab === 'philosophy' && <PhilosophyResources />}
@@ -47,16 +50,41 @@ export default function BibleTab() {
   )
 }
 
-function BibleReader() {
-  const [selectedPassage, setSelectedPassage] = useState<typeof biblePassages[0] | null>(null)
+const ALL_VERSIONS = Object.keys(bibleVersionLabels) as BibleVersion[]
+
+function BibleReader({ version, onVersionChange }: { version: BibleVersion; onVersionChange: (v: BibleVersion) => void }) {
+  const [selectedPassage, setSelectedPassage] = useState<typeof versionedBiblePassages[0] | null>(null)
 
   return (
     <div>
+      {/* Version Picker — always visible */}
+      <div className="mb-4">
+        <div className="flex items-center gap-2 mb-2">
+          <BookMarked className="w-4 h-4 text-primary-500" />
+          <span className="text-sm font-semibold text-gray-700">Bible Version</span>
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          {ALL_VERSIONS.map(v => (
+            <button
+              key={v}
+              onClick={() => onVersionChange(v)}
+              className={`flex-shrink-0 px-4 py-2 rounded-full font-semibold text-sm transition-colors ${
+                version === v
+                  ? 'bg-primary-500 text-white shadow-sm'
+                  : 'bg-white border border-gray-200 text-gray-600 hover:border-primary-300 hover:text-primary-600'
+              }`}
+            >
+              {bibleVersionLabels[v]}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {!selectedPassage ? (
         <>
           <h2 className="text-xl font-bold text-gray-900 mb-4">Select a Passage</h2>
           <div className="space-y-3">
-            {biblePassages.map((passage, index) => (
+            {versionedBiblePassages.map((passage, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedPassage(passage)}
@@ -77,7 +105,7 @@ function BibleReader() {
                       ))}
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
                 </div>
               </button>
             ))}
@@ -97,15 +125,38 @@ function BibleReader() {
             <div className="bg-gradient-to-r from-primary-400 to-primary-600 p-4 text-white">
               <h2 className="text-xl font-bold">{selectedPassage.book} {selectedPassage.chapter}</h2>
               <p className="text-sm text-white/80">{selectedPassage.title}</p>
+              <span className="inline-block mt-2 bg-white/20 text-white text-xs font-bold px-2.5 py-1 rounded-full">
+                {bibleVersionLabels[version]}
+              </span>
             </div>
 
             <div className="p-5 space-y-4">
-              {selectedPassage.verses.map(verse => (
+              {selectedPassage.versions[version].map(verse => (
                 <p key={verse.number} className="text-gray-700 leading-relaxed">
                   <sup className="text-primary-500 font-semibold text-sm">{verse.number}</sup>{' '}
                   {verse.text}
                 </p>
               ))}
+            </div>
+
+            {/* Version switcher inside passage */}
+            <div className="px-5 pb-5 border-t border-gray-100 pt-4">
+              <p className="text-xs text-gray-500 mb-2 font-medium">Read in another version:</p>
+              <div className="flex gap-2 flex-wrap">
+                {ALL_VERSIONS.map(v => (
+                  <button
+                    key={v}
+                    onClick={() => onVersionChange(v)}
+                    className={`px-3 py-1.5 rounded-full font-semibold text-xs transition-colors ${
+                      version === v
+                        ? 'bg-primary-500 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-primary-100 hover:text-primary-600'
+                    }`}
+                  >
+                    {bibleVersionLabels[v]}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
