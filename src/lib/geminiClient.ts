@@ -143,8 +143,26 @@ Instead say: "You know I am your OverComer Companion and I am here to help you â
 Always offer a sample prayer or summary they can bring to God themselves.`
 
 export function getApiKey(): string | null {
-  const customKey = localStorage.getItem('overcomer_custom_api_key')
-  return customKey && customKey.trim() !== '' ? customKey.trim() : null
+  // Primary location written by setCustomApiKey
+  const directKey = localStorage.getItem('overcomer_custom_api_key')
+  if (directKey && directKey.trim() !== '') return directKey.trim()
+
+  // Fallback: Zustand persist writes the whole state here; recover the key if direct entry is missing
+  try {
+    const stored = localStorage.getItem('overcomer-storage')
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      const key = parsed?.state?.customApiKey
+      if (key && key.trim() !== '') {
+        // Re-sync so future reads hit the fast path
+        localStorage.setItem('overcomer_custom_api_key', key.trim())
+        return key.trim()
+      }
+    }
+  } catch {
+    // ignore parse errors
+  }
+  return null
 }
 
 function isCustomKeyActive(): boolean {

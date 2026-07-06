@@ -83,6 +83,11 @@ export const useAppStore = create<AppState>()(
         if (!state.verseOfTheDay) {
           set({ verseOfTheDay: getFallbackVerse() })
         }
+        // Ensure the API key is written to the standalone localStorage entry
+        // that geminiClient.getApiKey() reads as its primary source.
+        if (state.customApiKey && state.customApiKey.trim() !== '') {
+          localStorage.setItem('overcomer_custom_api_key', state.customApiKey.trim())
+        }
         set({ isLoading: false })
       },
 
