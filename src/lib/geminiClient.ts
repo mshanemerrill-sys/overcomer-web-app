@@ -350,8 +350,22 @@ export async function generateSupportResponse(
     return `You have reached your daily free usage limit of 30 responses/day on the shared fallback key.\n\nTo get unlimited replies instantly, tap the Key icon at the top of the screen to enter your own completely FREE Gemini API key from Google AI Studio. It takes under a minute, requires no credit card, and ensures you have a private, dedicated channel!`
   }
 
+  // Filter out special marker messages and strip leading model-role messages.
+  // Gemini requires the contents array to start with a 'user' role message —
+  // the in-app greeting is role 'model', which causes a 400 from the API.
+  const cleanHistory = history.filter(
+    msg => msg.text !== '__API_KEY_NEEDED__' && msg.text.trim() !== ''
+  )
+
+  // Drop any leading model messages so the first content entry is always 'user'
+  let startIdx = 0
+  while (startIdx < cleanHistory.length && !cleanHistory[startIdx].isUser) {
+    startIdx++
+  }
+  const trimmedHistory = cleanHistory.slice(startIdx)
+
   const contents = [
-    ...history.map(msg => ({
+    ...trimmedHistory.map(msg => ({
       role: msg.isUser ? 'user' : 'model',
       parts: [{ text: msg.text }]
     })),
@@ -396,6 +410,31 @@ export async function generateSupportResponse(
       return `I received an unexpected response. Please try rephrasing your message. If the issue continues, tap the Key icon to verify your API key is entered correctly.`
     }
     return `I am here for you. I had trouble connecting right now — please try again in a moment. While you wait, stand firm on Romans 8:37: "We are more than conquerors through Him who loved us."`
+  }
+}
+
+export async function testApiConnection(key: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const response = await fetch(
+      `${GEMINI_API_BASE}/${DEFAULT_MODEL}:generateContent?key=${key.trim()}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: 'Hello' }] }],
+          generationConfig: { maxOutputTokens: 10 }
+        })
+      }
+    )
+    if (response.ok) return { ok: true }
+    const body = await response.text()
+    if (response.status === 401 || response.status === 403 ||
+      (response.status === 400 && (body.includes('API_KEY_INVALID') || body.includes('API key not valid')))) {
+      return { ok: false, error: 'Invalid API key. Please check that you copied it correctly from Google AI Studio.' }
+    }
+    return { ok: false, error: `API returned status ${response.status}. Please try again.` }
+  } catch {
+    return { ok: false, error: 'Could not reach the API. Check your internet connection and try again.' }
   }
 }
 

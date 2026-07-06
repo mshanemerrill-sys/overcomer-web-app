@@ -1,14 +1,29 @@
 import { useState } from 'react'
-import { X, Key, Eye, EyeOff, Info } from 'lucide-react'
+import { X, Key, Eye, EyeOff, Info, CircleCheck as CheckCircle, Circle as XCircle, Loader } from 'lucide-react'
 import { useAppStore } from '../store/useAppStore'
-import { isCustomKeyActive } from '../lib/geminiClient'
+import { isCustomKeyActive, testApiConnection } from '../lib/geminiClient'
 
 export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) {
   const { customApiKey, setCustomApiKey } = useAppStore()
   const [keyInput, setKeyInput] = useState(customApiKey || '')
   const [showKey, setShowKey] = useState(false)
+  const [testState, setTestState] = useState<'idle' | 'testing' | 'ok' | 'fail'>('idle')
+  const [testError, setTestError] = useState('')
 
   const keyActive = isCustomKeyActive()
+
+  const handleTest = async () => {
+    if (!keyInput.trim()) return
+    setTestState('testing')
+    setTestError('')
+    const result = await testApiConnection(keyInput.trim())
+    if (result.ok) {
+      setTestState('ok')
+    } else {
+      setTestState('fail')
+      setTestError(result.error || 'Connection failed.')
+    }
+  }
 
   const handleSave = () => {
     setCustomApiKey(keyInput.trim() || null)
@@ -18,6 +33,8 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
   const handleClear = () => {
     setKeyInput('')
     setCustomApiKey(null)
+    setTestState('idle')
+    setTestError('')
   }
 
   return (
@@ -73,7 +90,7 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
               <input
                 type={showKey ? 'text' : 'password'}
                 value={keyInput}
-                onChange={(e) => setKeyInput(e.target.value)}
+                onChange={(e) => { setKeyInput(e.target.value); setTestState('idle') }}
                 placeholder="Enter your API key (AIzaSy...)"
                 className="input-field pr-12"
               />
@@ -102,6 +119,31 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
               {' '}— no credit card required.
             </p>
           </div>
+
+          {/* Test Connection */}
+          {keyInput.trim() && (
+            <div>
+              <button
+                onClick={handleTest}
+                disabled={testState === 'testing'}
+                className="w-full flex items-center justify-center gap-2 border border-primary-200 text-primary-600 hover:bg-primary-50 disabled:opacity-50 font-semibold py-2.5 rounded-xl transition-colors text-sm"
+              >
+                {testState === 'testing' && <Loader className="w-4 h-4 animate-spin" />}
+                {testState === 'ok' && <CheckCircle className="w-4 h-4 text-green-500" />}
+                {testState === 'fail' && <XCircle className="w-4 h-4 text-red-500" />}
+                {testState === 'idle' && <Key className="w-4 h-4" />}
+                {testState === 'testing' ? 'Testing...' : testState === 'ok' ? 'Connection Successful!' : testState === 'fail' ? 'Test Failed' : 'Test Connection'}
+              </button>
+              {testState === 'ok' && (
+                <p className="text-xs text-green-600 font-semibold mt-1.5 text-center">
+                  Your key is working. Tap Save Settings to activate it.
+                </p>
+              )}
+              {testState === 'fail' && testError && (
+                <p className="text-xs text-red-600 mt-1.5 text-center">{testError}</p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Actions */}
@@ -125,4 +167,3 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
     </div>
   )
 }
-
