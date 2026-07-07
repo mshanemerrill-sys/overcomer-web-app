@@ -5,7 +5,7 @@ import { academyLessons } from '../../lib/data'
 import {
   Target, Star, BookOpen, ChevronDown, ChevronUp, Check,
   Wind, MapPin, Phone, ExternalLink, MessageCircle, RefreshCw, Download,
-  X, Search, ArrowRight, Medal
+  X, Search, ArrowRight, Medal, Heart, Globe
 } from 'lucide-react'
 import type { FocusPath, VerseOfTheDay, AcademyLesson } from '../../lib/types'
 
@@ -60,6 +60,9 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
         isLoading={isLoadingVerse}
         onRefresh={refreshVerse}
       />
+
+      {/* The Faith Connection */}
+      <FaithConnectionCard />
 
       {/* Freedom Day Counter */}
       <FreedomCounterCard
@@ -960,6 +963,57 @@ function VeteranCrisisBanner() {
       <p className="text-white/60 text-xs mt-3 text-center">
         Tap "Veteran Support" in the bottom nav for full resources + local zip code search
       </p>
+    </div>
+  )
+}
+
+/* ─── The Faith Connection Card ─────────────────────────────────── */
+function FaithConnectionCard() {
+  return (
+    <div className="rounded-2xl overflow-hidden shadow-md border border-primary-100">
+      {/* Header band */}
+      <div className="bg-gradient-to-r from-primary-500 to-primary-400 px-5 py-4 flex items-center gap-3">
+        <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
+          <Heart className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <p className="text-white font-extrabold text-base leading-tight">The Faith Connection</p>
+          <p className="text-white/80 text-xs">Serving God's people — completely free</p>
+        </div>
+      </div>
+
+      {/* Body */}
+      <div className="bg-white px-5 py-4 space-y-3">
+        <p className="text-gray-700 text-sm leading-relaxed">
+          Every course, resource, and tool in this app is provided at <strong className="text-primary-600">no cost</strong> through
+          the generosity of The Faith Connection ministry. Your donation helps us keep this guidance
+          free for everyone who needs it — no matter where they are in their journey.
+        </p>
+
+        {/* Donate CTA */}
+        <a
+          href="https://www.thefaithconnection.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full bg-primary-500 hover:bg-primary-600 active:bg-primary-700 text-white font-bold py-3 rounded-xl transition-colors shadow-sm"
+        >
+          <Heart className="w-4 h-4" />
+          Donate &amp; Keep Services Free
+          <ExternalLink className="w-4 h-4 opacity-80" />
+        </a>
+
+        {/* Secondary link */}
+        <a
+          href="https://www.thefaithconnection.org"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-1.5 text-primary-500 hover:text-primary-700 text-sm font-semibold transition-colors"
+        >
+          <Globe className="w-4 h-4" />
+          Visit thefaithconnection.org
+          <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+        </a>
+      </div>
     </div>
   )
 }
