@@ -148,7 +148,7 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
                 <div className="mt-1.5 bg-amber-50 border border-amber-100 rounded-xl p-3">
                   <p className="text-xs text-amber-800 font-semibold">Your key is valid and ready to use.</p>
                   <p className="text-xs text-amber-700 mt-1 leading-relaxed">
-                    Google is briefly throttling new keys — this clears within a minute. Save your key now and start chatting. It will work.
+                    Google is briefly throttling your key — this usually clears within a few minutes. Save your key now and start chatting. It will work.
                   </p>
                 </div>
               )}

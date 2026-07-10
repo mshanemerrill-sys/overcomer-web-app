@@ -3,6 +3,9 @@ import type { ChatMessage, VerseOfTheDay, ScriptureResult, DistortionAnalysis, L
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models'
 const DEFAULT_MODEL = 'gemini-2.0-flash'
 
+const MAX_RETRIES = 4
+const INITIAL_BACKOFF_MS = 1500
+
 const SYSTEM_INSTRUCTION = `You are "OverComer Companion", a kind, deeply compassionate Christ-centered companion for individuals struggling with addiction, life struggles, anxiety, depression, mental health challenges, or any weight that is controlling their life. You serve under the OverComer Recovery Ministries, which meets at The Refuge, Conway SC — a Christ-centered safe place for those who are struggling.
 
 ═══════════════════════════════════════════════════
@@ -262,23 +265,60 @@ function getTodayUsageCount(): number {
 
 export { getTodayUsageCount, isCustomKeyActive }
 
+function isRetryable429(errorBody: string): boolean {
+  const lower = errorBody.toLowerCase()
+  // Quota-exhausted / daily-limit 429s are NOT retryable in-session — retrying
+  // just burns the user's patience. Only transient per-minute throttles retry.
+  if (lower.includes('quota') && !lower.includes('per minute') && !lower.includes('perminute')) {
+    return false
+  }
+  if (lower.includes('daily') || lower.includes('daily_limit') || lower.includes('limit: 0')) {
+    return false
+  }
+  return true
+}
+
 async function callGemini(
   request: unknown,
   apiKey: string,
   model: string
 ): Promise<string> {
-  const response = await fetch(
-    `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request),
-    }
-  )
+  let lastError: Error | null = null
 
-  if (!response.ok) {
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    const response = await fetch(
+      `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(request),
+      }
+    )
+
+    if (response.ok) {
+      const data = await response.json()
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text
+      return text || 'I am here with you. Let us lean on God\'s word together.'
+    }
+
     const errorText = await response.text()
-    if (response.status === 429) throw new Error('RATE_LIMIT')
+
+    if (response.status === 429) {
+      // Non-retryable quota exhaustion — throw immediately so the fallback
+      // model list in safeCallGemini gets a chance, or the user sees a real error.
+      if (!isRetryable429(errorText)) {
+        throw new Error('QUOTA_EXHAUSTED')
+      }
+      // Transient per-minute throttle — back off and retry the same model.
+      lastError = new Error('RATE_LIMIT')
+      if (attempt < MAX_RETRIES) {
+        const delay = INITIAL_BACKOFF_MS * Math.pow(2, attempt) + Math.random() * 500
+        await new Promise(resolve => setTimeout(resolve, delay))
+        continue
+      }
+      throw lastError
+    }
+
     if (response.status === 401 || response.status === 403 ||
       (response.status === 400 && (
         errorText.includes('API_KEY_INVALID') ||
@@ -287,12 +327,19 @@ async function callGemini(
       ))) {
       throw new Error('KEY_ERROR')
     }
+
+    // 5xx and other server errors — retry with backoff
+    if (response.status >= 500 && attempt < MAX_RETRIES) {
+      lastError = new Error(`API_ERROR:${response.status}`)
+      const delay = INITIAL_BACKOFF_MS * Math.pow(2, attempt) + Math.random() * 500
+      await new Promise(resolve => setTimeout(resolve, delay))
+      continue
+    }
+
     throw new Error(`API_ERROR:${response.status}`)
   }
 
-  const data = await response.json()
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text
-  return text || 'I am here with you. Let us lean on God\'s word together.'
+  throw lastError || new Error('UNKNOWN')
 }
 
 async function safeCallGemini(
@@ -302,10 +349,11 @@ async function safeCallGemini(
   const apiKey = getApiKey()
   if (!apiKey) throw new Error('NO_API_KEY')
 
-  // Try primary model, then fallback
+  // Try primary model, then fallbacks. Rate limits and quota errors fall
+  // through to the next model (a different model may have available quota).
   const models = model === DEFAULT_MODEL
-    ? [DEFAULT_MODEL, 'gemini-1.5-flash']
-    : [model, DEFAULT_MODEL]
+    ? [DEFAULT_MODEL, 'gemini-1.5-flash', 'gemini-1.5-flash-8b']
+    : [model, DEFAULT_MODEL, 'gemini-1.5-flash']
 
   let lastErr: Error = new Error('UNKNOWN')
 
@@ -315,11 +363,12 @@ async function safeCallGemini(
     } catch (err) {
       lastErr = err as Error
       const msg = lastErr.message
-      // Key errors and rate limits — no point trying another model
-      if (msg === 'NO_API_KEY' || msg === 'KEY_ERROR' || msg === 'RATE_LIMIT') {
+      // Key errors mean the key itself is bad — no model will work.
+      if (msg === 'NO_API_KEY' || msg === 'KEY_ERROR') {
         throw lastErr
       }
-      // Server error on first model → try fallback
+      // RATE_LIMIT and QUOTA_EXHAUSTED fall through to try the next model,
+      // which may have separate quota. Only throw if all models fail.
     }
   }
 
@@ -383,7 +432,10 @@ export async function generateSupportResponse(
       return `NO_API_KEY_SETUP`
     }
     if (msg === 'RATE_LIMIT') {
-      return `Google is briefly throttling your new key. This is normal and clears within a minute. Please wait 60 seconds and try again. Remember Psalm 27:14: "Wait for the Lord; be strong and take heart."`
+      return `Google's free tier is very busy right now. I automatically retried several times but the throttle hasn't cleared yet. Please wait a few minutes and try again. Remember Psalm 27:14: "Wait for the Lord; be strong and take heart."`
+    }
+    if (msg === 'QUOTA_EXHAUSTED') {
+      return `Your Gemini API key has reached its daily quota limit. This resets every 24 hours — please try again tomorrow. If this happens often, you can create a new free key at aistudio.google.com/apikey. Remember Isaiah 40:31: "Those who hope in the Lord will renew their strength."`
     }
     return `I am here for you. I had trouble connecting right now — please try again in a moment. While you wait, stand firm on Romans 8:37: "We are more than conquerors through Him who loved us."`
   }
