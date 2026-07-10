@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { DoorOpen, Brain, RefreshCw, Sun, Users, Shield, BookOpen, Eye, Ear, Hand, ChevronDown, Check, ExternalLink, MapPin, Star, Clock, Phone, Leaf, Waves, Wind, CircleAlert as AlertCircle, Lightbulb, CirclePlay as PlayCircle, CirclePause as PauseCircle } from 'lucide-react'
 
-type SectionId = 'understanding' | 'renewing' | 'grounding' | 'mentorship' | 'resources'
+type SectionId = 'understanding' | 'renewing' | 'grounding' | 'mentorship' | 'resources' | 'findsupport'
 
 export default function ReentryTab() {
   const [activeSection, setActiveSection] = useState<SectionId | null>('understanding')
@@ -41,6 +41,13 @@ export default function ReentryTab() {
       subtitle: 'Agencies, programs, and hotlines',
       icon: <MapPin className="w-5 h-5" />,
       color: 'bg-rose-500'
+    },
+    {
+      id: 'findsupport',
+      title: 'Find Support Near You',
+      subtitle: 'Churches, recovery & support groups',
+      icon: <MapPin className="w-5 h-5" />,
+      color: 'bg-teal-500'
     }
   ]
 
@@ -81,6 +88,7 @@ export default function ReentryTab() {
             {section.id === 'grounding' && <GroundingContent />}
             {section.id === 'mentorship' && <MentorshipContent />}
             {section.id === 'resources' && <ResourcesContent />}
+            {section.id === 'findsupport' && <FindSupportContent />}
           </SectionCard>
         ))}
       </div>
@@ -670,5 +678,175 @@ function ResourcesContent() {
         </div>
       ))}
     </>
+  )
+}
+
+// Horry County, SC zip codes
+const HORRY_COUNTY_ZIPS = new Set([
+  '29526','29527','29528','29566','29568','29569',
+  '29572','29575','29576','29577','29578','29579',
+  '29581','29582','29588','29597','29598'
+])
+
+type SupportCategory = 'churches' | 'recovery' | 'support'
+
+function buildSearchUrl(zip: string, category: SupportCategory): string {
+  // The denomination/network preferences are embedded silently in the search query.
+  // Users only see a "Find near [zip]" label — not the underlying search terms.
+  if (category === 'churches') {
+    return `https://www.google.com/maps/search/Assemblies+of+God+OR+Church+of+God+OR+Pentecostal+Holiness+church+near+${zip}`
+  }
+  if (category === 'recovery') {
+    return `https://www.google.com/maps/search/Celebrate+Recovery+OR+AA+OR+NA+OR+addiction+recovery+group+near+${zip}`
+  }
+  return `https://www.google.com/maps/search/support+group+OR+counseling+center+OR+mental+health+near+${zip}`
+}
+
+function FindSupportContent() {
+  const [zip, setZip] = useState('')
+  const [category, setCategory] = useState<SupportCategory>('churches')
+  const [results, setResults] = useState<null | { zip: string; category: SupportCategory }>(null)
+  const [error, setError] = useState('')
+
+  const handleFind = () => {
+    const trimmed = zip.trim().replace(/\D/g, '')
+    if (trimmed.length !== 5) {
+      setError('Please enter a valid 5-digit zip code.')
+      return
+    }
+    setError('')
+    setResults({ zip: trimmed, category })
+  }
+
+  const isHorry = results ? HORRY_COUNTY_ZIPS.has(results.zip) : false
+
+  const categoryLabel: Record<SupportCategory, string> = {
+    churches: 'Churches',
+    recovery: 'Recovery Groups',
+    support: 'Support Groups',
+  }
+
+  const categoryColor: Record<SupportCategory, string> = {
+    churches: 'text-teal-700 bg-teal-50 border-teal-200',
+    recovery: 'text-blue-700 bg-blue-50 border-blue-200',
+    support: 'text-purple-700 bg-purple-50 border-purple-200',
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Search form */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <h3 className="font-bold text-gray-900 text-base mb-1">Find Support Near You</h3>
+        <p className="text-xs text-gray-500 mb-4">Enter your zip code to find local churches, recovery groups, and support near you.</p>
+
+        {/* Category selector */}
+        <div className="flex gap-2 mb-4">
+          {(['churches','recovery','support'] as SupportCategory[]).map(cat => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              className={`flex-1 py-2 px-1 rounded-xl text-xs font-semibold border transition-colors ${
+                category === cat ? categoryColor[cat] : 'text-gray-500 bg-gray-50 border-gray-200 hover:bg-gray-100'
+              }`}
+            >
+              {categoryLabel[cat]}
+            </button>
+          ))}
+        </div>
+
+        {/* Zip input */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            inputMode="numeric"
+            maxLength={5}
+            value={zip}
+            onChange={e => { setZip(e.target.value.replace(/\D/g,'')); setError('') }}
+            onKeyDown={e => e.key === 'Enter' && handleFind()}
+            placeholder="Enter zip code"
+            className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-300"
+          />
+          <button
+            onClick={handleFind}
+            className="bg-teal-500 hover:bg-teal-600 text-white font-semibold text-sm px-5 py-2.5 rounded-xl transition-colors"
+          >
+            Find
+          </button>
+        </div>
+        {error && <p className="text-xs text-red-500 mt-2">{error}</p>}
+      </div>
+
+      {/* Results */}
+      {results && (
+        <div className="space-y-3">
+          <p className="text-xs text-gray-500 font-medium px-1">
+            {categoryLabel[results.category]} near <span className="font-bold text-gray-700">{results.zip}</span>
+          </p>
+
+          {/* The Refuge — shown first for any Horry County zip */}
+          {isHorry && results.category === 'churches' && (
+            <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-2xl border border-teal-200 p-4 shadow-sm">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <h4 className="font-bold text-teal-900 text-sm">The Refuge</h4>
+                <span className="text-xs bg-teal-500 text-white rounded-full px-2 py-0.5 font-semibold flex-shrink-0">Featured</span>
+              </div>
+              <p className="text-xs text-teal-700 mb-1">290 Dunn Short Cut Road &bull; Horry County, SC</p>
+              <p className="text-xs text-gray-600 mb-3 leading-relaxed">
+                A welcoming, Bible-believing church community. All are accepted. Come as you are.
+              </p>
+              <a
+                href={`https://www.google.com/maps/search/The+Refuge+290+Dunn+Short+Cut+Road+Horry+County+SC`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold px-4 py-2 rounded-xl transition-colors"
+              >
+                <MapPin className="w-3.5 h-3.5" />
+                Get Directions
+              </a>
+            </div>
+          )}
+
+          {/* Additional search results card */}
+          <a
+            href={buildSearchUrl(results.zip, results.category)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block bg-white rounded-2xl border border-gray-100 shadow-sm p-4 hover:shadow-md transition-shadow"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-semibold text-gray-800 text-sm">
+                  More {categoryLabel[results.category]} Near {results.zip}
+                </h4>
+                <p className="text-xs text-gray-500 mt-0.5">Tap to view on Google Maps</p>
+              </div>
+              <ExternalLink className="w-4 h-4 text-teal-500 flex-shrink-0" />
+            </div>
+          </a>
+
+          {/* Also show other categories as secondary options */}
+          {(['churches','recovery','support'] as SupportCategory[])
+            .filter(cat => cat !== results.category)
+            .map(cat => (
+              <a
+                key={cat}
+                href={buildSearchUrl(results.zip, cat)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block bg-white rounded-2xl border border-gray-100 shadow-sm p-4 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-gray-800 text-sm">{categoryLabel[cat]} Near {results.zip}</h4>
+                    <p className="text-xs text-gray-500 mt-0.5">Tap to view on Google Maps</p>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                </div>
+              </a>
+            ))
+          }
+        </div>
+      )}
+    </div>
   )
 }
