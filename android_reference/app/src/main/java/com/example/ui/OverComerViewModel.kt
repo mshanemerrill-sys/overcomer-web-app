@@ -46,6 +46,30 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
             initialValue = emptyList()
         )
 
+    val communityTestimonies: StateFlow<List<VictoryLog>> = repository.victoryLogs
+        .map { logs ->
+            logs.filter { it.type == "COMMUNITY_SHARED" }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    val isUserAdmin: StateFlow<Boolean> = currentUserEmail
+        .map { it.trim().lowercase() == "mshanemerrill@gmail.com" }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
+    private val _moderationPrefs = application.getSharedPreferences("overcomer_moderation_prefs", Context.MODE_PRIVATE)
+    private val _removedPostNotes = MutableStateFlow(
+        _moderationPrefs.getStringSet("removed_notes", emptySet())?.toSet() ?: emptySet()
+    )
+    val removedPostNotes: StateFlow<Set<String>> = _removedPostNotes.asStateFlow()
+
     val freedomGoal: StateFlow<FreedomGoal?> = repository.freedomGoal
         .combine(currentUserUid) { goal, uid ->
             if (goal == null || goal.userId != uid) {
@@ -71,6 +95,46 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
     private val _customApiKey = MutableStateFlow("")
     val customApiKey: StateFlow<String> = _customApiKey.asStateFlow()
 
+    private val _customApiKeyStatus = MutableStateFlow("unverified")
+    val customApiKeyStatus: StateFlow<String> = _customApiKeyStatus.asStateFlow()
+
+    private val _verifiedApiKeyFingerprint = MutableStateFlow("")
+    val verifiedApiKeyFingerprint: StateFlow<String> = _verifiedApiKeyFingerprint.asStateFlow()
+
+    fun getSha256Fingerprint(input: String): String {
+        val sanitized = input.trim().removeSurrounding("\"").removeSurrounding("'").trim()
+        if (sanitized.isBlank()) return ""
+        val bytes = java.security.MessageDigest.getInstance("SHA-256").digest(sanitized.toByteArray(Charsets.UTF_8))
+        return bytes.joinToString("") { "%02x".format(it) }.take(8)
+    }
+
+    fun onKeyInputChanged(key: String) {
+        val sanitized = key.trim().removeSurrounding("\"").removeSurrounding("'").trim()
+        val fp = getSha256Fingerprint(sanitized)
+        if (sanitized.isBlank()) {
+            _customApiKeyStatus.value = "unverified"
+        } else if (fp == _verifiedApiKeyFingerprint.value) {
+            _customApiKeyStatus.value = "verified"
+        } else {
+            _customApiKeyStatus.value = "unverified"
+        }
+    }
+
+    private val _chatError = MutableStateFlow<String?>(null)
+    val chatError: StateFlow<String?> = _chatError.asStateFlow()
+
+    fun clearChatError() {
+        _chatError.value = null
+    }
+
+    // --- Bible Translation / Version Selector ---
+    private val _selectedBibleVersion = MutableStateFlow("NIV")
+    val selectedBibleVersion: StateFlow<String> = _selectedBibleVersion.asStateFlow()
+
+    fun selectBibleVersion(version: String) {
+        _selectedBibleVersion.value = version
+    }
+
     // --- User Path Selection States ---
     private val _userPath = MutableStateFlow<String?>(null)
     val userPath: StateFlow<String?> = _userPath.asStateFlow()
@@ -89,6 +153,9 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
 
     private val _isChatLoading = MutableStateFlow(false)
     val isChatLoading: StateFlow<Boolean> = _isChatLoading.asStateFlow()
+
+    private val _freeTurnsCount = MutableStateFlow(0)
+    val freeTurnsCount: StateFlow<Int> = _freeTurnsCount.asStateFlow()
 
     // Keep track of the current session's auto-saved chat ID
     private var currentAutoSavedChatId: Int? = null
@@ -137,8 +204,26 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
         // Load custom API key
         val apiPrefs = application.getSharedPreferences("overcomer_api_prefs", Context.MODE_PRIVATE)
         val savedKey = apiPrefs.getString("custom_gemini_api_key", "") ?: ""
-        _customApiKey.value = savedKey
-        com.example.network.GeminiClient.customApiKey = savedKey.ifBlank { null }
+        val sanitizedKey = savedKey.trim().removeSurrounding("\"").removeSurrounding("'").trim()
+        _customApiKey.value = sanitizedKey
+        com.example.network.GeminiClient.customApiKey = sanitizedKey.ifBlank { null }
+
+        val verifiedFingerprint = apiPrefs.getString("verified_api_key_fingerprint", "") ?: ""
+        _verifiedApiKeyFingerprint.value = verifiedFingerprint
+
+        val currentFingerprint = getSha256Fingerprint(sanitizedKey)
+        val savedStatus = apiPrefs.getString("custom_api_key_status", "unverified") ?: "unverified"
+        _customApiKeyStatus.value = if (sanitizedKey.isBlank()) {
+            "unverified"
+        } else if (currentFingerprint == verifiedFingerprint && verifiedFingerprint.isNotBlank()) {
+            "verified"
+        } else {
+            "unverified"
+        }
+
+        // Load free companion turns count
+        val freePrefs = application.getSharedPreferences("overcomer_free_prefs", Context.MODE_PRIVATE)
+        _freeTurnsCount.value = freePrefs.getInt("companion_free_turns_count", 0)
 
         // Always reset path to null on fresh app startup so the user is given the 3 focus paths selection page first.
         _userPath.value = null
@@ -170,15 +255,228 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     fun saveCustomApiKey(key: String) {
-        _customApiKey.value = key
-        com.example.network.GeminiClient.customApiKey = key.trim().ifBlank { null }
+        val sanitizedKey = key.trim().removeSurrounding("\"").removeSurrounding("'").trim()
+        val oldKey = _customApiKey.value
+        _customApiKey.value = sanitizedKey
+        com.example.network.GeminiClient.customApiKey = sanitizedKey.ifBlank { null }
         val prefs = getApplication<Application>().getSharedPreferences("overcomer_api_prefs", Context.MODE_PRIVATE)
-        prefs.edit().putString("custom_gemini_api_key", key.trim()).apply()
+        val editor = prefs.edit()
+        editor.putString("custom_gemini_api_key", sanitizedKey)
+        
+        val currentFp = getSha256Fingerprint(sanitizedKey)
+        if (sanitizedKey.isBlank()) {
+            _customApiKeyStatus.value = "unverified"
+            _verifiedApiKeyFingerprint.value = ""
+            editor.putString("custom_api_key_status", "unverified")
+            editor.putString("verified_api_key_fingerprint", "")
+        } else if (currentFp == _verifiedApiKeyFingerprint.value) {
+            _customApiKeyStatus.value = "verified"
+            editor.putString("custom_api_key_status", "verified")
+        } else {
+            _customApiKeyStatus.value = "unverified"
+            _verifiedApiKeyFingerprint.value = ""
+            editor.putString("custom_api_key_status", "unverified")
+            editor.putString("verified_api_key_fingerprint", "")
+        }
+        editor.apply()
+    }
+
+    fun updateCustomApiKeyStatus(status: String) {
+        _customApiKeyStatus.value = status
+        val prefs = getApplication<Application>().getSharedPreferences("overcomer_api_prefs", Context.MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.putString("custom_api_key_status", status)
+        if (status != "verified") {
+            _verifiedApiKeyFingerprint.value = ""
+            editor.putString("verified_api_key_fingerprint", "")
+        }
+        editor.apply()
+    }
+
+    private val _isTestingKey = MutableStateFlow(false)
+    val isTestingKey: StateFlow<Boolean> = _isTestingKey.asStateFlow()
+
+    fun testCustomApiKey(key: String, baseUrl: String = "https://generativelanguage.googleapis.com/", onResult: (Boolean, String) -> Unit) {
+        viewModelScope.launch {
+            _isTestingKey.value = true
+            _customApiKeyStatus.value = "testing"
+            val sanitizedKey = key.trim().removeSurrounding("\"").removeSurrounding("'").trim()
+            if (sanitizedKey.isBlank()) {
+                onResult(false, "API Key is empty. Please enter a valid Gemini API key from Google AI Studio.")
+                _customApiKeyStatus.value = "unverified"
+                _isTestingKey.value = false
+                return@launch
+            }
+            try {
+                val testRequest = com.example.network.GenerateContentRequest(
+                    contents = listOf(
+                        com.example.network.Content(
+                            role = "user",
+                            parts = listOf(com.example.network.Part(text = "Respond with 'Connected'"))
+                        )
+                    ),
+                    generationConfig = com.example.network.GenerationConfig(
+                        temperature = 0.1f
+                    )
+                )
+                val response = com.example.network.safeCallGemini(sanitizedKey, testRequest, baseUrl = baseUrl)
+                val text = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
+                if (!text.isNullOrBlank()) {
+                    val currentFp = getSha256Fingerprint(sanitizedKey)
+                    _verifiedApiKeyFingerprint.value = currentFp
+                    _customApiKey.value = sanitizedKey
+                    com.example.network.GeminiClient.customApiKey = sanitizedKey.ifBlank { null }
+                    val prefs = getApplication<Application>().getSharedPreferences("overcomer_api_prefs", Context.MODE_PRIVATE)
+                    prefs.edit()
+                        .putString("custom_gemini_api_key", sanitizedKey)
+                        .putString("verified_api_key_fingerprint", currentFp)
+                        .putString("custom_api_key_status", "verified")
+                        .apply()
+                    _customApiKeyStatus.value = "verified"
+                    onResult(true, "Connection Successful! Your key is valid and connected to Gemini.")
+                } else {
+                    val prefs = getApplication<Application>().getSharedPreferences("overcomer_api_prefs", Context.MODE_PRIVATE)
+                    prefs.edit()
+                        .putString("verified_api_key_fingerprint", "")
+                        .putString("custom_api_key_status", "failed")
+                        .apply()
+                    _verifiedApiKeyFingerprint.value = ""
+                    _customApiKeyStatus.value = "failed"
+                    onResult(false, "Connected but received empty response from Gemini.")
+                }
+            } catch (e: Exception) {
+                val prefs = getApplication<Application>().getSharedPreferences("overcomer_api_prefs", Context.MODE_PRIVATE)
+                prefs.edit()
+                    .putString("verified_api_key_fingerprint", "")
+                    .putString("custom_api_key_status", "failed")
+                    .apply()
+                _verifiedApiKeyFingerprint.value = ""
+                _customApiKeyStatus.value = "failed"
+                val errorDetails = when (e) {
+                    is com.example.network.GeminiException.InvalidApiKeyException -> {
+                        "Invalid API Key (HTTP 401/403). Please make sure you copied the entire key from AI Studio without any missing characters, or verify if the key is authorized."
+                    }
+                    is com.example.network.GeminiException.UnsupportedModelException -> {
+                        "Model Not Found (HTTP 404). The gemini-3.5-flash model might not be available or enabled for this key."
+                    }
+                    is com.example.network.GeminiException.NoInternetException -> {
+                        "Network Error. Please check your internet connection."
+                    }
+                    else -> {
+                        e.message ?: "Authentication failed. Please verify your key in Google AI Studio."
+                    }
+                }
+                onResult(false, errorDetails)
+            } finally {
+                _isTestingKey.value = false
+            }
+        }
     }
 
     // --- Safe Usage / Rate Limiter to prevent going over Free Tier ---
     fun isCustomKeyActive(): Boolean {
         return _customApiKey.value.isNotBlank()
+    }
+
+    fun incrementFreeTurnsCount() {
+        val freePrefs = getApplication<Application>().getSharedPreferences("overcomer_free_prefs", Context.MODE_PRIVATE)
+        val newCount = _freeTurnsCount.value + 1
+        _freeTurnsCount.value = newCount
+        freePrefs.edit().putInt("companion_free_turns_count", newCount).apply()
+    }
+
+    fun generateLocalCompanionResponse(userMessage: String, turnNumber: Int): String {
+        val input = userMessage.lowercase()
+        
+        // Identify the spiritual or mental focus category based on keywords in the message
+        val focus = when {
+            input.contains("crave") || input.contains("craving") || input.contains("tempt") || input.contains("temptation") || input.contains("desire") -> "craving"
+            input.contains("anxious") || input.contains("anxiety") || input.contains("fear") || input.contains("scared") || input.contains("worry") -> "anxiety"
+            input.contains("fail") || input.contains("relapse") || input.contains("slip") || input.contains("messed up") || input.contains("sin") || input.contains("guilt") || input.contains("shame") -> "grace"
+            input.contains("sad") || input.contains("depressed") || input.contains("depression") || input.contains("lonely") || input.contains("hopeless") -> "hope"
+            input.contains("trigger") || input.contains("tempted") || input.contains("urge") -> "trigger"
+            else -> "general"
+        }
+
+        return when (focus) {
+            "craving", "trigger" -> """
+                I hear you, and I want you to take a deep, slow breath right now. Cravings and temptations can feel incredibly intense, like a powerful wave crashing over you, but remember: **every wave peaks and then subsides**. You do not have to fight this battle in your own limited strength. 
+                
+                Let's practice a brief **Calming Grounding Step** (the STOP technique) together to steady your soul:
+                • **S** - **Stop**: Pause whatever you are doing. Put down your phone, close your eyes, and sit still.
+                • **T** - **Take a breath**: Inhale deeply for 4 seconds, hold for 4, and exhale slowly for 4. Feel God's presence surrounding you.
+                • **O** - **Observe**: Notice your feelings. Cravings are just automatic bodily responses or thoughts passing through; they are not your identity, and they do not command your actions.
+                • **P** - **Proceed with Christ**: Turn your thoughts to His delivering power.
+                
+                In Christ, you are a brand new creation. Your old dependence is dead and broken, and you are unquestionably free.
+                
+                Let this beautiful promise anchor you right now:
+                > "No temptation has overtaken you except what is common to mankind. And God is faithful; he will not let you be tempted beyond what you can bear. But when you are tempted, he will also provide a way out so that you can endure it." — **1 Corinthians 10:13 (NIV)**
+                
+                You are an OverComer. Lean into His grace, and let Him carry you through this moment.
+                
+                *Note: I am your OverComer’s Companion, and while I am an AI and cannot pray myself, I encourage you to talk directly to your Heavenly Father about this. He loves you, He is always listening, and He will sustain you.*
+            """.trimIndent()
+
+            "anxiety" -> """
+                My friend, I can feel the weight of anxiety and fear in your words, and I want to reassure you that you are perfectly safe in His hands. When anxious thoughts begin to multiply, our minds are often tricked by "cognitive distortions"—untrue, catastrophic projections of the future. But God has not given you a spirit of fear, but of power, love, and a sound mind!
+                
+                Let's use a simple **Sensory Grounding Step** right now to bring your racing thoughts back to the present moment:
+                • Focus your eyes and name **three things** you can see in your room.
+                • Reach out and touch **two objects** near you, noticing their physical texture.
+                • Close your eyes for a moment and identify **one subtle sound** in the background.
+                
+                As your mind settles, remember that the Lord is right beside you. He cares deeply about every single detail of your life.
+                
+                Be comforted by this wonderful scripture:
+                > "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus." — **Philippians 4:6-7 (NIV)**
+                
+                You do not have to figure out the whole future today. Just take this next single step with Him.
+                
+                *Note: I am your OverComer’s Companion. While I am an AI and cannot pray myself, I encourage you to bring these worries to God in your own prayer. He cares for you deeply and hears every whisper of your heart.*
+            """.trimIndent()
+
+            "grace" -> """
+                Please hear me clearly: **there is absolutely zero condemnation for you in Christ Jesus!** If you have slipped, stumbled, or feel like you have failed, do not let shame convince you to run away from God. That is a lie from the enemy. Instead, run *straight into* His arms. 
+                
+                Genetics or environment can make us vulnerable, but choice is the root of our actions, and **His grace is the source of our complete restoration**. Repentance is not a heavy, shameful punishment; it is a beautiful U-turn back to the Father who is running to meet you.
+                
+                Let this incredible promise wash over your soul:
+                > "If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness." — **1 John 1:9 (NIV)**
+                
+                Your identity is not "addict" or "failure." You are a beloved child of God, an OverComer who has been set unquestionably free. Shake off the dust, stand up, and let’s keep walking forward in His unconditional love.
+                
+                *Note: I am your OverComer’s Companion. Although I am an AI and cannot pray, I encourage you to speak directly to God. Confess your heart to Him—He is waiting with open arms to heal and restore.*
+            """.trimIndent()
+
+            "hope" -> """
+                I am so glad you reached out. When feelings of sadness, loneliness, or hopelessness cloud your vision, it is easy to feel isolated and forgotten. But you are never alone. God is closer to you than your very breath, and He has a beautiful, restorative purpose for your life.
+                
+                Let's practice a quick **Thought Reframing** exercise to renew your mind:
+                • **The Lie**: "Nothing will ever change, and I am permanently stuck in this dark place."
+                • **The Truth**: "This season is temporary. God is working in my heart right now, and His light can pierce any darkness."
+                
+                Be encouraged by this wonderful promise:
+                > "For I know the plans I have for you,' declares the Lord, 'plans to prosper you and not to harm you, plans to give you hope and a future.'" — **Jeremiah 29:11 (NIV)**
+                
+                Even when you cannot see it, He is working all things together for your ultimate good.
+                
+                *Note: I am your OverComer’s Companion. As an AI, I cannot pray myself, but I encourage you to share your heart with your Heavenly Father in prayer. He loves to bring hope and light to His children.*
+            """.trimIndent()
+
+            else -> """
+                Hello! It is so wonderful to connect with you. As your OverComer's Companion, I am here to walk alongside you, celebrating your victories and standing with you in every moment of struggle. 
+                
+                Whatever is on your heart today—whether you are celebrating a day of absolute freedom, feeling a bit weary, or just needing some scriptural encouragement—know that God is with you and He is unconditionally for you.
+                
+                Let this beautiful truth strengthen you today:
+                > "So if the Son sets you free, you will be free indeed." — **John 8:36 (NIV)**
+                
+                What has been on your mind today? I am here to listen and encourage you.
+                
+                *Note: I am your OverComer’s Companion. Since I am an AI, I cannot pray myself, but I highly encourage you to talk directly to your Heavenly Father in prayer. He loves you and is always listening.*
+            """.trimIndent()
+        }
     }
 
     fun isDailyLimitExceeded(): Boolean {
@@ -266,9 +564,68 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
         }
     }
 
+    private fun formatAuthorName(fullName: String): String {
+        val trimmed = fullName.trim()
+        if (trimmed.isEmpty()) return "Anonymous"
+        val parts = trimmed.split("\\s+".toRegex()).filter { it.isNotEmpty() }
+        if (parts.isEmpty()) return "Anonymous"
+        val firstName = parts[0]
+        if (parts.size > 1) {
+            val lastName = parts.last()
+            if (lastName.isNotEmpty()) {
+                return "$firstName ${lastName.take(1).uppercase()}."
+            }
+        }
+        return firstName
+    }
+
+    fun addVictoryTestimony(notes: String, shareOnCommunityBoard: Boolean) {
+        viewModelScope.launch {
+            val uid = currentUserUid.value
+            val path = _userPath.value ?: "TESTIMONY_VICTORY"
+            val rawName = currentUserName.value
+            val authorNameFormatted = formatAuthorName(rawName)
+            
+            // 1. Always save in Secure Private Journal
+            repository.insertLog(
+                VictoryLog(
+                    type = "JOURNAL_SECURE",
+                    notes = notes,
+                    userId = uid,
+                    userPath = path,
+                    authorName = "Me"
+                )
+            )
+            // 2. Optionally share on Community Board
+            if (shareOnCommunityBoard) {
+                repository.insertLog(
+                    VictoryLog(
+                        type = "COMMUNITY_SHARED",
+                        notes = notes,
+                        userId = "COMMUNITY", // Decoupled for community stream
+                        userPath = path,
+                        authorName = authorNameFormatted
+                    )
+                )
+            }
+        }
+    }
+
     fun deleteVictoryLog(id: Int) {
         viewModelScope.launch {
             repository.deleteLogById(id)
+        }
+    }
+
+    fun removeCommunityPost(notes: String, id: Int?) {
+        viewModelScope.launch {
+            if (id != null && id != 0) {
+                repository.deleteLogById(id)
+            }
+            val currentSet = _removedPostNotes.value.toMutableSet()
+            currentSet.add(notes)
+            _removedPostNotes.value = currentSet
+            _moderationPrefs.edit().putStringSet("removed_notes", currentSet).apply()
         }
     }
 
@@ -293,16 +650,22 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
         if (text.isBlank()) return
         if (_isChatLoading.value) return // Block concurrent requests to prevent double-sends and API rate violations
 
+        _chatError.value = null
+
         // 1. Append user message
         val userMsg = ChatMessage(text = text, isUser = true)
         _chatMessages.update { it + userMsg }
         autoSaveCurrentChat()
 
-        if (isDailyLimitExceeded()) {
+        val isCustomActive = isCustomKeyActive()
+        val currentFreeCount = _freeTurnsCount.value
+
+        // If they do not have a custom key and they used up all 3 free turns, prompt them to add their key
+        if (!isCustomActive && currentFreeCount >= 3) {
             _chatMessages.update {
                 it + ChatMessage(
-                    text = "You have reached your daily free usage limit of 30 responses/day on the shared fallback key to keep this service completely free and non-billing for everyone.\n\n" +
-                           "To get unlimited replies instantly, tap the Key 🔑 icon at the top of the screen to enter your own completely FREE Gemini API key from Google AI Studio. It takes under a minute, requires no credit card, and ensures you have a private, dedicated channel!",
+                    text = "You have completed your 3 free trial companion interactions.\n\n" +
+                           "To unlock unlimited, completely private, and 100% free companion chats, please tap the Settings ⚙️ icon at the top of the screen to paste your own free Gemini API key from Google AI Studio. It takes under a minute, requires no credit card, and ensures you have a private, dedicated channel for your journey!",
                     isUser = false
                 )
             }
@@ -316,8 +679,8 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
         // 3. Launch async network request in safety-conscious scope
         viewModelScope.launch {
             try {
-                // Convert current thread history to standard Gemini contents format
-                val conversationHistory = _chatMessages.value.map { msg ->
+                // Keep only the last 12 messages (6 turns) of conversation history to prevent rate limits and token bloat
+                val conversationHistory = _chatMessages.value.takeLast(12).map { msg ->
                     Content(
                         role = if (msg.isUser) "user" else "model",
                         parts = listOf(Part(text = msg.text))
@@ -330,20 +693,52 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
                 // Call client with history overview
                 val responseText = GeminiClient.generateSupportResponse(conversationHistory, pastChatsContext)
 
+                if (isCustomActive) {
+                    updateCustomApiKeyStatus("verified")
+                }
+
                 // 4. Append AI response
                 _chatMessages.update {
                     it + ChatMessage(text = responseText, isUser = false)
                 }
+                
+                if (!isCustomActive) {
+                    incrementFreeTurnsCount()
+                }
+                
                 incrementDailyRequestCount()
                 autoSaveCurrentChat()
             } catch (e: Exception) {
-                _chatMessages.update {
-                    it + ChatMessage(
-                        text = "I failed to connect. Ensure your internet is active and that your API key is correctly configured. Lean on Proverbs 3:5-6, and try again.",
-                        isUser = false
-                    )
+                val errorMsg = com.example.network.GeminiClient.getFriendlyErrorMessage(e)
+                _chatError.value = errorMsg
+                if (isCustomActive) {
+                    updateCustomApiKeyStatus("failed")
                 }
-                autoSaveCurrentChat()
+
+                // If network fails or throws 404, check if we can fall back to local responder for the first 3 turns
+                if (!isCustomActive && currentFreeCount < 3) {
+                    incrementFreeTurnsCount()
+                    val fallbackText = generateLocalCompanionResponse(text, currentFreeCount + 1)
+                    
+                    val finalMsg = if (currentFreeCount + 1 >= 3) {
+                        "$fallbackText\n\n✨ **OverComer Guide Note**: You have completed your 3 free trial companion interactions! To continue this deep conversation with unlimited, private, and 100% free support, please tap the Settings ⚙️ icon at the top of the screen to enter your own free Gemini API key from Google AI Studio. It takes under a minute and requires no credit card."
+                    } else {
+                        fallbackText
+                    }
+                    
+                    _chatMessages.update {
+                        it + ChatMessage(text = finalMsg, isUser = false)
+                    }
+                    autoSaveCurrentChat()
+                } else {
+                    _chatMessages.update {
+                        it + ChatMessage(
+                            text = errorMsg,
+                            isUser = false
+                        )
+                    }
+                    autoSaveCurrentChat()
+                }
             } finally {
                 _isChatLoading.value = false
             }
@@ -491,6 +886,26 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
     fun fetchVerseOfTheDay(forceGenerate: Boolean = false) {
         _isLoadingVerse.value = true
         viewModelScope.launch {
+            val prefs = getApplication<Application>().getSharedPreferences("overcomer_usage_prefs", Context.MODE_PRIVATE)
+            val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(java.util.Date())
+            
+            if (!forceGenerate) {
+                val cachedRef = prefs.getString("cached_verse_ref", "") ?: ""
+                val cachedText = prefs.getString("cached_verse_text", "") ?: ""
+                val cachedReflection = prefs.getString("cached_verse_reflection", "") ?: ""
+                val cachedDate = prefs.getString("cached_verse_date", "") ?: ""
+                
+                if (cachedDate == today && cachedRef.isNotBlank() && cachedText.isNotBlank()) {
+                    _verseOfTheDay.value = com.example.network.VerseOfTheDay(
+                        reference = cachedRef,
+                        text = cachedText,
+                        reflection = cachedReflection
+                    )
+                    _isLoadingVerse.value = false
+                    return@launch
+                }
+            }
+
             if (isDailyLimitExceeded()) {
                 _verseOfTheDay.value = GeminiClient.getFallbackVerse()
                 _isLoadingVerse.value = false
@@ -500,6 +915,14 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
                 val verse = GeminiClient.generateVerseOfTheDay()
                 _verseOfTheDay.value = verse
                 incrementDailyRequestCount()
+                
+                // Cache the newly generated verse for today
+                prefs.edit()
+                    .putString("cached_verse_date", today)
+                    .putString("cached_verse_ref", verse.reference)
+                    .putString("cached_verse_text", verse.text)
+                    .putString("cached_verse_reflection", verse.reflection)
+                    .apply()
             } catch (e: Exception) {
                 _verseOfTheDay.value = GeminiClient.getFallbackVerse()
             } finally {
@@ -523,7 +946,7 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
         }
         viewModelScope.launch {
             try {
-                val result = GeminiClient.lookupScripture(reference)
+                val result = GeminiClient.lookupScripture(reference, _selectedBibleVersion.value)
                 _aiScriptureResult.value = result
                 incrementDailyRequestCount()
             } catch (e: Exception) {
@@ -549,22 +972,22 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
     private val _isSearchingResources = MutableStateFlow(false)
     val isSearchingResources: StateFlow<Boolean> = _isSearchingResources.asStateFlow()
 
-    fun searchLocalResources(location: String, searchType: String, prioritizeAlignment: Boolean = true) {
+    fun searchLocalResources(location: String, searchType: String, prioritizeAlignment: Boolean = true, page: Int = 0) {
         if (location.isBlank()) return
         _isSearchingResources.value = true
         _localResources.value = emptyList()
         if (isDailyLimitExceeded()) {
-            _localResources.value = GeminiClient.getFallbackResources(location, searchType, prioritizeAlignment)
+            _localResources.value = GeminiClient.getFallbackResources(location, searchType, prioritizeAlignment, page)
             _isSearchingResources.value = false
             return
         }
         viewModelScope.launch {
             try {
-                val results = GeminiClient.searchLocalResources(location, searchType, prioritizeAlignment)
+                val results = GeminiClient.searchLocalResources(location, searchType, prioritizeAlignment, page)
                 _localResources.value = results
                 incrementDailyRequestCount()
             } catch (e: Exception) {
-                _localResources.value = GeminiClient.getFallbackResources(location, searchType, prioritizeAlignment)
+                _localResources.value = GeminiClient.getFallbackResources(location, searchType, prioritizeAlignment, page)
             } finally {
                 _isSearchingResources.value = false
             }

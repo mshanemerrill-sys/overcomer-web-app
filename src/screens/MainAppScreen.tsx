@@ -1,17 +1,15 @@
 import { useState } from 'react'
-import { Chrome as Home, Quote, MessageCircle, BookOpen, ScrollText, TriangleAlert as AlertTriangle, User, Settings, ExternalLink, DoorOpen, Medal } from 'lucide-react'
+import { Chrome as Home, Quote, MessageCircle, BookOpen, ScrollText, TriangleAlert as AlertTriangle, User, Settings } from 'lucide-react'
 import { useAppStore } from '../store/useAppStore'
 import FreedomTab from './tabs/FreedomTab'
 import InspirationTab from './tabs/InspirationTab'
 import CompanionTab from './tabs/CompanionTab'
 import JournalTab from './tabs/JournalTab'
 import BibleTab from './tabs/BibleTab'
-import ReentryTab from './tabs/ReentryTab'
-import VeteransTab from './tabs/VeteransTab'
 import SOSOverlay from '../components/SOSOverlay'
 import type { FocusPath } from '../lib/types'
 
-type TabType = 'freedom' | 'inspiration' | 'companion' | 'journal' | 'bible' | 'reentry'
+type TabType = 'freedom' | 'inspiration' | 'companion' | 'journal' | 'bible'
 
 interface MainAppScreenProps {
   onShowAuth: () => void
@@ -29,13 +27,13 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
       case 'MENTAL_HEALTH': return 'Wellness'
       case 'TOUGH_DAY': return 'Tough Day'
       case 'TESTIMONY_VICTORY': return 'Victory'
-      case 'VETERANS': return 'Veteran'
+      case 'VETERAN_TRANSITION': return 'Veteran'
       default: return 'Select'
     }
   }
 
   return (
-    <div className="min-h-screen bg-background-light flex flex-col">
+    <div className="h-[100dvh] bg-background-light flex flex-col overflow-hidden">
       {/* Top Bar */}
       <header className="bg-white shadow-sm sticky top-0 z-40 safe-top">
         <div className="flex items-center justify-between px-4 py-3">
@@ -56,7 +54,7 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
           {/* Right Actions */}
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setUserPath(null as unknown as FocusPath)}
+              onClick={() => setUserPath(null)}
               className="px-3 py-1.5 bg-primary-100 text-primary-600 rounded-full text-xs font-bold hover:bg-primary-200 transition-colors"
             >
               {getPathLabel(userPath)}
@@ -85,18 +83,17 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 min-h-0 overflow-y-auto">
         {activeTab === 'freedom' && <FreedomTab onNavigateToCompanion={() => setActiveTab('companion')} />}
         {activeTab === 'inspiration' && <InspirationTab onNavigateToCompanion={() => setActiveTab('companion')} />}
         {activeTab === 'companion' && <CompanionTab />}
         {activeTab === 'journal' && <JournalTab />}
         {activeTab === 'bible' && <BibleTab />}
-        {activeTab === 'reentry' && (userPath === 'VETERANS' ? <VeteransTab /> : <ReentryTab />)}
       </main>
 
       {/* Bottom Navigation */}
       <nav className="bg-white border-t border-gray-200 safe-bottom sticky bottom-0">
-        <div className="grid grid-cols-6 py-1.5">
+        <div className="grid grid-cols-5 py-1.5">
           <NavButton
             icon={<Home className="w-5 h-5" />}
             label="Freedom"
@@ -127,24 +124,7 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
             active={activeTab === 'bible'}
             onClick={() => setActiveTab('bible')}
           />
-          <NavButton
-            icon={userPath === 'VETERANS' ? <Medal className="w-5 h-5" /> : <DoorOpen className="w-5 h-5" />}
-            label={userPath === 'VETERANS' ? ['Veteran', 'Support'] : 'Re-entry'}
-            active={activeTab === 'reentry'}
-            onClick={() => setActiveTab('reentry')}
-          />
         </div>
-
-        {/* The Faith Connection Footer */}
-        <a
-          href="https://www.thefaithconnection.org"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 py-2 bg-primary-50 text-primary-600 text-xs font-medium hover:bg-primary-100 transition-colors"
-        >
-          Powered by The Faith Connection
-          <ExternalLink className="w-3 h-3" />
-        </a>
       </nav>
 
       {/* SOS Overlay */}

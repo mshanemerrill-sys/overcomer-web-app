@@ -53,7 +53,8 @@ data class VictoryLog(
     val reframedTruth: String = "",
     val scriptureReference: String = "",
     val userId: String = "", // Binds Log securely to an authenticated session
-    val userPath: String = "" // Tracks which focus path the log belongs to (TOUGH_DAY, SUBSTANCE_RECOVERY, MENTAL_HEALTH, TESTIMONY_VICTORY)
+    val userPath: String = "", // Tracks which focus path the log belongs to (TOUGH_DAY, SUBSTANCE_RECOVERY, MENTAL_HEALTH, TESTIMONY_VICTORY)
+    val authorName: String = "" // Anonymized or formatted name of the creator (e.g. John D.)
 )
 
 @Entity(tableName = "freedom_goals")
@@ -119,7 +120,7 @@ interface SavedChatDao {
 
 // --- App Database ---
 
-@Database(entities = [VictoryLog::class, FreedomGoal::class, SavedChat::class], version = 5, exportSchema = false)
+@Database(entities = [VictoryLog::class, FreedomGoal::class, SavedChat::class], version = 6, exportSchema = false)
 abstract class OverComerDatabase : RoomDatabase() {
     abstract val victoryLogDao: VictoryLogDao
     abstract val freedomGoalDao: FreedomGoalDao

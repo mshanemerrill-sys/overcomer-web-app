@@ -463,7 +463,7 @@ const trustedVoicesData: Array<{ topic: string; color: string; books: TrustedBoo
   },
 ]
 
-function TrustedVoicesLibrary() {
+export function TrustedVoicesLibrary() {
   const [expandedTopic, setExpandedTopic] = useState<string | null>(null)
 
   return (
@@ -518,4 +518,3 @@ function TrustedVoicesLibrary() {
     </div>
   )
 }
-

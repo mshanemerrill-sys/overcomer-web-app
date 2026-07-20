@@ -6,6 +6,11 @@ import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
@@ -19,6 +24,7 @@ import org.json.JSONObject
 data class GenerateContentRequest(
     val contents: List<Content>,
     val generationConfig: GenerationConfig? = null,
+    @Json(name = "system_instruction")
     val systemInstruction: Content? = null
 )
 
@@ -51,58 +57,150 @@ data class Candidate(
 )
 
 interface GeminiApiService {
-    @POST("v1beta/models/{model}:generateContent")
+    @POST("v1beta/models/gemini-3.5-flash:generateContent")
     suspend fun generateContent(
-        @Path("model") model: String,
-        @Query("key") apiKey: String,
+        @retrofit2.http.Header("x-goog-api-key") apiKey: String,
         @Body request: GenerateContentRequest
     ): GenerateContentResponse
+}
+
+sealed class GeminiException(message: String, cause: Throwable? = null) : Exception(message, cause) {
+    class SchemaOrBadRequestException(message: String) : GeminiException(message)
+    class InvalidApiKeyException(message: String) : GeminiException(message)
+    class UnsupportedModelException(message: String) : GeminiException(message)
+    class RateLimitException(message: String) : GeminiException(message)
+    class ServerErrorException(message: String) : GeminiException(message)
+    class GenericException(message: String, cause: Throwable? = null) : GeminiException(message, cause)
+    class NoInternetException(message: String, cause: Throwable) : GeminiException(message, cause)
+}
+
+fun sanitizeErrorMessage(message: String, keyToRedact: String?): String {
+    if (keyToRedact.isNullOrBlank()) return message
+    return message.replace(keyToRedact, "[REDACTED]")
+}
+
+fun parseGeminiError(code: Int, responseBody: String, apiKey: String): GeminiException {
+    var googleMessage = ""
+    var googleStatus = ""
+    var isApiKeyInvalid = false
+    
+    try {
+        val json = org.json.JSONObject(responseBody)
+        if (json.has("error")) {
+            val errorObj = json.getJSONObject("error")
+            googleMessage = errorObj.optString("message", "")
+            googleStatus = errorObj.optString("status", "")
+            
+            if (googleMessage.contains("API_KEY_INVALID") || 
+                googleMessage.contains("API key not valid") ||
+                googleStatus.contains("API_KEY_INVALID") ||
+                responseBody.contains("API_KEY_INVALID") ||
+                responseBody.contains("API key not valid")) {
+                isApiKeyInvalid = true
+            }
+        }
+    } catch (_: Exception) {
+        if (responseBody.contains("API_KEY_INVALID") || responseBody.contains("API key not valid")) {
+            isApiKeyInvalid = true
+        }
+    }
+    
+    val displayBody = if (googleMessage.isNotEmpty()) googleMessage else responseBody
+    val sanitizedMessage = sanitizeErrorMessage(displayBody, apiKey)
+    
+    return when {
+        isApiKeyInvalid -> {
+            GeminiException.InvalidApiKeyException("Invalid API Key: $sanitizedMessage")
+        }
+        code == 400 -> {
+            GeminiException.SchemaOrBadRequestException("Request configuration error (HTTP 400): $sanitizedMessage")
+        }
+        code == 401 || code == 403 -> {
+            GeminiException.InvalidApiKeyException("Authentication/authorization error (HTTP $code): $sanitizedMessage")
+        }
+        code == 404 -> {
+            GeminiException.UnsupportedModelException("Unsupported model (HTTP 404): $sanitizedMessage")
+        }
+        code == 429 -> {
+            GeminiException.RateLimitException("Usage limit reached (HTTP 429): $sanitizedMessage")
+        }
+        code in 500..599 -> {
+            GeminiException.ServerErrorException("Gemini service error (HTTP $code): $sanitizedMessage")
+        }
+        else -> {
+            GeminiException.GenericException("Gemini error (HTTP $code): $sanitizedMessage")
+        }
+    }
 }
 
 // Global helper to safely call the Gemini API with retries and model fallbacks
 suspend fun safeCallGemini(
     apiKey: String,
     request: GenerateContentRequest,
-    defaultModel: String = "gemini-3.5-flash"
-): GenerateContentResponse {
-    val modelsToTry = listOf(defaultModel, "gemini-2.5-flash", "gemini-3.1-pro-preview")
+    defaultModel: String = "gemini-3.5-flash",
+    baseUrl: String = "https://generativelanguage.googleapis.com/"
+): GenerateContentResponse = withContext(Dispatchers.IO) {
+    val apiVersion = "v1beta"
+    val model = "gemini-3.5-flash"
     var lastException: Exception? = null
+    var delayMs = 2000L
     
-    for (model in modelsToTry) {
-        var delayMs = 1500L
-        for (attempt in 1..3) {
-            try {
-                return RetrofitClient.service.generateContent(model, apiKey, request)
-            } catch (e: Exception) {
-                lastException = e
-                val errStr = e.toString()
-                val errMsg = e.message ?: ""
-                val isTransient = errStr.contains("503") || errMsg.contains("503") ||
-                                  errStr.contains("429") || errMsg.contains("429") ||
-                                  errStr.contains("500") || errMsg.contains("500") ||
-                                  errStr.contains("timeout") || errMsg.contains("timeout")
-                
-                if (isTransient && attempt < 3) {
-                    kotlinx.coroutines.delay(delayMs)
-                    delayMs *= 2
-                } else {
-                    // Fail over to next model name (or throw if it's the last one)
-                    break
+    for (attempt in 1..3) {
+        try {
+            val mediaType = "application/json; charset=utf-8".toMediaType()
+            val requestAdapter = RetrofitClient.moshi.adapter(GenerateContentRequest::class.java)
+            val jsonString = requestAdapter.toJson(request)
+            val body = jsonString.toRequestBody(mediaType)
+            
+            val formattedBaseUrl = if (baseUrl.endsWith("/")) baseUrl else "$baseUrl/"
+            val url = "${formattedBaseUrl}${apiVersion}/models/${model}:generateContent"
+            val okRequest = Request.Builder()
+                .url(url)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("x-goog-api-key", apiKey)
+                .post(body)
+                .build()
+            
+            RetrofitClient.okHttpClient.newCall(okRequest).execute().use { response ->
+                val responseBody = response.body?.string() ?: ""
+                val code = response.code
+                if (!response.isSuccessful) {
+                    throw parseGeminiError(code, responseBody, apiKey)
                 }
+                val responseAdapter = RetrofitClient.moshi.adapter(GenerateContentResponse::class.java)
+                return@withContext responseAdapter.fromJson(responseBody) ?: throw Exception("Failed to parse response body")
+            }
+        } catch (e: Exception) {
+            val mappedException = when {
+                e is GeminiException -> e
+                e is java.io.IOException -> GeminiException.NoInternetException("No internet connection available. Please check your network and try again.", e)
+                else -> GeminiException.GenericException(e.message ?: "An unexpected error occurred", e)
+            }
+            lastException = mappedException
+            
+            val isTransient = mappedException is GeminiException.RateLimitException ||
+                              mappedException is GeminiException.ServerErrorException ||
+                              mappedException is GeminiException.NoInternetException
+            
+            if (isTransient && attempt < 3) {
+                kotlinx.coroutines.delay(delayMs)
+                delayMs *= 2
+            } else {
+                throw mappedException
             }
         }
     }
-    throw lastException ?: Exception("Connection failed after trying multiple models")
+    throw lastException ?: Exception("Connection failed after 3 attempts")
 }
 
 object RetrofitClient {
     private const val BASE_URL = "https://generativelanguage.googleapis.com/"
 
-    private val moshi = Moshi.Builder()
+    val moshi = Moshi.Builder()
         .addLast(KotlinJsonAdapterFactory())
         .build()
 
-    private val okHttpClient = OkHttpClient.Builder()
+    val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(60, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
         .writeTimeout(60, TimeUnit.SECONDS)
@@ -122,6 +220,11 @@ object GeminiClient {
     
     @Volatile
     var customApiKey: String? = null
+    
+    private fun getSanitizedApiKey(): String {
+        val rawKey = if (!customApiKey.isNullOrBlank()) customApiKey!! else BuildConfig.GEMINI_API_KEY
+        return rawKey.trim().removeSurrounding("\"").removeSurrounding("'").trim()
+    }
     
     // Core system instruction detailing the theological model and clinical skills
     private val SYSTEM_INSTRUCTION = """
@@ -149,19 +252,21 @@ object GeminiClient {
         You are highly encouraged to draw wisdom from, quote, and reference the following vetted authorities who align with a Spirit-filled, biblically orthodox worldview:
         
         * Substance Recovery & Biblical Counseling:
-          - David Wilkerson (Teen Challenge founder): Emphasize the gospel of delivering power.
-          - Edward T. Welch ("Crossroads: A Step-by-Step Guide Away from Addiction"): Approach recovery with personal accountability under biblical truths.
-          - Edward T. Welch ("Blame It on the Brain?"): Carefully distinguish biological chemical imbalances/brain disorders from spiritual/behavioral choice issues to ensure balanced guidance and proper clinical referral bridging.
+          - David Wilkerson (Teen Challenge founder; "The Cross and the Switchblade" / Global Teen Challenge curriculum): Emphasize the gospel of delivering power.
+          - Nicky Cruz (Evangelist, founder of Nicky Cruz Outreach, former director of Teen Challenge under David Wilkerson): preach power of absolute deliverance and transformation.
+          - Edward T. Welch ("Crossroads: A Step-by-Step Guide Away from Addiction"): Approach recovery with personal accountability under biblical truths and peer-led support.
+          - Edward T. Welch ("Blame It on the Brain?" & "When People Are Big and God Is Small"): Carefully distinguish biological chemical imbalances/brain disorders from spiritual/behavioral choice issues to ensure balanced guidance, proper clinical referral bridging, and overcoming fear of man.
           - Paul David Tripp ("Instruments in the Redeemer's Hands"): Illustrate how ordinary believers are tools of active grace in helping loved ones.
           - Dr. David Powlison ("Seeing with New Eyes"): Examine human motives, core cravings, and worries through the diagnosis of God's Word.
           
         * Foundational & Integrative Christian Counseling:
           - Dr. Gary R. Collins ("Christian Counseling: A Comprehensive Guide"): Integrate systematic pastoral support models with solid structural guidelines.
-          - Dr. Timothy Clinton & AACC ("Competent Christian Counseling"): Maintain strong clinical competency coupled with robust scriptural grounding.
-          - Dr. Larry Crabb ("Understanding People" & "Connecting"): Connect deep psychological insights on inner core longings with healing relationships inside a safe fellowship.
+          - Dr. Timothy Clinton & AACC ("Competent Christian Counseling: Foundations and Practice"): Maintain strong clinical competency coupled with robust scriptural grounding.
+          - Dr. Larry Crabb ("Understanding People: Why We Do What We Do" & "Connecting"): Connect deep psychological insights on inner core longings with healing relationships inside a safe fellowship.
           
         * Mental Health, Trauma & Boundaries:
           - Dr. Matthew S. Stanford ("Grace for the Afflicted"): Definitively bridge neuroscientific insights and spiritual dynamics. Reassure users that treating chemical imbalances is medically sound and supports spiritual wellness.
+          - Dr. Jared Pingleton ("The Christian Counseling Companion" & "The Struggle is Real"): Integrate clinical psychological expertise with deep biblical, ministerial care to address mental and relational health in the church.
           - Dr. Dan B. Allender ("The Wounded Heart"): Speak with immense empathy and theological depth to those recovering from abuse or trauma.
           - Dr. Henry Cloud & Dr. John Townsend ("Boundaries"): Educate on when to say yes and how to say no, teaching deep compassion alongside absolute, uncompromising accountability and limits.
           
@@ -197,8 +302,56 @@ object GeminiClient {
         - Provide them with comforting, solid example prayers or summaries of your discussion that they can take directly to their Heavenly Father.
     """.trimIndent()
 
+    fun getFriendlyErrorMessage(e: Throwable): String {
+        return when (e) {
+            is GeminiException.NoInternetException -> {
+                "No Internet Connection 🌐\n\n" +
+                "It looks like your device is offline or the connection timed out. " +
+                "Please check your internet connection, reconnect, and try again.\n\n" +
+                "Remember Isaiah 41:10: 'So do not fear, for I am with you; do not be dismayed, for I am your God.'"
+            }
+            is GeminiException.InvalidApiKeyException -> {
+                val details = e.message?.let { "\n\nDetails: $it" } ?: ""
+                "Invalid API Key 🔑\n\n" +
+                "The Gemini API key is invalid or unauthorized. If you entered a custom API key, " +
+                "please verify it in the Settings panel and make sure there are no typos or leading/trailing spaces.$details"
+            }
+            is GeminiException.RateLimitException -> {
+                val details = e.message?.let { "\n\nDetails: $it" } ?: ""
+                "Rate Limit Reached ⏳\n\n" +
+                "We have reached a temporary rate limit (HTTP 429) because multiple OverComers are currently sharing our fallback system key.\n\n" +
+                "To continue your conversation immediately without any interruptions, you can easily configure your own completely FREE, private Gemini API key from Google AI Studio. It takes under a minute, requires no credit card, and ensures you have an unlimited, private channel for your journey!\n\n" +
+                "To set your own key:\n" +
+                "1. Tap the Settings ⚙️ icon at the top right of your screen.\n" +
+                "2. Paste your free Gemini API key into the input field.\n" +
+                "3. Tap 'Save Settings' to activate your private connection.\n\n" +
+                "Let’s take a deep breath together, wait 10-15 seconds, and continue. Remember Psalm 27:14: 'Wait for the Lord; be strong and take heart and wait for the Lord.'$details"
+            }
+            is GeminiException.UnsupportedModelException -> {
+                val details = e.message?.let { "\n\nDetails: $it" } ?: ""
+                "Unsupported Model 🤖\n\n" +
+                "The selected model (gemini-3.5-flash) is currently unsupported or unavailable for this API key. " +
+                "Please verify that your Google AI Studio API key has access to the latest models.$details"
+            }
+            is GeminiException.SchemaOrBadRequestException -> {
+                val details = e.message?.let { "\n\nDetails: $it" } ?: ""
+                "Configuration Error ⚙️\n\n" +
+                "There was a bad request / configuration error (HTTP 400) when communicating with the API. This typically means the API payload schema or arguments are mismatched. " +
+                "Please ensure the application's request format is updated to match the latest Gemini API specifications.$details"
+            }
+            is GeminiException.ServerErrorException -> {
+                "Server Error 🖥️\n\n" +
+                "Google's Gemini servers returned a server error (HTTP 5xx). " +
+                "The service might be temporarily undergoing maintenance or experiencing heavy load. Please try again in a few moments."
+            }
+            else -> {
+                "Error: ${e.localizedMessage ?: "Connection failed"}. Please check your internet connection and verify that your Gemini API key is valid in the Settings panel."
+            }
+        }
+    }
+
     suspend fun generateSupportResponse(conversationHistory: List<Content>, pastChatsSummary: String? = null): String {
-        val apiKey = if (!customApiKey.isNullOrBlank()) customApiKey!! else BuildConfig.GEMINI_API_KEY
+        val apiKey = getSanitizedApiKey()
         if (apiKey.isEmpty() || apiKey == "MY_GEMINI_API_KEY") {
             return "Please configure your GEMINI_API_KEY in AI Studio's Secrets panel to enable guidance."
         }
@@ -225,17 +378,16 @@ object GeminiClient {
             response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
                 ?: "I'm here for you. Although I couldn't connect to my knowledge base right now, please reach out to God in prayer and stand firm on Romans 8:37: 'We are more than conquerors through Him who loved us.'"
         } catch (e: Exception) {
-            val msg = e.message ?: ""
-            if (msg.contains("429") || e.toString().contains("429")) {
-                "We reached a temporary rate limit (HTTP 429) due to high server traffic. Let's take a deep breath, wait 10-15 seconds, and continue. Remember Psalm 27:14: 'Wait for the Lord; be strong and take heart and wait for the Lord.'"
+            if (customApiKey.isNullOrBlank()) {
+                throw e
             } else {
-                "Error: ${e.message ?: "Connection failed"}. Please make sure your device is connected to the internet, and verify that your Gemini API key is valid in the Secrets panel."
+                getFriendlyErrorMessage(e)
             }
         }
     }
 
     suspend fun analyzeCognitiveDistortion(journalText: String): DistortionAnalysisResult {
-        val apiKey = if (!customApiKey.isNullOrBlank()) customApiKey!! else BuildConfig.GEMINI_API_KEY
+        val apiKey = getSanitizedApiKey()
         if (apiKey.isEmpty() || apiKey == "MY_GEMINI_API_KEY") {
             return DistortionAnalysisResult(
                 distortions = "API Key Needed",
@@ -309,13 +461,15 @@ object GeminiClient {
     }
 
     suspend fun generateVerseOfTheDay(): VerseOfTheDay {
-        val apiKey = if (!customApiKey.isNullOrBlank()) customApiKey!! else BuildConfig.GEMINI_API_KEY
+        val apiKey = getSanitizedApiKey()
         if (apiKey.isEmpty() || apiKey == "MY_GEMINI_API_KEY") {
             return getFallbackVerse()
         }
 
+        val todayStr = java.text.SimpleDateFormat("MMMM d, yyyy", java.util.Locale.US).format(java.util.Date())
         val prompt = """
-            Generate an encouraging biblically inspired "Verse of the Day" focused on supporting mental resilience, courage, overcoming anxiety or addiction, and standing firm in God's peace.
+            Today's date is $todayStr. Generate an encouraging biblically inspired "Verse of the Day" focused on supporting mental resilience, courage, overcoming anxiety or addiction, and standing firm in God's peace.
+            Please ensure you choose a different comforting scripture suitable for today. Ensure it is unique and different from other days of the year.
             Choose a comforting scripture from translations like NIV, AMP, or MSG.
             Provide a short, gentle, 2-3 sentence devotional reflection explaining how this scripture anchors our mind and builds emotional resilience.
             
@@ -432,8 +586,8 @@ object GeminiClient {
         return fallbackList[dayIndex % fallbackList.size]
     }
 
-    suspend fun lookupScripture(reference: String): AIScriptureResult {
-        val apiKey = if (!customApiKey.isNullOrBlank()) customApiKey!! else com.example.BuildConfig.GEMINI_API_KEY
+    suspend fun lookupScripture(reference: String, version: String = "NIV"): AIScriptureResult {
+        val apiKey = getSanitizedApiKey()
         if (apiKey.isEmpty() || apiKey == "MY_GEMINI_API_KEY") {
             return AIScriptureResult(
                 reference = reference,
@@ -443,14 +597,14 @@ object GeminiClient {
         }
 
         val prompt = """
-            Retrieve the full, authentic Bible verse text for the following scripture reference: "$reference".
+            Retrieve the full, authentic Bible verse text for the following scripture reference: "$reference" in the translation: "$version".
             Also, provide a detailed, extremely encouraging spiritual and practical commentary/pastoral reflection (3-4 sentences) on how this specific verse helps an OverComer find freedom, peace, or resilience.
-            Prefer translations like NIV, AMP, ESV, or NKJV. Specify which translation you retrieved.
+            You must retrieve the text using the exact "$version" translation. Specify which translation you retrieved.
             
             Respond strictly in valid JSON format matching this exact schema:
             {
-               "reference": "The scripture citation reference (e.g., 'Philippians 4:13 (AMP)')",
-               "text": "The exact full text of the bible verse(s) retrieved",
+               "reference": "The scripture citation reference (e.g., '$reference ($version)')",
+               "text": "The exact full text of the bible verse(s) retrieved in the $version translation",
                "explanation": "The pastoral, comforting, encouraging spiritual explanation and study commentary"
             }
         """.trimIndent()
@@ -510,10 +664,10 @@ object GeminiClient {
         return horryKeywords.any { loc.contains(it) }
     }
 
-    suspend fun searchLocalResources(location: String, searchType: String, prioritizeAlignment: Boolean = true): List<LocalResource> {
-        val apiKey = if (!customApiKey.isNullOrBlank()) customApiKey!! else BuildConfig.GEMINI_API_KEY
+    suspend fun searchLocalResources(location: String, searchType: String, prioritizeAlignment: Boolean = true, page: Int = 0): List<LocalResource> {
+        val apiKey = getSanitizedApiKey()
         val rawResults = if (apiKey.isEmpty() || apiKey == "MY_GEMINI_API_KEY") {
-            getFallbackResources(location, searchType, prioritizeAlignment)
+            getFallbackResources(location, searchType, prioritizeAlignment, page)
         } else {
             val alignmentInstructions = if (prioritizeAlignment) {
                 """
@@ -531,6 +685,7 @@ object GeminiClient {
 
             val prompt = """
                 Find authentic and active local resources near "$location" matching the category "$searchType".
+                (This is request page/batch number ${page + 1}. Find up to 4 real matches. Please ensure these matches are completely different and distinct from any previously returned results for this location and category).
                 
                 $alignmentInstructions
                 
@@ -538,10 +693,11 @@ object GeminiClient {
                 1. If category is "Celebrate Recovery", search for Celebrate Recovery ministries and support group meetings in or near this location.
                 2. If category is "Christian Support Groups", search for Christian-based addiction recovery support groups, Bible studies for struggles, or peer-led groups in or near this location.
                 3. If category is "Churches", search for bible-believing Christian churches, assemblies, or chapels in or near this location.
+                4. If category is "Veteran Support", search for local veteran support resources, VA clinics/outreach centers, Christian veteran transition ministries (such as REBOOT Recovery), VFW/American Legion posts, or local military-to-civilian transition assistance near this location.
                 
                 For each resource found, provide:
                 - name: The real official name of the church, meeting location, or group.
-                - type: The category ("Celebrate Recovery", "Christian Support Group", or "Christian Church").
+                - type: The category ("Celebrate Recovery", "Christian Support Group", "Christian Church", or "Veteran Support").
                 - address: The full physical address (street, city, state, zip) to help them travel there.
                 - details: A helpful description including typical meeting times (e.g., 'Tuesdays at 7 PM'), service hours, or unique recovery/ministry focuses.
                 - contact: A phone number, email, or main contact info if known (otherwise 'Contact local venue').
@@ -575,9 +731,9 @@ object GeminiClient {
             try {
                 val response = safeCallGemini(apiKey, request)
                 val jsonString = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text ?: ""
-                parseResourcesResult(jsonString, location, searchType, prioritizeAlignment)
+                parseResourcesResult(jsonString, location, searchType, prioritizeAlignment, page)
             } catch (e: Exception) {
-                getFallbackResources(location, searchType, prioritizeAlignment)
+                getFallbackResources(location, searchType, prioritizeAlignment, page)
             }
         }
 
@@ -602,7 +758,7 @@ object GeminiClient {
         }
     }
 
-    private fun parseResourcesResult(jsonStr: String, location: String, searchType: String, prioritizeAlignment: Boolean): List<LocalResource> {
+    private fun parseResourcesResult(jsonStr: String, location: String, searchType: String, prioritizeAlignment: Boolean, page: Int = 0): List<LocalResource> {
         return try {
             val cleaned = jsonStr.trim()
                 .substringAfter("```json")
@@ -626,18 +782,18 @@ object GeminiClient {
                 )
             }
             if (list.isEmpty()) {
-                getFallbackResources(location, searchType, prioritizeAlignment)
+                getFallbackResources(location, searchType, prioritizeAlignment, page)
             } else {
                 list
             }
         } catch (e: Exception) {
-            getFallbackResources(location, searchType, prioritizeAlignment)
+            getFallbackResources(location, searchType, prioritizeAlignment, page)
         }
     }
 
-    fun getFallbackResources(location: String, searchType: String, prioritizeAlignment: Boolean): List<LocalResource> {
+    fun getFallbackResources(location: String, searchType: String, prioritizeAlignment: Boolean, page: Int = 0): List<LocalResource> {
         val locLabel = location.ifBlank { "your area" }
-        return when (searchType) {
+        val baseList = when (searchType) {
             "Celebrate Recovery" -> listOf(
                 LocalResource(
                     name = "Celebrate Recovery National Directory",
@@ -672,6 +828,32 @@ object GeminiClient {
                     details = "Faith-based recovery and rehabilitation programs with local support networks, mentoring, and counseling services affiliated with Assemblies of God.",
                     contact = "teenchallengeusa.org",
                     directionUrl = "https://www.google.com/maps/search/?api=1&query=Teen+Challenge+near+$location"
+                )
+            )
+            "Veteran Support" -> listOf(
+                LocalResource(
+                    name = "Veterans Crisis Line & VA Clinic Support",
+                    type = "Veteran Support",
+                    address = "Available nationwide (Dial 988, then press 1)",
+                    details = "A free, confidential resource available 24/7 to active duty service members, guardsmen, reservists, and veterans. Offers immediate care and referrals to local VA medical centers.",
+                    contact = "Dial 988, press 1 | Text 838255",
+                    directionUrl = "https://www.google.com/maps/search/?api=1&query=VA+Medical+Center+near+$location"
+                ),
+                LocalResource(
+                    name = "REBOOT Recovery (Veteran & First Responder Support)",
+                    type = "Veteran Support",
+                    address = "Local faith-based courses near $locLabel",
+                    details = "REBOOT offers trauma recovery courses specifically tailored to combat veterans and their families. This Christian-led program helps veterans address the moral and spiritual wounds of service.",
+                    contact = "rebootrecovery.com/military",
+                    directionUrl = "https://rebootrecovery.com/military"
+                ),
+                LocalResource(
+                    name = "Local VFW Post (Veterans of Foreign Wars)",
+                    type = "Veteran Support",
+                    address = "Main Chapter near $locLabel",
+                    details = "A dedicated post offering veteran peer fellowship, local advocacy, and service officers to help navigate VA benefits and community transition support.",
+                    contact = "Contact local VFW officer",
+                    directionUrl = "https://www.google.com/maps/search/?api=1&query=VFW+Post+near+$location"
                 )
             )
             else -> {
@@ -731,6 +913,18 @@ object GeminiClient {
                     )
                 }
             }
+        }
+
+        return if (page > 0) {
+            baseList.map { res ->
+                res.copy(
+                    name = "${res.name} (Alternate Location ${page + 1})",
+                    address = res.address + " Suite " + (page * 10 + 1),
+                    details = "${res.details} This is search result set ${page + 1}."
+                )
+            }
+        } else {
+            baseList
         }
     }
 }

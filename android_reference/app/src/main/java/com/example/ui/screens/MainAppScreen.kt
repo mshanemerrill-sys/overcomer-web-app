@@ -105,6 +105,7 @@ fun FocusSelectionScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
+            .safeDrawingPadding()
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -123,13 +124,11 @@ fun FocusSelectionScreen(
             )
 
             Text(
-                text = "Welcome to OverComer",
-                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp),
+                text = "Welcome to Overcomer—where we live from Christ’s position of Victory",
+                style = MaterialTheme.typography.titleLarge.copy(fontSize = 20.sp, lineHeight = 26.sp),
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onBackground,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                softWrap = false
+                textAlign = TextAlign.Center
             )
 
             Card(
@@ -138,13 +137,56 @@ fun FocusSelectionScreen(
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Text(
-                    text = "Are you having an all around tough day, Are you struggling with your substance recovery or are you struggling with your mental health wellness?",
-                    style = MaterialTheme.typography.titleMedium.copy(lineHeight = 24.sp),
-                    fontWeight = FontWeight.SemiBold,
+                    text = "This App is built to lift up those fighting addiction or mental health struggles, assist veterans processing service, or support individuals overcoming the weight of past incarceration. It is equally a refuge for anyone who doesn't face these specific battles but is simply having a rough day and needs a lift. Out of every struggle comes a story.\n\nStep into your focus path, claim your peace, or simply log in to share your testimony and Victory Day.",
+                    style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 22.sp),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(20.dp)
                 )
+            }
+
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onSelect("TESTIMONY_VICTORY") }
+                    .testTag("victory_board_link_card"),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFFFF8E1)
+                ),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.5.dp, Color(0xFFFFA000))
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Color(0xFFFFA000).copy(alpha = 0.15f), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Victory Board link",
+                            tint = Color(0xFFFFA000),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Tap here to view testimonies of other OverComers Here",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color(0xFFE65100)
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowRight,
+                        contentDescription = "Go to Victory Board",
+                        tint = Color(0xFFFFA000)
+                    )
+                }
             }
 
             Text(
@@ -185,7 +227,17 @@ fun FocusSelectionScreen(
                 testTag = "focus_mental_health_card"
             )
 
-            // Option 4: Today is a Testimony/Victory Day
+            // Option 4: Veteran Transition & Freedom
+            FocusOptionCard(
+                title = "Veteran Transition & Freedom",
+                description = "Sound biblical counsel for PTSD, transition struggles, and civilian reintegration. Includes national, state, and local support resources.",
+                icon = Icons.Default.Star,
+                color = Color(0xFF1B5E20), // Dark military green
+                onClick = { onSelect("VETERAN_TRANSITION") },
+                testTag = "focus_veteran_transition_card"
+            )
+
+            // Option 5: Today is a Testimony/Victory Day
             FocusOptionCard(
                 title = "Today is a Testimony/Victory Day",
                 description = "Celebrate what God has done! Enjoy victorious scriptures, battle-winning quotes, and share your triumphs with your OverComer companion.",
@@ -530,6 +582,7 @@ fun MainAppScreen(
                                         "SUBSTANCE_RECOVERY" -> "Recovery"
                                         "MENTAL_HEALTH" -> "Wellness"
                                         "TOUGH_DAY" -> "Tough Day"
+                                        "VETERAN_TRANSITION" -> "Veteran"
                                         else -> "Select"
                                     },
                                     style = MaterialTheme.typography.labelSmall,
@@ -758,6 +811,7 @@ fun FreedomTabScreen(
         "SUBSTANCE_RECOVERY" -> "Remember: You are not defined by your struggle, but by His grace. You are a new creation in Christ. Cleanse your mind, breathe deep, and walk in absolute victory today."
         "MENTAL_HEALTH" -> "Remember: You are loved, cherished, and chosen by God. You are a new creation in Christ. Cleanse your mind, rest in His peace, and walk in emotional resilience today."
         "TOUGH_DAY" -> "Today might feel like an all round tough day, but God is your present help in times of trouble. Let His supernatural grace carry your load today."
+        "VETERAN_TRANSITION" -> "Remember: Your identity is anchored in Jesus Christ, who has won the ultimate battle for you. It is alright to ask for help—God is your shield, your fortress, and your deliverer. Walk in His peace today."
         "TESTIMONY_VICTORY" -> "Today is a Testimony and Victory Day! Let's praise God for His absolute faithfulness, rejoice in His mercy, and walk in the fullness of His triumph today."
         else -> "Remember: You are not defined by your struggle, but by His grace. You are a new creation in Christ. Cleanse your mind, breathe deep, and walk in absolute victory today."
     }
@@ -1047,6 +1101,8 @@ fun FreedomTabScreen(
                             Text(
                                 text = if (userPath == "MENTAL_HEALTH") {
                                     if (daysCount == 1) "DAY OF TRANQUILITY" else "DAYS OF PEACE"
+                                } else if (userPath == "VETERAN_TRANSITION") {
+                                    if (daysCount == 1) "DAY OF INTEGRATION" else "DAYS OF CIVILIAN STRENGTH"
                                 } else {
                                     if (daysCount == 1) "DAY OF FREEDOM" else "DAYS OF VICTORY"
                                 },
@@ -1074,7 +1130,7 @@ fun FreedomTabScreen(
                             }
                         }
                         
-                        if (userPath == "MENTAL_HEALTH") {
+                        if (userPath == "MENTAL_HEALTH" || userPath == "VETERAN_TRANSITION") {
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(
                                 text = "Sovereign walk in $savedStruggle",
@@ -1112,7 +1168,13 @@ fun FreedomTabScreen(
             }
 
             item {
-                val creedTitle = if (userPath == "MENTAL_HEALTH") "My Mental Peace Covenant" else "My OverComer Creed"
+                val creedTitle = if (userPath == "MENTAL_HEALTH") {
+                    "My Mental Peace Covenant"
+                } else if (userPath == "VETERAN_TRANSITION") {
+                    "My Veteran Covenant of Freedom"
+                } else {
+                    "My OverComer Creed"
+                }
                 val creedText = savedDeclaration
 
                 // OverComer declaration card - Clean Minimal Secondary Container scheme
@@ -1172,12 +1234,26 @@ fun FreedomTabScreen(
             }
         }
 
+        if (userPath == "VETERAN_TRANSITION") {
+            item {
+                VeteranSupportSection()
+            }
+        }
+
         item {
             SupportGroupLocatorSection(viewModel = viewModel)
         }
 
         item {
             PostIncarcerationSupportSection()
+        }
+
+        item {
+            CuratedBiblicalLibrarySection()
+        }
+
+        item {
+            TheFaithConnectionSection()
         }
 
         item {
@@ -1464,6 +1540,12 @@ fun FreedomTabScreen(
                 "The date I started having good days",
                 "The date I stopped having anxiety/panic"
             )
+        } else if (userPath == "VETERAN_TRANSITION") {
+            listOf(
+                "The date I transitioned to civilian life",
+                "The date I committed to walk in freedom with my platoon",
+                "The date I stopped letting trauma define me"
+            )
         } else {
             listOf(
                 "since I OverCome addiction",
@@ -1492,7 +1574,14 @@ fun FreedomTabScreen(
 
         AlertDialog(
             onDismissRequest = { showEditGoalDialog = false },
-            title = { Text(if (userPath == "MENTAL_HEALTH") "Walk of Peace Settings" else "Walk of Freedom Settings") },
+            title = {
+                val titleText = when (userPath) {
+                    "MENTAL_HEALTH" -> "Walk of Peace Settings"
+                    "VETERAN_TRANSITION" -> "Veteran Transition Settings"
+                    else -> "Walk of Freedom Settings"
+                }
+                Text(titleText)
+            },
             text = {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -1507,6 +1596,8 @@ fun FreedomTabScreen(
                     Text("My Focus Area:", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                     val struggleTypes = if (userPath == "MENTAL_HEALTH") {
                         listOf("Anxiety", "Depression", "Fear", "Anger", "Trauma / PTSD", "Mental Peace")
+                    } else if (userPath == "VETERAN_TRANSITION") {
+                        listOf("Transition Stress", "Combat Trauma / PTSD", "Loss of Mission", "Hypervigilance", "Civilian Integration")
                     } else {
                         listOf("Substance Use", "Alcohol / Drinking", "Drugs", "Nicotine / Smoking", "Habitual Temptations")
                     }
@@ -2545,7 +2636,8 @@ class LiveVoiceController(
             field = value
             if (value) {
                 stopListening()
-                mainLooperHandler.removeCallbacksAndMessages(null)
+                mainLooperHandler.removeCallbacks(finalizeSpeechRunnable)
+                restartRunnable?.let { mainLooperHandler.removeCallbacks(it) }
             }
         }
 
@@ -2554,6 +2646,19 @@ class LiveVoiceController(
     private var consecutiveErrors = 0
     private val maxConsecutiveErrors = 3
     private var lastErrorTime = 0L
+
+    private var restartRunnable: Runnable? = null
+
+    private fun scheduleRestart(delay: Long) {
+        restartRunnable?.let { mainLooperHandler.removeCallbacks(it) }
+        val runnable = Runnable {
+            if (!isMuted && !isTtsSpeaking && !isThinking) {
+                startListening()
+            }
+        }
+        restartRunnable = runnable
+        mainLooperHandler.postDelayed(runnable, delay)
+    }
 
     // Intelligent speech accumulator to support seamless, pause-friendly hands-free speaking
     private val accumulatedSpeech = StringBuilder()
@@ -2738,7 +2843,9 @@ class LiveVoiceController(
     }
 
     init {
-        val listener = TextToSpeech.OnInitListener { status ->
+        var listener: TextToSpeech.OnInitListener? = null
+
+        listener = TextToSpeech.OnInitListener { status ->
             if (status == TextToSpeech.SUCCESS) {
                 applyVoiceSettings()
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
@@ -2770,11 +2877,12 @@ class LiveVoiceController(
             }
         }
 
-        // Strongly prefer Google's high-fidelity natural Text-to-Speech voices
+        // Initialize with the system default TTS engine to ensure compatibility across non-Pixel devices (e.g., Samsung).
         tts = try {
-            TextToSpeech(context, listener, "com.google.android.tts")
-        } catch (_: Throwable) {
-            TextToSpeech(context, listener)
+            TextToSpeech(context, listener!!)
+        } catch (e: Exception) {
+            onErrorMsg("TextToSpeech initialization failed.")
+            null
         }
 
         if (isRecognizerAvailable) {
@@ -2836,24 +2944,14 @@ class LiveVoiceController(
                         if (error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT || error == SpeechRecognizer.ERROR_NO_MATCH) {
                             consecutiveErrors = 0
                             val retryInterval = 400L // Fast seamless restart
-                            mainLooperHandler.removeCallbacksAndMessages(null)
-                            mainLooperHandler.postDelayed({
-                                if (!isMuted && !isTtsSpeaking && !isThinking) {
-                                    startListening()
-                                }
-                            }, retryInterval)
+                            scheduleRestart(retryInterval)
                             return
                         }
 
                         // Solve immediate start lag/glitch by treating BUSY status with an immediate reset and fast restart
                         if (error == SpeechRecognizer.ERROR_RECOGNIZER_BUSY) {
                             try { speechRecognizer?.cancel() } catch (_: Exception) {}
-                            mainLooperHandler.removeCallbacksAndMessages(null)
-                            mainLooperHandler.postDelayed({
-                                if (!isMuted && !isTtsSpeaking && !isThinking) {
-                                    startListening()
-                                }
-                            }, 100L) // Ultra fast 100ms retry for busy states
+                            scheduleRestart(100L) // Ultra fast 100ms retry for busy states
                             return
                         }
 
@@ -2867,12 +2965,7 @@ class LiveVoiceController(
                         }
 
                         val retryInterval = 1000L
-                        mainLooperHandler.removeCallbacksAndMessages(null)
-                        mainLooperHandler.postDelayed({
-                            if (!isMuted && !isTtsSpeaking && !isThinking) {
-                                startListening()
-                            }
-                        }, retryInterval)
+                        scheduleRestart(retryInterval)
                     }
 
                     override fun onResults(results: Bundle?) {
@@ -2921,8 +3014,8 @@ class LiveVoiceController(
         
         onUserTextPartial(accumulatedSpeech.toString())
         
-        // 1.8 seconds grace period of silence allows the user to pause, breathe, or pace without early cutoff
-        val speakDelay = 1800L
+        // 3.5 seconds grace period of silence allows the user to pause, breathe, or pace without early cutoff, meeting user request for at least 3 seconds
+        val speakDelay = 3500L
         mainLooperHandler.postDelayed(finalizeSpeechRunnable, speakDelay)
         
         // Continuous listening: restart recognizer immediately to catch next phrase
@@ -2999,7 +3092,8 @@ class LiveVoiceController(
         isThinking = false
         stopListening()
         // Cancel any pending speech listening retries or finalization runnables immediately when we transition to speaking
-        mainLooperHandler.removeCallbacksAndMessages(null)
+        mainLooperHandler.removeCallbacks(finalizeSpeechRunnable)
+        restartRunnable?.let { mainLooperHandler.removeCallbacks(it) }
         accumulatedSpeech.clear()
         
         mainLooperHandler.post {
@@ -3050,7 +3144,8 @@ class LiveVoiceController(
     fun shutdown() {
         isCurrentlyListening = false
         isTtsSpeaking = false
-        mainLooperHandler.removeCallbacksAndMessages(null)
+        mainLooperHandler.removeCallbacks(finalizeSpeechRunnable)
+        restartRunnable?.let { mainLooperHandler.removeCallbacks(it) }
         stopSpeak()
         try {
             tts?.shutdown()
@@ -3081,6 +3176,7 @@ fun LiveVoiceSessionDialog(
 
     val chatMessages by viewModel.chatMessages.collectAsStateWithLifecycle()
     val isChatLoading by viewModel.isChatLoading.collectAsStateWithLifecycle()
+    val chatError by viewModel.chatError.collectAsStateWithLifecycle()
 
     // Keep instance reference of the controller
     var controller by remember { mutableStateOf<LiveVoiceController?>(null) }
@@ -3088,6 +3184,17 @@ fun LiveVoiceSessionDialog(
     // Prevent duplicated speaking or race condition triggers
     var lastSpokenMessageText by remember {
         mutableStateOf(chatMessages.lastOrNull { !it.isUser }?.text ?: "")
+    }
+
+    // Handle chat error state immediately
+    LaunchedEffect(chatError) {
+        val err = chatError
+        if (err != null) {
+            errorMsg = err
+            liveState = LiveModeState.ERROR
+            controller?.isThinking = false
+            controller?.stopListening()
+        }
     }
 
     // Synchronize response complete and reading state immediately when message arrives and controller is ready
@@ -3108,6 +3215,7 @@ fun LiveVoiceSessionDialog(
 
     // Initialize controller on mount, clean on unmount
     DisposableEffect(Unit) {
+        viewModel.clearChatError()
         val initialVoiceId = sharedPrefs.getString("counselor_selected_voice", CounselorVoice.GENTLE_GUIDE.id) ?: CounselorVoice.GENTLE_GUIDE.id
         val initialVoice = CounselorVoice.values().find { it.id == initialVoiceId } ?: CounselorVoice.GENTLE_GUIDE
 
@@ -3724,6 +3832,10 @@ fun ChatTabScreen(viewModel: OverComerViewModel) {
     var showSavedSessionsList by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    val customApiKey by viewModel.customApiKey.collectAsStateWithLifecycle()
+    val customApiKeyStatus by viewModel.customApiKeyStatus.collectAsStateWithLifecycle()
+    var showLocalApiSettingsDialog by remember { mutableStateOf(false) }
+
     val micPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -3793,6 +3905,13 @@ fun ChatTabScreen(viewModel: OverComerViewModel) {
         )
     }
 
+    if (showLocalApiSettingsDialog) {
+        SecureApiSettingsDialog(
+            viewModel = viewModel,
+            onDismissRequest = { showLocalApiSettingsDialog = false }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -3822,6 +3941,163 @@ fun ChatTabScreen(viewModel: OverComerViewModel) {
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f)
             )
+        }
+
+        if (customApiKey.isBlank()) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 6.dp)
+                    .testTag("companion_api_setup_card"),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFFFF8E1) // light beautiful amber
+                ),
+                shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.5.dp, Color(0xFFFFA000))
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.VpnKey,
+                            contentDescription = "Key Icon",
+                            tint = Color(0xFFE65100),
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = "Connect Your Private Companion Key (100% Free)",
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                            color = Color(0xFFE65100)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "The Overcomer's Companion runs on Google's Gemini AI. To enjoy unlimited, completely private, and 100% free support, configure your own free API key from Google AI Studio. Setting up a key takes under 1 minute and does not require any credit card.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF5D4037),
+                        lineHeight = 16.sp
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Button 1: Get free API key
+                        Button(
+                            onClick = {
+                                try {
+                                    val intent = android.content.Intent(
+                                        android.content.Intent.ACTION_VIEW,
+                                        android.net.Uri.parse("https://aistudio.google.com/")
+                                    )
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, "Could not open browser. Please visit https://aistudio.google.com/", Toast.LENGTH_LONG).show()
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFFE65100),
+                                contentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.weight(1f).testTag("get_key_from_companion_screen_btn")
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Launch,
+                                    contentDescription = "Get Key Icon",
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Text(
+                                    "Get Free Key",
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                                )
+                            }
+                        }
+
+                        // Button 2: Enter key
+                        OutlinedButton(
+                            onClick = { showLocalApiSettingsDialog = true },
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color(0xFFE65100)
+                            ),
+                            border = BorderStroke(1.dp, Color(0xFFE65100)),
+                            shape = RoundedCornerShape(10.dp),
+                            modifier = Modifier.weight(1f).testTag("configure_key_from_companion_screen_btn")
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Configure Key Icon",
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Text(
+                                    "Configure Key",
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (customApiKey.isNotBlank()) {
+            val (colors, bannerIcon) = when (customApiKeyStatus) {
+                "verified" -> Triple(Color(0xFFE8F5E9), Color(0xFF2E7D32), "Private Companion Connection Active ✨") to Icons.Default.CheckCircle
+                "failed" -> Triple(Color(0xFFFFEBEE), Color(0xFFC62828), "Private Companion Connection Failed ❌") to Icons.Default.Error
+                else -> Triple(Color(0xFFFFF3E0), Color(0xFFE65100), "Private Companion Connection Not Verified ⚠️") to Icons.Default.Warning
+            }
+            val (bannerBg, bannerFg, bannerText) = colors
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                color = bannerBg,
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            imageVector = bannerIcon,
+                            contentDescription = "Active connection status",
+                            tint = bannerFg,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = bannerText,
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                            color = bannerFg
+                        )
+                    }
+                    TextButton(
+                        onClick = { showLocalApiSettingsDialog = true },
+                        contentPadding = PaddingValues(0.dp),
+                        modifier = Modifier.height(24.dp)
+                    ) {
+                        Text(
+                            text = "Change Key",
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.ExtraBold),
+                            color = bannerFg
+                        )
+                    }
+                }
+            }
         }
 
         // Safe privacy banner
@@ -4468,7 +4744,16 @@ fun JournalLogsTabScreen(viewModel: OverComerViewModel) {
                                 FilterChip(
                                     selected = logFilter == filter,
                                     onClick = { logFilter = filter },
-                                    label = { Text(filter) },
+                                    label = {
+                                        val labelText = when (filter) {
+                                            "ALL" -> "Show All"
+                                            "CBT" -> "Mind Renewal"
+                                            "TRIGGER" -> "Triggers"
+                                            "REFLECT" -> "Grace Notes"
+                                            else -> filter
+                                        }
+                                        Text(labelText)
+                                    },
                                     modifier = Modifier.testTag("log_filter_chip_$filter")
                                 )
                             }
@@ -5081,7 +5366,15 @@ fun JournalLogsTabScreen(viewModel: OverComerViewModel) {
                             ElevatedFilterChip(
                                 selected = selectedLogType == type,
                                 onClick = { selectedLogType = type },
-                                label = { Text(type) },
+                                label = {
+                                    val labelText = when (type) {
+                                        "CBT" -> "Mind Renewal"
+                                        "TRIGGER" -> "Trigger Event"
+                                        "REFLECT" -> "Grace Reflection"
+                                        else -> type
+                                    }
+                                    Text(labelText)
+                                },
                                 modifier = Modifier.testTag("form_log_type_$type")
                             )
                         }
@@ -5975,6 +6268,27 @@ val inspirationalQuotes = listOf(
         category = "Overcoming Cravings"
     ),
     InspirationalQuote(
+        id = 13,
+        text = "The Holy Spirit will always meet you on the level of your faith, and if you believe that Jesus is able to deliver you completely, He will do it.",
+        reference = "David Wilkerson",
+        contextReflection = "Perfect deliverance is powered by simple faith in Jesus' resurrection power, rather than our willpower.",
+        category = "Overcoming Cravings"
+    ),
+    InspirationalQuote(
+        id = 14,
+        text = "Addiction is worship gone wrong. True freedom begins when we reorient our hearts to worship the living God instead of our desires.",
+        reference = "Edward T. Welch",
+        contextReflection = "Our cravings point to deep spiritual thirst. Worship God with that intensity, and the lesser desires will fade.",
+        category = "Overcoming Cravings"
+    ),
+    InspirationalQuote(
+        id = 15,
+        text = "Surrendering to Jesus isn't a sign of weakness; it is the ultimate expression of courage that breaks every chain of desire.",
+        reference = "Nicky Cruz",
+        contextReflection = "True strength begins when we stop fighting in our own power and surrender our battle to the Savior.",
+        category = "Overcoming Cravings"
+    ),
+    InspirationalQuote(
         id = 4,
         text = "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God.",
         reference = "Philippians 4:6-7",
@@ -5993,6 +6307,27 @@ val inspirationalQuotes = listOf(
         text = "Peace I leave with you; my peace I give you. I do not give to you as the world gives. Do not let your hearts be troubled and do not be afraid.",
         reference = "John 14:27",
         contextReflection = "Jesus doesn't give transactional peace that depends on circumstances. He gives structural, spiritual peace. Rest in it.",
+        category = "Peace & Anxiety"
+    ),
+    InspirationalQuote(
+        id = 16,
+        text = "I have learned that the way to overcome anxiety is to look away from self to the security of God's sovereign care.",
+        reference = "C.S. Lewis",
+        contextReflection = "Anxiety looks inward at our limits. Peace looks outward at God's limitless love and sovereignty.",
+        category = "Peace & Anxiety"
+    ),
+    InspirationalQuote(
+        id = 17,
+        text = "Anxiety does not empty tomorrow of its sorrows, but only empties today of its strength.",
+        reference = "Charles Spurgeon",
+        contextReflection = "Sorrow and worry rob you of the grace given to live in the present. Trust Him for today's steps.",
+        category = "Peace & Anxiety"
+    ),
+    InspirationalQuote(
+        id = 18,
+        text = "Real peace comes when we stop demanding that our circumstances change and instead rest in the unwavering love of the Father.",
+        reference = "Dr. Larry Crabb",
+        contextReflection = "True spiritual rest isn't found in a perfect environment, but in a perfect Relationship.",
         category = "Peace & Anxiety"
     ),
     InspirationalQuote(
@@ -6017,6 +6352,27 @@ val inspirationalQuotes = listOf(
         category = "Strength & Faith"
     ),
     InspirationalQuote(
+        id = 19,
+        text = "God's work done in God's way will never lack God's supply. Rely on His strength, not your own.",
+        reference = "Hudson Taylor",
+        contextReflection = "When we follow His path and guidelines, He is fully committed to providing the strength and resources we need.",
+        category = "Strength & Faith"
+    ),
+    InspirationalQuote(
+        id = 20,
+        text = "Faith is not about believing God will do what you want; it is trusting that He is who He says He is, and that He is active in your weakness.",
+        reference = "Paul David Tripp",
+        contextReflection = "Faith is anchored in His character. He uses our moments of weakness to demonstrate His perfect grace.",
+        category = "Strength & Faith"
+    ),
+    InspirationalQuote(
+        id = 21,
+        text = "God is looking for people through whom He can do the impossible. What a pity that we plan only what we can do by ourselves.",
+        reference = "A.W. Tozer",
+        contextReflection = "Step out of your comfort zone and trust Him to do what you could never accomplish in your human effort.",
+        category = "Strength & Faith"
+    ),
+    InspirationalQuote(
         id = 10,
         text = "Therefore, if anyone is in Christ, the new creation has come: The old has gone, the new is here!",
         reference = "2 Corinthians 5:17",
@@ -6035,6 +6391,27 @@ val inspirationalQuotes = listOf(
         text = "But he said to me, 'My grace is sufficient for you, for my power is made perfect in weakness.'",
         reference = "2 Corinthians 12:9",
         contextReflection = "Weakness is not a disqualification; it is a canvas for His strength. Admit your struggle and let His grace power you through.",
+        category = "Grace & Forgiveness"
+    ),
+    InspirationalQuote(
+        id = 22,
+        text = "To be a Christian means to forgive the inexcusable because God has forgiven the inexcusable in you.",
+        reference = "C.S. Lewis",
+        contextReflection = "The power to forgive others flows directly from realizing how deeply we have been forgiven by Christ.",
+        category = "Grace & Forgiveness"
+    ),
+    InspirationalQuote(
+        id = 23,
+        text = "Grace means God is for us even when we fail. True accountability is built on the foundation of that absolute safety.",
+        reference = "Dr. Henry Cloud",
+        contextReflection = "We don't hide our flaws out of fear when we realize God's grace provides an unshakable shelter of love.",
+        category = "Grace & Forgiveness"
+    ),
+    InspirationalQuote(
+        id = 24,
+        text = "The cross shows us the extent of our sin, but it also shows us the limitless depth of God's mercy and grace.",
+        reference = "Billy Graham",
+        contextReflection = "Never let guilt keep you from Him. His mercy at the cross is infinitely greater than your failures.",
         category = "Grace & Forgiveness"
     )
 )
@@ -6144,6 +6521,229 @@ val curatedPassages = listOf(
     )
 )
 
+val curatedPassagesTranslations = mapOf(
+    "NKJV" to listOf(
+        // Psalms 23
+        listOf(
+            1 to "The Lord is my shepherd; I shall not want.",
+            2 to "He makes me to lie down in green pastures; He leads me beside the still waters.",
+            3 to "He restores my soul; He leads me in the paths of righteousness For His name's sake.",
+            4 to "Yea, though I walk through the valley of the shadow of death, I will fear no evil; For You are with me; Your rod and Your staff, they comfort me.",
+            5 to "You prepare a table before me in the presence of my enemies; You anoint my head with oil; My cup runs over.",
+            6 to "Surely goodness and mercy shall follow me All the days of my life; And I will dwell in the house of the Lord Forever."
+        ),
+        // Philippians 4 (verses 4-9, 13)
+        listOf(
+            4 to "Rejoice in the Lord always. Again I will say, rejoice!",
+            5 to "Let your gentleness be known to all men. The Lord is at hand.",
+            6 to "Be anxious for nothing, but in everything by prayer and supplication, with thanksgiving, let your requests be made known to God;",
+            7 to "and the peace of God, which surpasses all understanding, will guard your hearts and minds through Christ Jesus.",
+            8 to "Finally, brethren, whatever things are true, whatever things are noble, whatever things are just, whatever things are pure, whatever things are lovely, whatever things are of good report, if there is any virtue and if there is any praise—meditate on these things.",
+            9 to "The things which you learned and received and heard and saw in me, these do, and the God of peace will be with you.",
+            13 to "I can do all things through Christ who strengthens me."
+        ),
+        // John 3 (verses 16-17)
+        listOf(
+            16 to "For God so loved the world that He gave His only begotten Son, that whoever believes in Him should not perish but have everlasting life.",
+            17 to "For God did not send His Son into the world to condemn the world, but that the world through Him might be saved."
+        ),
+        // Romans 8 (verses 1-2, 31, 35, 37-39)
+        listOf(
+            1 to "There is therefore now no condemnation to those who are in Christ Jesus, who do not walk according to the flesh, but according to the Spirit.",
+            2 to "For the law of the Spirit of life in Christ Jesus has made me free from the law of sin and death.",
+            31 to "What then shall we say to these things? If God is for us, who can be against us?",
+            35 to "Who shall separate us from the love of Christ? Shall tribulation, or distress, or persecution, or famine, or nakedness, or peril, or sword?",
+            37 to "Yet in all these things we are more than conquerors through Him who loved us.",
+            38 to "For I am persuaded that neither death nor life, nor angels nor principalities nor powers, nor things present nor things to come,",
+            39 to "nor height nor depth, nor any other created thing, shall be able to separate us from the love of God which is in Christ Jesus our Lord."
+        ),
+        // James 1 (verses 2-4, 12)
+        listOf(
+            2 to "My brethren, count it all joy when you fall into various trials,",
+            3 to "knowing that the testing of your faith produces patience.",
+            4 to "But let patience have its perfect work, that you may be perfect and complete, lacking nothing.",
+            12 to "Blessed is the man who endures temptation; for when he has been approved, he will receive the crown of life which the Lord has promised to those who love Him."
+        ),
+        // Psalms 91 (verses 1-4)
+        listOf(
+            1 to "He who dwells in the secret place of the Most High Shall abide under the shadow of the Almighty.",
+            2 to "I will say of the Lord, 'He is my refuge and my fortress; My God, in Him I will trust.'",
+            3 to "Surely He shall deliver you from the snare of the fowler And from the perilous peril.",
+            4 to "He shall cover you with His feathers, And under His wings you shall take refuge; His truth shall be your shield and buckler."
+        ),
+        // James 3 (verses 2, 5)
+        listOf(
+            2 to "For we all stumble in many things. If anyone does not stumble in word, he is a perfect man, able also to bridle the whole body.",
+            5 to "Even so the tongue is a little member and boasts great things. See how great a forest a little fire kindles!"
+        )
+    ),
+    "KJV" to listOf(
+        // Psalms 23
+        listOf(
+            1 to "The Lord is my shepherd; I shall not want.",
+            2 to "He maketh me to lie down in green pastures: he leadeth me beside the still waters.",
+            3 to "He restoreth my soul: he leadeth me in the paths of righteousness for his name's sake.",
+            4 to "Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me; thy rod and thy staff they comfort me.",
+            5 to "Thou preparest a table before me in the presence of mine enemies: thou anointest my head with oil; my cup runneth over.",
+            6 to "Surely goodness and mercy shall follow me all the days of my life: and I will dwell in the house of the Lord for ever."
+        ),
+        // Philippians 4 (verses 4-9, 13)
+        listOf(
+            4 to "Rejoice in the Lord alway: and again I say, Rejoice.",
+            5 to "Let your moderation be known unto all men. The Lord is at hand.",
+            6 to "Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.",
+            7 to "And the peace of God, which passeth all understanding, shall keep your hearts and minds through Christ Jesus.",
+            8 to "Finally, brethren, whatsoever things are true, whatsoever things are honest, whatsoever things are just, whatsoever things are pure, whatsoever things are lovely, whatsoever things are of good report; if there be any virtue, and if there be any praise, think on these things.",
+            9 to "Those things, which ye have both learned, and received, and heard, and seen in me, do: and the God of peace shall be with you.",
+            13 to "I can do all things through Christ which strengtheneth me."
+        ),
+        // John 3 (verses 16-17)
+        listOf(
+            16 to "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.",
+            17 to "For God sent not his Son into the world to condemn the world; but that the world through him might be saved."
+        ),
+        // Romans 8 (verses 1-2, 31, 35, 37-39)
+        listOf(
+            1 to "There is therefore now no condemnation to them which are in Christ Jesus, who walk not after the flesh, but after the Spirit.",
+            2 to "For the law of the Spirit of life in Christ Jesus hath made me free from the law of sin and death.",
+            31 to "What shall we then say to these things? If God be for us, who can be against us?",
+            35 to "Who shall separate us from the love of Christ? shall tribulation, or distress, or persecution, or famine, or nakedness, or peril, or sword?",
+            37 to "Nay, in all these things we are more than conquerors through him that loved us.",
+            38 to "For I am persuaded, that neither death, nor life, nor angels, nor principalities, nor powers, nor things present, nor things to come,",
+            39 to "Nor height, nor depth, nor any other creature, shall be able to separate us from the love of God, which is in Christ Jesus our Lord."
+        ),
+        // James 1 (verses 2-4, 12)
+        listOf(
+            2 to "My brethren, count it all joy when ye fall into divers temptations;",
+            3 to "Knowing this, that the trying of your faith worketh patience.",
+            4 to "But let patience have her perfect work, that ye may be perfect and entire, wanting nothing.",
+            12 to "Blessed is the man that endureth temptation: for when he is tried, he shall receive the crown of life, which the Lord hath promised to them that love him."
+        ),
+        // Psalms 91 (verses 1-4)
+        listOf(
+            1 to "He that dwelleth in the secret place of the most High shall abide under the shadow of the Almighty.",
+            2 to "I will say of the Lord, He is my refuge and my fortress: my God; in him will I trust.",
+            3 to "Surely he shall deliver thee from the snare of the fowler, and from the noisome pestilence.",
+            4 to "He shall cover thee with his feathers, and under his wings shalt thou trust: his truth shall be his shield and buckler."
+        ),
+        // James 3 (verses 2, 5)
+        listOf(
+            2 to "For in many things we offend all. If any man offend not in word, the same is a perfect man, and able also to bridle the whole body.",
+            5 to "Even so the tongue is a little member, and boasteth great things. Behold, how great a matter a little fire kindleth!"
+        )
+    ),
+    "The Amplified" to listOf(
+        // Psalms 23
+        listOf(
+            1 to "The Lord is my Shepherd [to guide, protect, and provide for me], I shall not want.",
+            2 to "He makes me lie down in green pastures; He leads me beside still waters.",
+            3 to "He refreshes and restores my soul (life); He leads me in the paths of righteousness for His name's sake.",
+            4 to "Even though I walk through the [sunless] valley of the shadow of death, I fear no evil, for You are with me; Your rod [to protect] and Your staff [to guide], they comfort me.",
+            5 to "You prepare a table before me in the presence of my enemies. You have anointed my head with oil; My cup overflows.",
+            6 to "Surely goodness and mercy and unfailing love shall follow me all the days of my life, And I shall dwell in the house of the Lord [and in His presence] forever."
+        ),
+        // Philippians 4 (verses 4-9, 13)
+        listOf(
+            4 to "Rejoice in the Lord always [delight, take pleasure in Him]; again I will say, rejoice!",
+            5 to "Let your gentle spirit [your selflessness, mercy, and tolerance] be known to all people. The Lord is near.",
+            6 to "Do not be anxious or worried about anything, but in everything [every circumstance and situation] by prayer and petition with thanksgiving, continue to make your [specific] requests known to God.",
+            7 to "And the peace of God [that peace which transcends all understanding, that reassuring quiet of a soul-assured of its salvation through Christ] will guard your hearts and minds in Christ Jesus.",
+            8 to "Finally, believers, whatever is true, whatever is honorable and worthy of respect, whatever is right and confirmed by God's word, whatever is pure and wholesome, whatever is lovely and brings peace, whatever is admirable and of good repute; if there is any excellence and if there is anything worthy of praise, think on these things [evaluate them, and fix your minds on them].",
+            9 to "As for the things you have learned and received and heard and seen in me, practice these things in daily life, and the God of peace will be with you.",
+            13 to "I can do all things through Him who strengthens and empowers me [to stand, to remain, to triumph]."
+        ),
+        // John 3 (verses 16-17)
+        listOf(
+            16 to "For God so [greatly] loved and dearly prized the world, that He [even] gave His [one and] only begotten Son, so that whoever believes and trusts in Him [as Savior] shall not perish, but have eternal life.",
+            17 to "For God did not send the Son into the world to judge and condemn the world [that is, to initiate the judgment and doom of the world], but that the world might be saved through Him."
+        ),
+        // Romans 8 (verses 1-2, 31, 35, 37-39)
+        listOf(
+            1 to "Therefore there is now no condemnation [no guilty verdict, no punishment] for those who are in Christ Jesus, who walk not after the flesh, but after the Spirit.",
+            2 to "For the law of the Spirit of life in Christ Jesus [the law of our new being] has set you free from the law of sin and of death.",
+            31 to "What then shall we say to these things? If God is for us, who is against us? [Who can be our foe, if God is on our side?]",
+            35 to "Who shall ever separate us from the love of Christ? Will tribulation, or distress, or persecution, or famine, or nakedness, or danger, or sword?",
+            37 to "Yet in all these things we are more than conquerors and gain an overwhelming victory through Him who loved us.",
+            38 to "For I am convinced [and continue to be convinced] that neither death, nor life, nor angels, nor principalities, nor things present and threatening, nor things to come, nor powers,",
+            39 to "nor height, nor depth, nor any other created thing, will be able to separate us from the unlimited love of God, which is in Christ Jesus our Lord."
+        ),
+        // James 1 (verses 2-4, 12)
+        listOf(
+            2 to "Consider it nothing but joy, my brothers and sisters, whenever you fall into various trials,",
+            3 to "be assured that the testing of your faith [through experience] produces endurance [leading to spiritual maturity, and inner peace].",
+            4 to "And let endurance have its perfect result and do a thorough work, so that you may be perfect and completely developed [in your faith], lacking in nothing.",
+            12 to "Blessed [happy, spiritually prosperous, favored by God] is the man who is steadfast under trial and perseveres when tempted; for when he has passed the test and been approved, he will receive the [victor's] crown of life which the Lord has promised to those who love Him."
+        ),
+        // Psalms 91 (verses 1-4)
+        listOf(
+            1 to "He who dwells in the shelter of the Most High will remain secure and rest in the shadow of the Almighty [whose power no enemy can withstand].",
+            2 to "I will say of the Lord, 'He is my refuge and my fortress, My God, in whom I trust [with great confidence, and on whom I rely].'",
+            3 to "For He will deliver you from the snare of the trapper and from the deadly pestilence.",
+            4 to "He will cover you and shield you with His pinions, and under His wings you will find refuge; His faithfulness is a shield and a wall of protection."
+        ),
+        // James 3 (verses 2, 5)
+        listOf(
+            2 to "For we all stumble and sin in many ways. If anyone does not stumble in what he says [never saying the wrong thing], he is a perfect man [fully developed in character], able to bridle and guide his whole body as well.",
+            5 to "In the same way, the tongue is a small part of the body, and yet it boasts of great things. See [by comparison] how great a forest is set on fire by a small spark!"
+        )
+    ),
+    "The Message" to listOf(
+        // Psalms 23
+        listOf(
+            1 to "God, my shepherd! I don't need a thing.",
+            2 to "You have bedded me down in lush meadows, you find me quiet pools to drink from.",
+            3 to "True to your word, you let me catch my breath and send me in the right direction.",
+            4 to "Even when the way goes through Death Valley, I'm not afraid when you walk at my side. Your trusty shepherd's crook makes me feel secure.",
+            5 to "You serve me a six-course dinner right in front of my enemies. You revive my drooping head; my cup brims with blessing.",
+            6 to "Your beauty and love chase after me every day of my life. I'm back home in the House of God for the rest of my life."
+        ),
+        // Philippians 4 (verses 4-9, 13)
+        listOf(
+            4 to "Celebrate God all day, every day. I mean, revel in him!",
+            5 to "Make it as clear as the wind what you are doing—that you're not claiming your own rights. The Master is about to arrive.",
+            6 to "Don't fret or worry. Instead of worrying, pray. Let petitions and praises shape your worries into prayers, letting God know what is bothering you.",
+            7 to "Before you know it, a sense of God’s wholeness, everything coming together for good, will come and settle you down. It’s wonderful what happens when Christ displaces worry at the center of your life.",
+            8 to "Summing it all up, friends, I'd say you'll do best by filling your minds and meditating on things true, noble, reputable, authentic, compelling, gracious—the best, not the worst; the beautiful, not the ugly; things to praise, not things to curse.",
+            9 to "Put into practice what you learned from me, what you heard and saw and realized. Do that, and God, who makes everything work together, will work you into his most excellent harmonies.",
+            13 to "Whatever I have, wherever I am, I can make it through anything in the One who makes me who I am."
+        ),
+        // John 3 (verses 16-17)
+        listOf(
+            16 to "This is how much God loved the world: He gave his Son, his one and only Son. And why? So that no one need be destroyed; by believing in him, anyone can have a whole and lasting life.",
+            17 to "God didn't go to all the trouble of sending his Son merely to point an accusing finger, telling the world how bad it was. He came to help, to put the world right again."
+        ),
+        // Romans 8 (verses 1-2, 31, 35, 37-39)
+        listOf(
+            1 to "With the arrival of Jesus, the Messiah, that fateful dilemma is resolved. Those who enter into Christ’s life-giving fellowship no longer have to live under a continuous, low-lying black cloud.",
+            2 to "A new power is in operation. The Spirit of life in Christ, like a strong wind, has cleared the air and freed you from a fated lifetime of brutal tyranny at the hands of sin and death.",
+            31 to "So, what do you think? With God on our side like this, how can we lose?",
+            35 to "Do you think anyone is going to be able to drive a wedge between us and Christ’s love for us? There is no way! Not trouble, not hard times, not hatred, not hunger, not homelessness, not bullying threats, not backstabbing, not even the worst sins listed in Scripture.",
+            37 to "None of this fusses us because Jesus loves us. I’m absolutely convinced that nothing—nothing living or dead, angelic or demonic, today or tomorrow, high or low, thinkable or unthinkable—absolutely nothing can get between us and God’s love because of the way that Jesus our Master has embraced us.",
+            38 to "For I am persuaded that neither death nor life, nor angels nor principalities nor powers, nor things present nor things to come,",
+            39 to "nor height nor depth, nor any other created thing, shall be able to separate us from the love of God which is in Christ Jesus our Lord."
+        ),
+        // James 1 (verses 2-4, 12)
+        listOf(
+            2 to "Consider it a sheer gift, friends, when tests and challenges come at you from all sides.",
+            3 to "You know that under pressure, your faith-life is forced into the open and shows its true colors.",
+            4 to "So don't try to get out of anything prematurely. Let it do its work so you become mature and well-developed, not deficient in any way.",
+            12 to "Anyone who meets a testing challenge head-on and manages to stick it out is mighty fortunate. For such persons, loyally in love with God, the reward is life and more life."
+        ),
+        // Psalms 91 (verses 1-4)
+        listOf(
+            1 to "You who sit down in the High God's presence, spend the night in Almighty's shadow,",
+            2 to "Say this: 'God, you're my refuge. I trust in you and I'm safe!'",
+            3 to "That's right—he rescues you from hidden traps, he shields you from deadly hazards.",
+            4 to "His huge outstretched arms protect you—under them you're perfectly safe; his arms fend off all harm."
+        ),
+        // James 3 (verses 2, 5)
+        listOf(
+            2 to "We all make mistakes of all kinds, constantly. If you find someone who never makes a mistake in what he says, then you've found a perfect person, in perfect control of himself.",
+            5 to "A smoldering word can get a whole forest-fire going. It's easy to see what happens next..."
+        )
+    )
+)
+
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun BibleTabScreen(viewModel: OverComerViewModel) {
@@ -6153,6 +6753,7 @@ fun BibleTabScreen(viewModel: OverComerViewModel) {
     
     val aiResult by viewModel.aiScriptureResult.collectAsStateWithLifecycle()
     val isSearching by viewModel.isSearchingScripture.collectAsStateWithLifecycle()
+    val selectedVersion by viewModel.selectedBibleVersion.collectAsStateWithLifecycle()
     
     Column(
         modifier = Modifier
@@ -6188,6 +6789,48 @@ fun BibleTabScreen(viewModel: OverComerViewModel) {
         )
         
         Spacer(modifier = Modifier.height(4.dp))
+
+        // Bible Version Selector Chips
+        Text(
+            text = "Bible Translation Version:",
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val versions = listOf("NIV", "The Amplified", "NKJV", "KJV", "The Message")
+            versions.forEach { version ->
+                val isSelected = selectedVersion == version
+                FilterChip(
+                    selected = isSelected,
+                    onClick = { viewModel.selectBibleVersion(version) },
+                    label = { Text(version, style = MaterialTheme.typography.labelSmall) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = isSelected,
+                        borderColor = MaterialTheme.colorScheme.outlineVariant,
+                        selectedBorderColor = MaterialTheme.colorScheme.primary
+                    ),
+                    modifier = Modifier.testTag("bible_version_chip_${version.replace(" ", "_").lowercase()}")
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(4.dp))
         
         // Tab contents
         Box(
@@ -6198,6 +6841,11 @@ fun BibleTabScreen(viewModel: OverComerViewModel) {
             when (activeSubTab) {
                 BibleSubTab.READER -> {
                     val activePassage = curatedPassages[selectedPassageIndex]
+                    val displayedVerses = if (selectedVersion == "NIV") {
+                        activePassage.verses
+                    } else {
+                        curatedPassagesTranslations[selectedVersion]?.getOrNull(selectedPassageIndex) ?: activePassage.verses
+                    }
                     
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
@@ -6287,7 +6935,7 @@ fun BibleTabScreen(viewModel: OverComerViewModel) {
                                             modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
                                         ) {
                                             Text(
-                                                text = "NIV",
+                                                text = selectedVersion,
                                                 style = MaterialTheme.typography.labelSmall,
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -6298,7 +6946,7 @@ fun BibleTabScreen(viewModel: OverComerViewModel) {
                                     
                                     HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
                                     
-                                    activePassage.verses.forEach { (number, text) ->
+                                    displayedVerses.forEach { (number, text) ->
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
                                             verticalAlignment = Alignment.Top
@@ -6647,6 +7295,14 @@ fun ShieldCreedContent(viewModel: OverComerViewModel) {
                         .replace("addict or permanently sick", "defined by your distress or permanently broken")
                 }
             }
+            "VETERAN_TRANSITION" -> {
+                original.map { belief ->
+                    belief
+                        .replace("addiction or struggle", "PTSD, transition struggles, or military-to-civilian hurdles")
+                        .replace("Your struggle is NOT your permanent biological identity. It is a behavioral choice that leads to bondage", "Your trauma or PTSD is NOT your permanent identity. It is a severe vulnerability, but Christ is your shield and fortress")
+                        .replace("addict or permanently sick", "permanently damaged, broken, or isolated")
+                }
+            }
             "TESTIMONY_VICTORY" -> {
                 original.map { belief ->
                     belief
@@ -6664,6 +7320,9 @@ fun ShieldCreedContent(viewModel: OverComerViewModel) {
         when (userPath) {
             "MENTAL_HEALTH", "TOUGH_DAY" -> {
                 originalMotto.replace("over addiction", "over fear, worry, and depression")
+            }
+            "VETERAN_TRANSITION" -> {
+                originalMotto.replace("over addiction", "over PTSD, trauma, and civilian reintegration")
             }
             "TESTIMONY_VICTORY" -> {
                 originalMotto.replace("over addiction", "over every battle, trial, and challenge")
@@ -6868,7 +7527,7 @@ fun InspirationalQuotesTabScreen(viewModel: OverComerViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "🌟 Inspirational Quotes",
+                    text = "📖 Inspiration Bible Verses",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -6909,22 +7568,27 @@ fun InspirationalQuotesTabScreen(viewModel: OverComerViewModel) {
             }
         }
 
-        val filteredQuotes = inspirationalQuotes.filter { selectedCategory == "All" || it.category == selectedCategory }
+        val filteredVerses = inspirationalQuotes.filter { (it.id in 1..12) && (selectedCategory == "All" || it.category == selectedCategory) }
+        val filteredFamousQuotes = inspirationalQuotes.filter { (it.id in 13..24) && (selectedCategory == "All" || it.category == selectedCategory) }
 
-        LazyColumn(
+        var currentVerseIdx by remember(selectedCategory) { mutableStateOf(0) }
+        var currentFamousQuoteIdx by remember(selectedCategory) { mutableStateOf(0) }
+
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 24.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(filteredQuotes.size) { quoteIdx ->
-                val quote = filteredQuotes[quoteIdx]
+            // Section 1: Bible Verses
+            if (filteredVerses.isNotEmpty()) {
+                val verse = filteredVerses[currentVerseIdx.coerceIn(0, filteredVerses.size - 1)]
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .testTag("inspirational_quote_card_${quote.id}"),
-                    shape = RoundedCornerShape(20.dp),
+                        .testTag("bible_verse_card_${verse.id}"),
+                    shape = RoundedCornerShape(24.dp),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surface,
@@ -6933,8 +7597,162 @@ fun InspirationalQuotesTabScreen(viewModel: OverComerViewModel) {
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(
-                        modifier = Modifier.padding(18.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                                    .padding(horizontal = 10.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = verse.category,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            
+                            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                IconButton(
+                                    onClick = {
+                                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                                        val clip = android.content.ClipData.newPlainText("Inspiration Bible Verse", "\"${verse.text}\"\n— ${verse.reference}")
+                                        clipboard.setPrimaryClip(clip)
+                                        Toast.makeText(context, "Bible verse copied! 📋", Toast.LENGTH_SHORT).show()
+                                    },
+                                    modifier = Modifier.size(36.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ContentCopy,
+                                        contentDescription = "Copy Verse",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+
+                                IconButton(
+                                    onClick = { speakQuote(verse.text, verse.reference) },
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f), CircleShape)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.VolumeUp,
+                                        contentDescription = "Listen to verse",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        Text(
+                            text = "\"${verse.text}\"",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                            fontWeight = FontWeight.SemiBold,
+                            lineHeight = 22.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+
+                        Text(
+                            text = "— ${verse.reference}",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.End
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f))
+                                .padding(14.dp)
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(
+                                    text = "RENEW MY MIND:",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = verse.contextReflection,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    lineHeight = 16.sp
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Button(
+                    onClick = {
+                        currentVerseIdx = (currentVerseIdx + 1) % filteredVerses.size
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("inspirational_next_verse_btn"),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    ) {
+                        Text("Next Bible Verse", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                        Icon(Icons.Default.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+
+            // Section 2: Inspirational Quotes by Famous People
+            Text(
+                text = "📜 Inspirational Quotes by Famous People",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+            Text(
+                text = "Wisdom from trusted mentors & historical Christian figures",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            if (filteredFamousQuotes.isNotEmpty()) {
+                val quote = filteredFamousQuotes[currentFamousQuoteIdx.coerceIn(0, filteredFamousQuotes.size - 1)]
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("famous_quote_card_${quote.id}"),
+                    shape = RoundedCornerShape(24.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -7010,9 +7828,9 @@ fun InspirationalQuotesTabScreen(viewModel: OverComerViewModel) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
+                                .clip(RoundedCornerShape(16.dp))
                                 .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f))
-                                .padding(12.dp)
+                                .padding(14.dp)
                         ) {
                             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(
@@ -7031,6 +7849,35 @@ fun InspirationalQuotesTabScreen(viewModel: OverComerViewModel) {
                         }
                     }
                 }
+
+                Button(
+                    onClick = {
+                        currentFamousQuoteIdx = (currentFamousQuoteIdx + 1) % filteredFamousQuotes.size
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp)
+                        .testTag("inspirational_next_quote_btn"),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary
+                    )
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    ) {
+                        Text("Next Quote", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall)
+                        Icon(Icons.Default.ArrowForward, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
+                }
+            } else {
+                Text(
+                    text = "No quotes available in this category.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = 12.dp)
+                )
             }
         }
     }
@@ -7113,7 +7960,11 @@ val bibleAffirmationsDefaults = listOf(
 @Composable
 fun BibleAffirmationsSection() {
     val items = bibleAffirmationsDefaults
-    var currentIndex by remember { mutableStateOf(0) }
+    val initialIndex = remember {
+        val dayOfYear = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_YEAR)
+        dayOfYear % bibleAffirmationsDefaults.size
+    }
+    var currentIndex by remember { mutableStateOf(initialIndex) }
     val currentItem = items[currentIndex]
     
     // Track spoken/declared affirmation IDs in a stateful set
@@ -8765,122 +9616,900 @@ fun LessonOneContent(prefs: android.content.SharedPreferences, onStatusChange: (
         }
 
         when (activeStep) {
-            1 -> {
-                StepSummaryCard(
-                    title = "Step 1: Admit Your Weakness",
-                    description = "Admit you have a problem and are powerless over addiction/weight.",
-                    scriptures = listOf(
-                        ScriptureQuote("Romans 7:18", "For I know that in me (that is, in my flesh,) dwells no good thing. I want to do what is right, but I can’t."),
-                        ScriptureQuote("1 John 1:9", "If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness."),
-                        ScriptureQuote("Proverbs 28:13", "Whoever conceals their sins does not prosper, but the one who confesses and renounces them finds mercy.")
-                    ),
-                    questions = listOf(
-                        "What addiction/weight are you struggling with? (Drugs, alcohol, food, weight, etc.)",
-                        "Briefly share your story or testimony of how this struggle took hold of your life."
-                    ),
-                    stepIndex = 1,
-                    prefs = prefs
-                )
+            1 -> StepOneDetail(prefs)
+            2 -> StepTwoDetail(prefs)
+            3 -> StepThreeDetail(prefs)
+            4 -> StepFourDetail(prefs)
+            5 -> StepFiveDetail(prefs)
+            6 -> StepSixDetail(prefs)
+            7 -> StepSevenDetail(prefs)
+        }
+    }
+}
+
+@Composable
+fun ScriptureQuoteRow(quote: String, ref: String) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Text(
+            text = "\"$quote\"",
+            style = MaterialTheme.typography.bodySmall.copy(
+                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                fontWeight = FontWeight.Medium
+            ),
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = "— $ref",
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.ExtraBold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.End
+        )
+    }
+}
+
+@Composable
+fun GuidedQuestionsCard(
+    stepIndex: Int,
+    prefs: android.content.SharedPreferences,
+    questions: List<String>
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Text(
+                text = "🙋 GUIDED QUESTIONS (Allow the Holy Spirit to lead you):",
+                style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.secondary
+            )
+
+            questions.forEachIndexed { qIdx, question ->
+                val answerKey = "step_${stepIndex}_q_${qIdx}"
+                var answerText by remember(answerKey) {
+                    mutableStateOf(prefs.getString(answerKey, "") ?: "")
+                }
+                
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                        text = "${qIdx + 1}. $question",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    OutlinedTextField(
+                        value = answerText,
+                        onValueChange = {
+                            answerText = it
+                            prefs.edit().putString(answerKey, it).apply()
+                        },
+                        placeholder = { Text("Write your honest reflection...", style = MaterialTheme.typography.bodySmall) },
+                        modifier = Modifier.fillMaxWidth().testTag("recovery_input_step_${stepIndex}_q_$qIdx"),
+                        textStyle = MaterialTheme.typography.bodySmall,
+                        singleLine = false,
+                        maxLines = 4
+                    )
+                }
             }
-            2 -> {
-                StepSummaryCard(
-                    title = "Step 2: Repent to God",
-                    description = "Deep genuine repentance before God, wiping the slate completely clean.",
-                    scriptures = listOf(
-                        ScriptureQuote("1 John 1:9", "If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness."),
-                        ScriptureQuote("Psalm 51:1-2", "Have mercy upon me, O God, according to your lovingkindness; according unto the multitude of thy tender mercies blot out my transgressions. Wash me thoroughly from mine iniquity, and cleanse me from my sin."),
-                        ScriptureQuote("2 Chronicles 7:14", "If my people who are called by my name shall humble themselves and pray and seek my face and turn from their wicked ways; then, I will hear from heaven and forgive their sin and heal their land."),
-                        ScriptureQuote("Acts 3:19", "Repent, then and turn to God, so that your sins may be wiped out, that times of refreshing may come from the Lord."),
-                        ScriptureQuote("Psalm 32:5", "Then I acknowledged my sin to you and did not cover up my iniquity. I said, 'I will confess my transgressions to the Lord.' And you forgave the guilt of my sin.")
-                    ),
-                    questions = listOf(
-                        "Explain in your own heart what Repentance is and actually means?",
-                        "What happens if you slip up or have a bad moment? What is God's grace attitude toward you then?"
-                    ),
-                    stepIndex = 2,
-                    prefs = prefs
+        }
+    }
+}
+
+@Composable
+fun StepOneDetail(prefs: android.content.SharedPreferences) {
+    var check1 by remember { mutableStateOf(prefs.getBoolean("step1_indicator_1", false)) }
+    var check2 by remember { mutableStateOf(prefs.getBoolean("step1_indicator_2", false)) }
+    var check3 by remember { mutableStateOf(prefs.getBoolean("step1_indicator_3", false)) }
+    var check4 by remember { mutableStateOf(prefs.getBoolean("step1_indicator_4", false)) }
+    var check5 by remember { mutableStateOf(prefs.getBoolean("step1_indicator_5", false)) }
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Step 1: Admit Your Weakness",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
                 )
-            }
-            3 -> {
-                StepSummaryCard(
-                    title = "Step 3: Release to God",
-                    description = "Turn the complete control of your life over to God as living worship.",
-                    scriptures = listOf(
-                        ScriptureQuote("Romans 12:1", "I urge you brothers and sisters, in the view of God’s mercy, to offer you bodies as a living sacrifice, holy and pleasing to God – this is your true and proper worship."),
-                        ScriptureQuote("1 Peter 5:7-8", "casting all your care upon him; for he careth for you. Be sober, be vigilant; because your adversary the devil, as a roaring lion, walketh about, seeking whom he may devour."),
-                        ScriptureQuote("Matthew 11:28-30", "Come unto me, all ye that labor and are heavy laden, and I will give you rest. Take my yoke upon you and learn of me... For my yoke is easy and my burden is light.")
-                    ),
-                    questions = listOf(
-                        "Explain what a life fully turned over to God looks like daily.",
-                        "Explain what Him taking control of your impulses and choices looks like.",
-                        "Write down how Christ already helped you through a previous decision or victory."
-                    ),
-                    stepIndex = 3,
-                    prefs = prefs
+                Text(
+                    text = "Admit you have a problem and are powerless over addiction/weight.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
                 )
-            }
-            4 -> {
-                StepSummaryCard(
-                    title = "Step 4: Examine Yourself",
-                    description = "Take a fully honest, moral inventory of yourself, your habits, and your decisions.",
-                    scriptures = listOf(
-                        ScriptureQuote("Lamentations 3:40", "Let us examine our ways and test them, and let us return to the Lord."),
-                        ScriptureQuote("2 Corinthians 13:5", "Examine yourselves to see whether you are in the faith; test yourselves. Do you not realize that Christ Jesus is in you—unless, of course, you fail the test?")
-                    ),
-                    questions = listOf(
-                        "Begin to list your choices, secrets, or past events that you need to examine under His light. (No one sees this but you)."
-                    ),
-                    stepIndex = 4,
-                    prefs = prefs
+                
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                
+                Text(
+                    text = "📖 FOUNDATION SCRIPTURES:",
+                    style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
                 )
-            }
-            5 -> {
-                StepSummaryCard(
-                    title = "Step 5: Acknowledge & Apologize",
-                    description = "Admit to God, ourselves, and someone else our wrongdoings.",
-                    scriptures = listOf(
-                        ScriptureQuote("James 5:16", "Therefore, confess your sins to each other and pray for each other so that you may be healed."),
-                        ScriptureQuote("Proverbs 28:13", "Whoever conceals their sins does not prosper, but the one who confesses and renounces them finds mercy.")
-                    ),
-                    questions = listOf(
-                        "Write down people you have offended or hurt during your struggle.",
-                        "Write down exactly what you would like to say to apologize humbly to them.",
-                        "When and how will you call or message them to make amends this week?"
-                    ),
-                    stepIndex = 5,
-                    prefs = prefs
+                
+                ScriptureQuoteRow(
+                    quote = "For I know that in me (that is, in my flesh,) dwells no good thing. I want to do what is right, but I can’t.",
+                    ref = "Romans 7:18"
                 )
-            }
-            6 -> {
-                StepSummaryCard(
-                    title = "Step 6: Seek God's Presence",
-                    description = "Seek God through daily prayer and meditation on His Word and His Works.",
-                    scriptures = listOf(
-                        ScriptureQuote("Colossians 3:16", "Let the message of Christ dwell among you richly as you teach and admonish one another with all wisdom through Psalms, hymns and songs from the spirit...")
-                    ),
-                    questions = listOf(
-                        "Explain what it means to actively SEEK God every single morning.",
-                        "How would you explain prayer and meditation to someone who is struggling?"
-                    ),
-                    stepIndex = 6,
-                    prefs = prefs
+                ScriptureQuoteRow(
+                    quote = "If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness.",
+                    ref = "1 John 1:9"
                 )
-            }
-            7 -> {
-                StepSummaryCard(
-                    title = "Step 7: Help Others",
-                    description = "Help other struggling addicts and lift their loads with gentle restoration.",
-                    scriptures = listOf(
-                        ScriptureQuote("Galatians 6:1", "Brothers and sisters, if someone is caught in a sin, you who live by the Spirit should restore that person gently. But watch yourselves, or you also may be tempted.")
-                    ),
-                    questions = listOf(
-                        "How can you actively support and serve as a beacon of Hope to another recovering OverComer?"
-                    ),
-                    stepIndex = 7,
-                    prefs = prefs
+                ScriptureQuoteRow(
+                    quote = "Whoever conceals their sins does not prosper, but the one who confesses and renounces them finds mercy.",
+                    ref = "Proverbs 28:13"
+                )
+                ScriptureQuoteRow(
+                    quote = "Are you tired? Worn out? Burned out on religion? Come to me. Get away with me and you’ll recover your life. I’ll show you how to take a real rest. Walk with me and work with me—watch how I do it. Learn the unforced rhythms of grace...",
+                    ref = "Matthew 11:28-30 MSG"
+                )
+                ScriptureQuoteRow(
+                    quote = "But he said to me, 'My grace is sufficient for you, for my power is made perfect in weakness.' Therefore I will boast all the more gladly about my weaknesses, so that Christ's power may rest on me.",
+                    ref = "2 Corinthians 12:9-10 NIV"
                 )
             }
         }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "❓ Why is Admitting a Problem So Important?",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Admitting there is a problem indicates you are becoming aware of your problematic behaviors and how they contribute to a larger concern. It creates a healthy, humble mindset to begin working on the many difficult components of your weights, which were previously avoided or ignored.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🔍 Powerlessness Checklist (Honest Check-in)",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Ask yourself these questions and check any that apply to your current situation:",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
+                val indicators = listOf(
+                    "Does my struggle interfere with healthy habits like spending time with family, reading my Bible, praying, or sleeping/eating well?" to 1,
+                    "Does my struggle cause me to miss important obligations surrounding work, family, or personal commitments?" to 2,
+                    "Do I fall back into my struggle to help relieve stress and anxiety?" to 3,
+                    "Are my tolerance levels of dealing with people lower when faced with a situation?" to 4,
+                    "Do I hide my struggle from my loved ones?" to 5
+                )
+
+                indicators.forEach { (text, idx) ->
+                    val checked = when(idx) {
+                        1 -> check1
+                        2 -> check2
+                        3 -> check3
+                        4 -> check4
+                        else -> check5
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth().clickable {
+                            val newVal = !checked
+                            when(idx) {
+                                1 -> { check1 = newVal; prefs.edit().putBoolean("step1_indicator_1", newVal).apply() }
+                                2 -> { check2 = newVal; prefs.edit().putBoolean("step1_indicator_2", newVal).apply() }
+                                3 -> { check3 = newVal; prefs.edit().putBoolean("step1_indicator_3", newVal).apply() }
+                                4 -> { check4 = newVal; prefs.edit().putBoolean("step1_indicator_4", newVal).apply() }
+                                5 -> { check5 = newVal; prefs.edit().putBoolean("step1_indicator_5", newVal).apply() }
+                            }
+                        }.padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Checkbox(
+                            checked = checked,
+                            onCheckedChange = { newVal ->
+                                when(idx) {
+                                    1 -> { check1 = newVal; prefs.edit().putBoolean("step1_indicator_1", newVal).apply() }
+                                    2 -> { check2 = newVal; prefs.edit().putBoolean("step1_indicator_2", newVal).apply() }
+                                    3 -> { check3 = newVal; prefs.edit().putBoolean("step1_indicator_3", newVal).apply() }
+                                    4 -> { check4 = newVal; prefs.edit().putBoolean("step1_indicator_4", newVal).apply() }
+                                    5 -> { check5 = newVal; prefs.edit().putBoolean("step1_indicator_5", newVal).apply() }
+                                }
+                            }
+                        )
+                        Text(text = text, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "⚓ How Do You Complete Step 1?",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+                Text(
+                    text = "• Accept complete defeat: Acknowledge that something is wrong and you can't fix it on your own.\n" +
+                           "• Embrace the truth: Break through self-deception and want to make an honest change.\n" +
+                           "• Understand recovery can't be done alone: You need help from God and His body.\n" +
+                           "• Abandon pride and seek humility: Modesty and humbleness are found in admitting your powerless state.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        GuidedQuestionsCard(
+            stepIndex = 1,
+            prefs = prefs,
+            questions = listOf(
+                "What specific addiction or weight are you struggling with? (Be fully honest before God).",
+                "Share your story or testimony of how this struggle began and took hold of your life.",
+                "How do you think taking this first step of admitting your weakness will help you?",
+                "How can you begin to address and dismantle denial in your life?"
+            )
+        )
+    }
+}
+
+@Composable
+fun StepTwoDetail(prefs: android.content.SharedPreferences) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Step 2: Repent to God",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "To truly repent, you must not only turn away from your sins, but turn towards God. Repentance allows you to enjoy the freedom of your loving relationship with God.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                
+                Text(
+                    text = "📖 FOUNDATION SCRIPTURES:",
+                    style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                
+                ScriptureQuoteRow("Repent, then, and turn to God, so that your sins may be wiped out, that times of refreshing may come from the Lord.", "Acts 3:19")
+                ScriptureQuoteRow("If we confess our sins, he is faithful and just and will forgive us our sins and purify us from all unrighteousness.", "1 John 1:9")
+                ScriptureQuoteRow("Whoever conceals their sins does not prosper, but the one who confesses and renounces them finds mercy.", "Proverbs 28:13")
+                ScriptureQuoteRow("For the Lord your God is gracious and compassionate. He will not turn his face from you if you return to him.", "2 Chronicles 30:9")
+                ScriptureQuoteRow("Produce fruit in keeping with repentance.", "Matthew 3:8")
+                ScriptureQuoteRow("The Lord is not slow in keeping his promise, as some understand slowness. Instead he is patient with you, not wanting anyone to perish, but everyone to come to repentance.", "2 Peter 3:9")
+                ScriptureQuoteRow("From that time on Jesus began to preach, 'Repent, for the kingdom of heaven has come near.'", "Matthew 4:17")
+                ScriptureQuoteRow("But go and learn what this means: 'I desire mercy, not sacrifice.' For I have not come to call the righteous, but sinners.", "Matthew 9:13")
+                ScriptureQuoteRow("Come near to God and he will come near to you. Wash your hands, you sinners, and purify your hearts, you double-minded.", "James 4:8")
+                ScriptureQuoteRow("Those whom I love I rebuke and discipline. So be earnest and repent.", "Revelation 3:19")
+                ScriptureQuoteRow("Rend your heart and not your garments. Return to the Lord your God, for he is gracious and compassionate, slow to anger and abounding in love...", "Joel 2:13")
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "⚙️ What Does Repentance Mean?",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Repentance means:\n" +
+                           "1. To turn from sin and dedicate oneself to the amendment of one's life.\n" +
+                           "2. To feel regret or contrition.\n" +
+                           "3. To change one's mind.\n\n" +
+                           "It's not just feeling bad—it's a change of direction!",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🔄 The TURN Framework",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+                Text(
+                    text = "How do you turn your life over to Jesus Christ? You TRUST:\n\n" +
+                           "• Trust: Deciding to turn your life and will over to God requires trust. Romans 10:9 says if you confess with your mouth and believe in your heart, you will be saved.\n\n" +
+                           "• Understand: Relying solely on your own understanding got you into trouble. Proverbs 3:5-6 says trust in the Lord with all your heart, and He will direct your paths.\n\n" +
+                           "• Repent: Turning away from sin and towards God. Romans 12:2 says be transformed by the renewing of your mind. You receive a new life (2 Corinthians 5:17) and are declared not guilty!",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        GuidedQuestionsCard(
+            stepIndex = 2,
+            prefs = prefs,
+            questions = listOf(
+                "What is stopping you from asking Jesus Christ into your heart as your Lord and Savior? (If you already have, describe that experience).",
+                "How has relying on your own understanding caused problems in your life? Be specific.",
+                "What does repent mean to you? What do you feel you need to repent of today?",
+                "What does the declaration of 'not guilty' in Romans 3:24-26 mean to you personally?",
+                "When you turn your life over to Christ, you have a new life (2 Corinthians 5:17). What does that new life mean to you?"
+            )
+        )
+    }
+}
+
+@Composable
+fun StepThreeDetail(prefs: android.content.SharedPreferences) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Step 3: Release to God",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Turn the complete control of your life over to God. Cast off the past, failures, hurts, and struggles.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                
+                Text(
+                    text = "📖 FOUNDATION SCRIPTURES:",
+                    style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                
+                ScriptureQuoteRow("I urge you brothers and sisters, in the view of God’s mercy, to offer your bodies as a living sacrifice, holy and pleasing to God – this is your true and proper worship.", "Romans 12:1")
+                ScriptureQuoteRow("Casting all your care upon him; for he careth for you. Be sober, be vigilant; because your adversary the devil, as a roaring lion, walketh about, seeking whom he may devour.", "1 Peter 5:7-8")
+                ScriptureQuoteRow("Come unto me, all ye that labor and are heavy laden, and I will give you rest. Take my yoke upon you and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls. For my yoke is easy and my burden is light.", "Matthew 11:28-30")
+                ScriptureQuoteRow("He is before all things, and in him all things hold together.", "Colossians 1:17")
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🧬 Laminin: The Protein Branded by the Cross",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Laminin is a cell adhesion molecule—the protein 'rebar' or 'glue' that literally holds the human body together.\n\n" +
+                           "Remarkably, laminin is shaped exactly like a Cross! Colossians 1:15-17 says: 'He is before all things, and in him all things hold together.' God formed you so that your very body is held together by the shape of the Cross! You are branded by His love!\n\n" +
+                           "Therefore, we must **RELEASE** things. We must cast our past failures, who we used to be, our hurts, struggles, and what others said off of us and onto Jesus, because HE holds us together!",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "⚓ 'Casting' Literally Means 'Throw Upon'",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+                Text(
+                    text = "In 1 Peter 5:7, 'casting' means to literally throw upon Him. Don't gently hand over your burdens and then take them back; throw them upon Jesus, because He is more than capable of holding your weight.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        GuidedQuestionsCard(
+            stepIndex = 3,
+            prefs = prefs,
+            questions = listOf(
+                "Explain what a life fully turned over to God looks like daily.",
+                "Explain what Him taking control of your impulses and choices looks like.",
+                "Write down your story of how Christ has worked for and through you in a past struggle or choice."
+            )
+        )
+    }
+}
+
+@Composable
+fun StepFourDetail(prefs: android.content.SharedPreferences) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Step 4: Examine Yourself",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Take a moral inventory of yourself and decisions that you’ve made.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                
+                Text(
+                    text = "📖 FOUNDATION SCRIPTURES:",
+                    style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                
+                ScriptureQuoteRow("Let us examine our ways and test them, and let us return to the Lord.", "Lamentations 3:40")
+                ScriptureQuoteRow("Examine yourselves to see whether you are in the faith; test yourselves. Do you not realize that Christ Jesus is in you—unless, of course, you fail the test?", "2 Corinthians 13:5")
+                ScriptureQuoteRow("Blessed are the pure in heart, for they will see God.", "Matthew 5:8")
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🪞 3 Effective Ways to Examine Yourself",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "1. **Examine Your Faith** (2 Cor 13:5): The word examine is 'peirazo' (scrutinize/try), and test is 'dokimazo' (stronger word, test like metals with intense fire). Be like the Bereans (Acts 17:11) who searched scriptures daily.\n\n" +
+                           "2. **Examine Your Works** (Gal 6:3-5): Ensure deeds agree with faith. 'It is not what we know that will save us. It is what we do with what we know.' Do good out of love for God and others, not for applause.\n\n" +
+                           "3. **Examine Through God's Perspective** (Psalm 139:23-24): Pray 'Search me, O God, and know my heart...' The Bible is like a mirror—look into it to correct what needs to be changed, not just to admire its beauty.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "☀️ 4 Areas of Life That Begin to Improve",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+                Text(
+                    text = "Once you examine yourself honestly, these four outcomes will flourish:\n" +
+                           "• **Face the Truth**: Break free from self-deception.\n" +
+                           "• **Ease the Pain**: Stop letting secret wounds fester.\n" +
+                           "• **Stop the Blame**: Take personal, healthy responsibility.\n" +
+                           "• **Accept Forgiveness**: Rest in Christ's complete grace.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "✏️ INTROSPECTIVE SENTENCE COMPLETIONS:",
+                    style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+
+                val items = listOf(
+                    "I can be more honest with..." to "step4_completion_1",
+                    "I can ease my pain by..." to "step4_completion_2",
+                    "I can stop blaming..." to "step4_completion_3",
+                    "I can accept God's forgiveness because..." to "step4_completion_4"
+                )
+
+                items.forEach { (label, key) ->
+                    var value by remember(key) { mutableStateOf(prefs.getString(key, "") ?: "") }
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text(text = label, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                        OutlinedTextField(
+                            value = value,
+                            onValueChange = {
+                                value = it
+                                prefs.edit().putString(key, it).apply()
+                            },
+                            placeholder = { Text("Complete the sentence...", style = MaterialTheme.typography.bodySmall) },
+                            modifier = Modifier.fillMaxWidth(),
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            maxLines = 2
+                        )
+                    }
+                }
+            }
+        }
+
+        GuidedQuestionsCard(
+            stepIndex = 4,
+            prefs = prefs,
+            questions = listOf(
+                "What wrongs, resentments, or secret sins are keeping you awake at night? Wouldn't you like to get rid of them?",
+                "What value do you see in confessing, in coming clean of the wreckage of your past?",
+                "What results do you expect God to produce in your life through this inventory?",
+                "What freedom do you feel because of Romans 8:1 and Romans 3:23-24? What specifically do 'No condemnation' and 'not guilty' mean to you?"
+            )
+        )
+    }
+}
+
+@Composable
+fun StepFiveDetail(prefs: android.content.SharedPreferences) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Step 5: Acknowledge & Apologize",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Admit to God, ourselves, and someone else our wrongdoings.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                
+                Text(
+                    text = "📖 FOUNDATION SCRIPTURES:",
+                    style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                
+                ScriptureQuoteRow("Therefore, confess your sins to each other and pray for each other so that you may be healed.", "James 5:16")
+                ScriptureQuoteRow("Whoever conceals their sins does not prosper, but the one who confesses and renounces them finds mercy.", "Proverbs 28:13")
+                ScriptureQuoteRow("They cried to the Lord in their troubles, and he rescued them! He led them from the darkness and the shadow of death and snapped their chains.", "Psalms 107:13-14 TLB")
+                ScriptureQuoteRow("If we confess our sins, he is faithful and just and will forgive us our sins and cleanse us from all unrighteousness.", "1 John 1:9")
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "❓ Why Admit My Wrongs?",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "1. **We Gain Healing**: Confessing is not to earn God's forgiveness (which is already free), but to receive mutual prayer and relational healing.\n\n" +
+                           "2. **We Gain Freedom**: Secrets keep us bound up, frozen, and in chains. Confession breaks and snaps those chains.\n" +
+                           "3. **We Gain Support**: Sharing your inventory with a trusted mentor provides feedback, keeps you focused, and gives you a compassionate listener.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🤝 How to Choose Someone to Share With",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+                Text(
+                    text = "• Choose someone of the same sex whom you trust and respect.\n" +
+                           "• Ask your mentor, sponsor, or a trusted accountability partner who understands and has walked this road.\n" +
+                           "• Most importantly, ensure they are a strong believer and follower of Jesus Christ.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        GuidedQuestionsCard(
+            stepIndex = 5,
+            prefs = prefs,
+            questions = listOf(
+                "Who are you considering sharing your inventory with, and why?",
+                "Most of us find it easier to confess to God than to another human. What is the most difficult part of sharing with a person for you?",
+                "What is your biggest fear of sharing your inventory or faults with another person?",
+                "Write down a list of people you have offended and what you plan to say to apologize humbly to them."
+            )
+        )
+    }
+}
+
+@Composable
+fun StepSixDetail(prefs: android.content.SharedPreferences) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Step 6: Seek God's Presence",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Seek God through daily prayer and meditation on His Word and His Works.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                
+                Text(
+                    text = "📖 FOUNDATION SCRIPTURES:",
+                    style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                
+                ScriptureQuoteRow("Let the message of Christ dwell among you richly as you teach and admonish one another with all wisdom through Psalms, hymns and songs from the spirit...", "Colossians 3:16")
+                ScriptureQuoteRow("The Lord is a refuge for the oppressed, a stronghold in times of trouble. Those who know your name trust in you, for you, Lord, have never forsaken those who seek you.", "Psalms 9:9-10 NIV")
+                ScriptureQuoteRow("Watch and pray so that you will not fall into temptation. The spirit is willing but the flesh is weak.", "Mark 14:38")
+                ScriptureQuoteRow("Be still, and know that I am God.", "Psalm 46:10")
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🛡️ Relapse Prevention: The R-E-L-A-P-S-E Acrostic",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "• **R**eserve a daily quiet time: Dedicate daily time for Bible reading, self-examination, and prayer (Mark 14:38).\n" +
+                           "• **E**valuate: Review your physical, emotional, relational, and spiritual health.\n" +
+                           "• **L**isten to Jesus: Slow down enough to hear His directions. Test everything (1 Thess 5:21).\n" +
+                           "• **A**lone and quiet time: Be still and know Him (Psalm 46:10).\n" +
+                           "• **P**lug into God's power: Tell God your specific needs and pray about everything (Philippians 4:6).\n" +
+                           "• **S**low down to hear: Remember that God's timing is perfect (Job 33:33, Phil 4:7).\n" +
+                           "• **E**njoy your growth: Rejoice in small successes; celebrate victory!",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "❤️ Do a H-E-A-R-T Check Right Now",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+                Text(
+                    text = "Are you currently feeling any of these danger zones?\n" +
+                           "• **H**urting?\n" +
+                           "• **E**xhausted?\n" +
+                           "• **A**ngry?\n" +
+                           "• **R**esentful?\n" +
+                           "• **T**ense?\n\n" +
+                           "Acknowledge these to your Mentor or in prayer immediately to prevent slip-ups.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        GuidedQuestionsCard(
+            stepIndex = 6,
+            prefs = prefs,
+            questions = listOf(
+                "What tools or methods have you developed in your recovery to prevent a relapse?",
+                "Do a H-E-A-R-T check right now. Which of these are you feeling, and what do you do when you experience them?",
+                "How would you rate your listening skills with God from 1 to 10? How can you improve your listening skills with others?",
+                "Describe what a daily quiet time means to you, and specify when and where you usually pray.",
+                "After you pray, do you slow down long enough to hear God's answer?"
+            )
+        )
+    }
+}
+
+@Composable
+fun StepSevenDetail(prefs: android.content.SharedPreferences) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "Step 7: Help Others",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Help other struggling individuals the same way that you were supported.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                
+                Text(
+                    text = "📖 FOUNDATION SCRIPTURES:",
+                    style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                
+                ScriptureQuoteRow("Brothers and sisters, if someone is caught in a sin, you who live by the Spirit should restore that person gently. But watch yourselves, or you also may be tempted.", "Galatians 6:1")
+                ScriptureQuoteRow("Freely you have received freely give.", "Matthew 10:8")
+                ScriptureQuoteRow("Two are better than one, because together they can work more effectively. If one of them falls down, the other can help him up...", "Ecclesiastes 4:9-12")
+                ScriptureQuoteRow("My children, our love should not be just words and talk, it must be true love, which shows itself in action.", "1 John 3:18")
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🌱 I Become We — Victory Shared",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "The road to recovery is not meant to be traveled alone. God never wastes a hurt! Step 7 gives us the opportunity to share our experiences and victories, carrying this message to others and practicing these steps in all our affairs.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.15f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🗣️ 10 Tips for Sharing Your Testimony",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+                Text(
+                    text = "1. **You've Got the Power**: The Holy Spirit lives in you and gives you the power to witness (Acts 1:8).\n" +
+                           "2. **Everyone's on a Journey**: God is already at work in others' lives (Acts 17:26-27).\n" +
+                           "3. **God Desires to Use You**: Your story helps connect someone to Jesus (2 Cor 5:20).\n" +
+                           "4. **Be Prepared**: Always be ready to give a reason for your hope (1 Peter 3:15).\n" +
+                           "5. **Practice**: Practice out loud; keep it to about three minutes.\n" +
+                           "6. **Pray**: Ask God to bring a friend or relative to mind and pray for them.\n" +
+                           "7. **Ask Permission**: 'Can I tell you a little bit about my spiritual experience?'\n" +
+                           "8. **Be a Good Listener**: Ask about their religious background and where they are on their journey.\n" +
+                           "9. **Leave the Results to God**: It is the Holy Spirit who moves hearts.\n" +
+                           "10. **Remember**: Sharing your testimony is about loving the person.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        GuidedQuestionsCard(
+            stepIndex = 7,
+            prefs = prefs,
+            questions = listOf(
+                "What does 'freely you have received, freely give' mean to you in your own recovery?",
+                "How has your attempt to put God first in your life changed your understanding of what it means to give?",
+                "List specific instances in your recovery where you have seen Ecclesiastes 4:9 ('two are better than one') in action.",
+                "How can you be a doer of the Word (James 1:22) among: Family, OverComer Group, Church, Job, and your broader Community?"
+            )
+        )
     }
 }
 
@@ -8990,73 +10619,166 @@ data class ScriptureQuote(
 )
 
 @Composable
-fun LessonTwoContent(prefs: android.content.SharedPreferences, onStatusChange: (Boolean) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text(
-            text = "🌱 Lesson 2: Trusting God's Process",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Black,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = "Adapted from 'Trust the Process' by Shane Merrill & Micah Cartee.",
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.secondary
-        )
+fun ArticleTab(prefs: android.content.SharedPreferences) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "📖 PROVERBS 13:12-23 (NIV)",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Hope deferred makes the heart sick, but a longing fulfilled is a tree of life. Whoever scorns instruction will pay for it, but whoever respects a command is rewarded. The teaching of the wise is a fountain of life, turning a person from the snares of death. Good judgment wins favor, but the way of the unfaithful leads to their destruction. All who are prudent act with knowledge, but fools expose their folly. A wicked messenger falls into trouble, but a trustworthy envoy brings healing. Whoever disregards discipline comes to poverty and shame, but whoever heeds correction is honored. A longing fulfilled is sweet to the soul, but fools detest turning from evil. Walk with the wise and become wise, for a companion of fools suffers harm. Trouble pursues the sinner, but the righteous are rewarded with good things. A good person leaves an inheritance for their children’s children, but a sinner’s wealth is stored up for the righteous. An unplowed field produces food for the poor, but injustice sweeps it away.",
+                    style = MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic, lineHeight = 18.sp),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.08f))
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "📖 Reflection Scripture:",
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "\"Hope deferred makes the heart sick, but a longing fulfilled is a tree of life. Whoever scorns instruction will pay for it, but whoever respects a command is rewarded.\"",
-                    style = MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic),
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = "— Proverbs 13:12-13",
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.End
-                )
-
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
-                Text(
-                    text = "🌱 The Chinese Bamboo Tree",
+                    text = "⏳ The Season of Waiting",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "The Chinese Bamboo Tree must be watered and fertilized every single day for five years before it breaks through the ground. If at any time the process stops, the tree dies inside the soil.\n\n" +
-                           "But in the fifth year, it breaks through the soil and grows to nearly ninety feet tall in just six weeks! The tree spent five long years developing an incredibly deep and wide root system so that when it grows, it will never topple over. Do you allow waiting to develop you or embitter you?",
+                    text = "There are times when God puts things in our hearts (dreams, aspirations, goals) and He gives them to us right away. There are other times, and this seems to be the majority, when God puts things in our hearts and then makes us wait.\n\n" +
+                           "Often, we can wonder what God is doing. We can begin to ask, \"Did I really hear from God?\" Or perhaps the biggest question we can ask is, \"God, what is taking you so long?\"\n\n" +
+                           "During those times of waiting, God prepares us for His promise. During our waiting, He teaches us things. He grows our character, our faith, and our ability to do what He has called us to do. God takes us through a process. The question is, \"Will you trust the process?\"",
                     style = MaterialTheme.typography.bodySmall,
                     lineHeight = 18.sp
                 )
+            }
+        }
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "🛡️ Anointed, Not Yet Appointed",
+                    text = "🛡️ David's Anointing (1 Samuel 16)",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = "In 1 Samuel 16, God told Samuel to anoint one of Jesse's sons as king. When Samuel saw Eliab, the oldest, tallest, and physically fit son, he thought, \"Surely the Lord’s anointed stands here before the Lord.\"\n\n" +
+                           "But the Lord said: \"Do not consider his appearance or his height, for I have rejected him. The Lord does not look at the things people look at. People look at the outward appearance, but the Lord looks at the heart.\"\n\n" +
+                           "After all seven sons passed and were rejected, David, the youngest who was tending sheep, was brought in. The Lord said, \"Rise and anoint him; this is the one.\"",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                Text(
+                    text = "🔄 Back to the Sheepfold",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "If this story was a movie, David would have taken the throne immediately. But instead, David went right back to what he was doing before: watching the sheep. Why would God anoint him and then send him back?\n\n" +
+                           "Because God wanted to take David through a process. The anointing was a reminder of the promise that the process would bring.",
+                      style = MaterialTheme.typography.bodySmall,
+                      lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.08f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "🎋 The Chinese Bamboo Tree",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+                Text(
+                    text = "The Chinese Bamboo Tree begins as a nut planted in soil. It must be watered and fertilized every single day for five years before it finally breaks through the ground. If at any point the process stops, the tree dies inside the ground.\n\n" +
+                           "But in that fifth year, it breaks through and grows to nearly ninety feet tall in just six weeks! The tree must take five long years of developing a strong, deep, wide root system so it doesn’t topple over when it is grown.\n\n" +
+                           "We tend to get frustrated when we don’t get five-year results immediately. The truth is that the process is essential, and everyone must go through it to get results. Will you allow the waiting to develop you or embitter you? Bitterness is unbelief in the promises of God.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "🎯 Anointed, Not Yet Appointed",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "David was anointed by Samuel as king, but he was sent right back to watching sheep. Preparation must precede opportunity! David had to master the lyre in the quiet of the fields before playing for King Saul, and slay the bear and lion before fighting Goliath. If you shortcut the process, you short-circuit the product!",
+                    text = "A common hindrance is mistaking the anointing of God for the appointing of God. David had the anointing to be king, but he didn't yet have the appointment to be king.\n\n" +
+                           "When you have talent, influence, or counseling ability, others see it and praise you. This can cause you to think: \"Well, I can see it, and others can see it, why can’t God see it? What is God waiting for?\" This leads to tunnel vision—focusing so much on the light at the end of the tunnel that you can't see what is happening around you. You trip over things because you can't see!",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.08f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "🔑 Preparation is Key",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "David's appointment after his anointing was to watch sheep. If you're watching sheep right now, that's your appointment. Preparation must come before the opportunity.\n\n" +
+                           "While tending sheep, David developed his ability to play the lyre and write music (such as Psalm 19:1), which later got him into King Saul's service. While watching sheep, David fought off lions and bears, which prepared him to defeat Goliath. If you shortcut the process, you short-circuit the product!",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.08f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "🧹 Shane's Janitor Testimony",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+                Text(
+                    text = "Shane Merrill shares his testimony: He entered the car business at 18, became a young manager making lucrative money. When he got saved, God radically changed his life. He felt called to ministry, and Pastor David told him he must go to school. Deciding to go to school, he lost his car dealership job.\n\n" +
+                           "He wanted to serve at James River Church, so he applied for a job as a janitor. It took its toll; he had a wife and two kids, and he went from making high income to cleaning toilets. He began to complain in his head to God at 5:30 AM while unlocking the building.\n\n" +
+                           "Suddenly, Lead Pastor John Lindell's office door swung open, and Pastor John said: \"I don't do this very often, but I have a word of the Lord for you: Where you are at right now is not where you will always be. Be patient.\"\n\n" +
+                           "Shane says: \"The next day, I woke up, went to work, and cleaned toilets. The day after that, I cleaned toilets. I did that job for another year and a half. Although nothing changed on the outside immediately, something changed on the inside. God was building my trust, character, and willingness to serve.\"",
                     style = MaterialTheme.typography.bodySmall,
                     lineHeight = 18.sp
                 )
@@ -9064,16 +10786,234 @@ fun LessonTwoContent(prefs: android.content.SharedPreferences, onStatusChange: (
         }
 
         Text(
-            text = "🙋 PERSONAL REFLECTION:",
+            text = "By Shane Merrill & Micah Cartee • Christian Living",
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.ExtraBold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun OutlineTab() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "I. Introduction",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "• **Proverbs 13:12-23 Overview**:\n" +
+                           "  - Hope deferred vs. longing fulfilled.\n" +
+                           "  - Wisdom, instruction, and discipline.\n" +
+                           "  - The contrast between the righteous and the wicked.\n" +
+                           "• **Personal Reflection**:\n" +
+                           "  - God's timing in fulfilling dreams and aspirations.\n" +
+                           "  - The struggle of waiting and questioning God's timing.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "II. Understanding Proverbs 13:12-23",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "• **A. Hope Deferred and Longing Fulfilled (v.12)**:\n" +
+                           "  - Emotional impact of delayed hope.\n" +
+                           "  - Joy of fulfilled desires (\"a tree of life\").\n" +
+                           "• **B. Wisdom and Instruction (v.13-14)**:\n" +
+                           "  - Respecting commands and instructions.\n" +
+                           "  - The value of wisdom as a fountain of life.\n" +
+                           "• **C. Good Judgment vs. Foolishness (v.15-16)**:\n" +
+                           "  - Favor through good judgment.\n" +
+                           "  - Destruction of the unfaithful.\n" +
+                           "• **D. Role of Messengers & Discipline (v.17-18)**:\n" +
+                           "  - Consequences of wickedness vs. rewards of trustworthiness.\n" +
+                           "  - Importance of heeding correction.\n" +
+                           "• **E. Companionship and Influence (v.19-20)**:\n" +
+                           "  - Delight in fulfilled desires.\n" +
+                           "  - Impact of wise and foolish associations.\n" +
+                           "• **F. Righteousness and Provision (v.21-23)**:\n" +
+                           "  - Rewards for the righteous and stored wealth.\n" +
+                           "  - Injustice sweeping away unplowed fields.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.08f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "III. Biblical Example: The Process of David's Anointing",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "• **A. Samuel's Mission (1 Samuel 16)**:\n" +
+                           "  - God's rejection of Saul and selection of David.\n" +
+                           "  - Samuel's fear and obedience.\n" +
+                           "• **B. The Anointing of David**:\n" +
+                           "  - Misconception of Eliab as the chosen one.\n" +
+                           "  - God's focus on the heart over appearance.\n" +
+                           "  - David's anointing despite youth and minor role.\n" +
+                           "• **C. The Waiting Period**:\n" +
+                           "  - David's return to tending sheep.\n" +
+                           "  - Seeming contradiction of anointing without immediate appointment.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.08f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "IV. The Purpose of the Waiting Process",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+                Text(
+                    text = "• **A. Character and Faith Development**:\n" +
+                           "  - Growth in trust and reliance on God.\n" +
+                           "  - Strengthening of faith and character.\n" +
+                           "• **B. Learning and Preparation**:\n" +
+                           "  - Skills and experiences gained during wait.\n" +
+                           "  - Comparison to the Chinese Bamboo Tree's growth.\n" +
+                           "• **C. Avoiding Bitterness**:\n" +
+                           "  - The danger of becoming bitter during delays.\n" +
+                           "  - Embracing faith and the promise of God's timing.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "V. The Anointing vs. Appointment",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "• **A. Recognizing the Difference**:\n" +
+                           "  - Distinction between anointing and actualization.\n" +
+                           "  - Significance of preparation before fulfillment.\n" +
+                           "• **B. Avoiding Tunnel Vision**:\n" +
+                           "  - Staying aware of God's current work and lessons.\n" +
+                           "  - The risk of focusing solely on future goals.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.08f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "VI. Examples from David's Life",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "• **A. David's Musical Skills**:\n" +
+                           "  - Development while tending sheep (Psalm 19:1).\n" +
+                           "  - Opportunity to play and bring relief to Saul.\n" +
+                           "• **B. David's Courage and Strength**:\n" +
+                           "  - Experiences with lions and bears.\n" +
+                           "  - Preparation for facing Goliath.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.08f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "VII. The Importance of Trusting the Process",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.tertiary
+                )
+                Text(
+                    text = "• **A. Embracing God's Timing**:\n" +
+                           "  - Faith in God's perfect timing and process.\n" +
+                           "  - Allowing the process to refine and prepare us.\n" +
+                           "• **B. The Outcome of Faithfulness**:\n" +
+                           "  - David's eventual kingship as a result of preparation.\n" +
+                           "  - The importance of readiness for God's promises.\n\n" +
+                           "**Conclusion**:\n" +
+                           "- Encouragement to trust the process & reassurance of God's faithfulness.\n" +
+                           "- Strengthening faith through understanding God's ways.",
+                    style = MaterialTheme.typography.bodySmall,
+                    lineHeight = 18.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun JournalTab(prefs: android.content.SharedPreferences) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text(
+            text = "🙋 PERSONAL REFLECTION JOURNAL:",
             style = MaterialTheme.typography.labelSmall.copy(letterSpacing = 1.sp),
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.secondary
         )
 
         val questions = listOf(
-            "What area of your recovery or mental life feels like a slow, invisible 'root growth' waiting process right now?",
-            "What are your current 'bear and lion' routines that are preparing you to face your upcoming giants?",
-            "How can you choose to 'get better, not bitter' in your faith walk today?"
+            "What area of your life or recovery feels like a slow, invisible 'root growth' waiting process right now?",
+            "What are your current 'bear and lion' routine assignments (like David watching sheep or Shane cleaning toilets) that God is using to prepare you?",
+            "Have you ever mistook God's 'anointing' (your visible talent or call) for His 'appointing' (the actual timing and position)? How can you avoid tunnel vision?",
+            "Shane's testimony reminds us that preparation comes before opportunity. Write down a prayer asking God to grow your character, service, and patience during your season of waiting."
         )
 
         questions.forEachIndexed { idx, question ->
@@ -9085,7 +11025,8 @@ fun LessonTwoContent(prefs: android.content.SharedPreferences, onStatusChange: (
                 Text(
                     text = "${idx + 1}. $question",
                     style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 OutlinedTextField(
                     value = answerText,
@@ -9096,9 +11037,60 @@ fun LessonTwoContent(prefs: android.content.SharedPreferences, onStatusChange: (
                     placeholder = { Text("Write your thoughts...", style = MaterialTheme.typography.bodySmall) },
                     modifier = Modifier.fillMaxWidth().testTag("recovery_input_lesson_2_q_$idx"),
                     textStyle = MaterialTheme.typography.bodySmall,
-                    maxLines = 4
+                    singleLine = false,
+                    maxLines = 5
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun LessonTwoContent(prefs: android.content.SharedPreferences, onStatusChange: (Boolean) -> Unit) {
+    var selectedTab by remember { mutableStateOf(0) }
+    
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Text(
+            text = "🌱 Lesson 2: Trusting God's Process",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Black,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = "Proverbs 13:12-23 Study & 'Trust the Process' Article",
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        TabRow(
+            selectedTabIndex = selectedTab,
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.primary
+        ) {
+            Tab(
+                selected = selectedTab == 0,
+                onClick = { selectedTab = 0 },
+                text = { Text("📖 Read Article", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+            )
+            Tab(
+                selected = selectedTab == 1,
+                onClick = { selectedTab = 1 },
+                text = { Text("📝 Study Outline", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+            )
+            Tab(
+                selected = selectedTab == 2,
+                onClick = { selectedTab = 2 },
+                text = { Text("🙋 Journal", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        when (selectedTab) {
+            0 -> ArticleTab(prefs)
+            1 -> OutlineTab()
+            2 -> JournalTab(prefs)
         }
     }
 }
@@ -9474,13 +11466,13 @@ fun LessonFiveContent(prefs: android.content.SharedPreferences, onStatusChange: 
 fun LessonSixContent(prefs: android.content.SharedPreferences, onStatusChange: (Boolean) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(
-            text = "👨‍Simple Parent Restoration",
+            text = "👨‍👩‍👧‍👦 Lesson 6: Family & Parents Restoration",
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Black,
             color = MaterialTheme.colorScheme.primary
         )
         Text(
-            text = "Appreciate, honor, and restore family connections, remembering we only have one Mom and one Dad.",
+            text = "Appreciate, honor, and restore family connections, remembering we only have one Mom and one Dad under God's grace.",
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.secondary
@@ -9494,12 +11486,23 @@ fun LessonSixContent(prefs: android.content.SharedPreferences, onStatusChange: (
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
-                    text = "👩 Mom",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Love Mom",
+                        tint = Color(0xFFD81B60),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "👩 Mom — The Gift of Nurture",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
                 
                 val momLines = listOf(
                     "When we’re 5 years old, we say: “Mommy, I love you.”",
@@ -9512,16 +11515,24 @@ fun LessonSixContent(prefs: android.content.SharedPreferences, onStatusChange: (
                     "When we’re 70, we say: “I’d give up everything to have my Mom here with me again.”"
                 )
                 
-                momLines.forEach { line ->
-                    Text(
-                        text = line,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Medium
-                    )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)),
+                    border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
+                ) {
+                    Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        momLines.forEach { line ->
+                            Text(
+                                text = line,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
                 }
 
                 Text(
-                    text = "You only have one Mom. Appreciate her, whether she’s here on Earth or in Heaven.",
+                    text = "You only have one Mom. Appreciate and honor her, whether she is here on Earth or has gone home to Heaven.",
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
                         fontWeight = FontWeight.Bold
@@ -9531,12 +11542,23 @@ fun LessonSixContent(prefs: android.content.SharedPreferences, onStatusChange: (
 
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-                Text(
-                    text = "👨 Dad",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Honor Dad",
+                        tint = Color(0xFF1976D2),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "👨 Dad — The Gift of Strength",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
 
                 val dadLines = listOf(
                     "When we’re 5 years old, we say: “Daddy, I love you.”",
@@ -9549,16 +11571,24 @@ fun LessonSixContent(prefs: android.content.SharedPreferences, onStatusChange: (
                     "When we’re 70, we say: “I’d give up everything to have my Dad here with me again.”"
                 )
 
-                dadLines.forEach { line ->
-                    Text(
-                        text = line,
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Medium
-                    )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)),
+                    border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant)
+                ) {
+                    Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        dadLines.forEach { line ->
+                            Text(
+                                text = line,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
                 }
 
                 Text(
-                    text = "You only have one Dad. Appreciate him, whether he’s here on Earth or in Heaven.",
+                    text = "You only have one Dad. Appreciate and honor him, whether he is here on Earth or has gone home to Heaven.",
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
                         fontWeight = FontWeight.Bold
@@ -9728,6 +11758,68 @@ fun LessonSevenContent(prefs: android.content.SharedPreferences, onStatusChange:
 
 @Composable
 fun LessonEightContent(prefs: android.content.SharedPreferences, onStatusChange: (Boolean) -> Unit) {
+    var expandedGroup by remember { mutableStateOf<Int?>(null) }
+    
+    val groups = listOf(
+        Triple(
+            "🛡️ Group 1: Power, Peace & Quietness (Verses 1-8)",
+            Color(0xFF0D47A1),
+            listOf(
+                "Isaiah 41:10" to "So do not fear, for I am with you; do not be dismayed, for I am your God. I will strengthen you and help you; I will uphold you with my righteous right hand.",
+                "Psalm 56:3" to "When I am afraid, I put my trust in you.",
+                "Philippians 4:6-7" to "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.",
+                "John 14:27" to "Peace is what I leave with you; it is my own peace that I give you. I do not give it as the world does. Do not be worried and upset; do not be afraid.",
+                "2 Timothy 1:7" to "For God has not given us a spirit of fear, but of power and of love and of a sound mind.",
+                "1 John 4:18" to "There is no fear in love. But perfect love drives out fear, because fear has to do with punishment. The one who fears is not made perfect in love.",
+                "Psalm 94:19" to "When anxiety was great within me, your consolation brought joy to my soul.",
+                "Isaiah 43:1" to "But now, this is what the Lord says…Fear not, for I have redeemed you; I have summoned you by name; you are mine."
+            )
+        ),
+        Triple(
+            "🌿 Group 2: Strength in the Valley (Verses 9-16)",
+            Color(0xFF00796B),
+            listOf(
+                "Proverbs 12:25" to "An anxious heart weighs a man down, but a kind word cheers him up.",
+                "Psalm 23:4" to "Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me; your rod and your staff, they comfort me.",
+                "Joshua 1:9" to "Have I not commanded you? Be strong and courageous. Do not be terrified; do not be discouraged, for the Lord your God will be with you wherever you go.",
+                "Matthew 6:34" to "Therefore do not worry about tomorrow, for tomorrow will worry about itself. Each day has enough trouble of its own.",
+                "1 Peter 5:6-7" to "Humble yourselves, then, under God’s mighty hand, so that he will lift you up in his own good time. Leave all your worries with him, because he cares for you.",
+                "Isaiah 35:4" to "Tell everyone who is discouraged, Be strong and don’t be afraid! God is coming to your rescue…",
+                "Luke 12:22-26" to "Do not worry about your life, what you will eat; or about your body, what you will wear. Life is more than food, and the body more than clothes. Consider the ravens: They do not sow or reap, they have no storeroom or barn; yet God feeds them. And how much more valuable you are than birds! Who of you by worrying can add a single hour to his life? Since you cannot do this very little thing, why do you worry about the rest.",
+                "Psalm 27:1" to "The Lord is my light and my salvation—whom shall I fear? The Lord is the stronghold of my life—of whom shall I be afraid?"
+            )
+        ),
+        Triple(
+            "⚔️ Group 3: Our Shield and Helper (Verses 17-25)",
+            Color(0xFFE65100),
+            listOf(
+                "Psalm 55:22" to "Cast your cares on the Lord and he will sustain you; he will never let the righteous fall.",
+                "Mark 6:50" to "Immediately he spoke to them and said, 'Take courage! It is I. Don’t be afraid.'",
+                "Deuteronomy 31:6" to "Be strong and courageous. Do not be afraid or terrifed because of them, for the Lord your God goes with you; he will never leave you nor forsake you.",
+                "Isaiah 41:13-14" to "'For I am the Lord, your God, who takes hold of your right hand and says to you, Do not fear; I will help you. Do not be afraid, for I myself will help you,' declares the Lord, your Redeemer, the Holy One of Israel.",
+                "Psalm 46:1" to "God is our refuge and strength, an ever-present help in trouble.",
+                "Psalm 118:6-7" to "The Lord is with me; I will not be afraid. What can man do to me? The Lord is with me; he is my helper.",
+                "Proverbs 29:25" to "Fear of man will prove to be a snare, but whoever trusts in the Lord is kept safe.",
+                "Mark 4:39-40" to "He got up, rebuked the wind and said to the waves, “Quiet! Be still!” Then the wind died down and it was completely calm. He said to his disciples, “Why are you so afraid? Do you still have no faith?”",
+                "Psalm 34:7" to "The angel of the Lord encamps around those who fear him, and he delivers them."
+            )
+        ),
+        Triple(
+            "👑 Group 4: Eternal Victory & Protection (Verses 26-33)",
+            Color(0xFF8E24AA),
+            listOf(
+                "1 Peter 3:14" to "But even if you suffer for doing what is right, God will reward you for it. So don’t worry or be afraid of their threats.",
+                "Psalm 34:4" to "I prayed to the Lord, and he answered me. He freed me from all my fears.",
+                "Deuteronomy 3:22" to "Do not be afraid of them; the Lord your God himself will fight for you.",
+                "Revelation 1:17" to "Then he placed his right hand on me and said: 'Do not be afraid. I am the First and the Last.'",
+                "Mark 5:36" to "Jesus told him, ‘Don’t be afraid; just believe.’",
+                "Romans 8:38-39" to "And I am convinced that nothing can ever separate us from God’s love. Neither death nor life, neither angels nor demons, neither our fears for today nor our worries about tomorrow—not even the powers of hell can separate us from God’s love.",
+                "Zephaniah 3:17" to "The Lord your God is in your midst, A victorious warrior. He will exult over you with joy, He will be quiet in His love, He will rejoice over you with shouts of joy.",
+                "Psalm 91:1-4" to "He who dwells in the shelter of the Most High will rest in the shadow of the Almighty. I will say of the Lord, “He is my refuge and my fortress, my God, in whom I trust.”…He will cover you with his feathers, and under his wings you will find refuge; his faithfulness will be your shield and rampart."
+            )
+        )
+    )
+
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(
             text = "🛡️ Lesson 8: Freedom from Fear (Nakia's Miracle)",
@@ -9768,39 +11860,76 @@ fun LessonEightContent(prefs: android.content.SharedPreferences, onStatusChange:
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
                 Text(
-                    text = "📖 33 Verses of Victory Over Fear (Slay the Giants):",
+                    text = "📖 33 Verses of Victory Over Fear:",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
                 
-                val verses = listOf(
-                    "Isaiah 41:10 — So do not fear, for I am with you; do not be dismayed, for I am your God.",
-                    "Psalm 56:3 — When I am afraid, I put my trust in you.",
-                    "Philippians 4:6-7 — Do not be anxious about anything, but present your requests to God...",
-                    "John 14:27 — Peace I leave with you; my peace I give you. Do not let your hearts be troubled.",
-                    "2 Timothy 1:7 — For God has not given us a spirit of fear, but of power, love, and a sound mind.",
-                    "1 John 4:18 — There is no fear in love. But perfect love drives out fear...",
-                    "Psalm 94:19 — When anxiety was great within me, your consolation brought joy to my soul.",
-                    "Isaiah 43:1 — Fear not, for I have redeemed you; I have summoned you by name; you are mine.",
-                    "Proverbs 12:25 — An anxious heart weighs a man down, but a kind word cheers him up.",
-                    "Psalm 23:4 — Even though I walk through the valley of the shadow of death, I will fear no evil...",
-                    "Joshua 1:9 — Be strong and courageous. Do not be terrified... the Lord is with you wherever you go."
-                )
-
-                verses.forEach { verse ->
-                    Text(
-                        text = "• $verse",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-
                 Text(
-                    text = "Access the full 33 verses at crosswalk.com or our shared OverComer document to shield your mind daily from sudden fear.",
-                    style = MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic),
-                    color = MaterialTheme.colorScheme.secondary
+                    text = "God's Word is our ultimate weapon against worry and anxiety. Below are all 33 calming scriptures Shane read to his class the night before the crash. Click on any category to meditate on these life-giving words.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                // Render Groups as beautiful expandable accordions
+                groups.forEachIndexed { groupIdx, (title, color, verseList) ->
+                    val isExpanded = expandedGroup == groupIdx
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { expandedGroup = if (isExpanded) null else groupIdx },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isExpanded) color.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surface
+                        ),
+                        border = BorderStroke(0.5.dp, if (isExpanded) color.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outlineVariant)
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = title,
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                                    color = if (isExpanded) color else MaterialTheme.colorScheme.onSurface
+                                )
+                                Icon(
+                                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                    contentDescription = if (isExpanded) "Collapse" else "Expand",
+                                    tint = if (isExpanded) color else MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            
+                            AnimatedVisibility(visible = isExpanded) {
+                                Column(
+                                    modifier = Modifier.padding(top = 12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    verseList.forEach { (ref, text) ->
+                                        Column {
+                                            Text(
+                                                text = "• \"$text\"",
+                                                style = MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic),
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                            Text(
+                                                text = "— $ref",
+                                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                                color = color,
+                                                modifier = Modifier.fillMaxWidth(),
+                                                textAlign = TextAlign.End
+                                            )
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -9845,6 +11974,8 @@ fun LessonEightContent(prefs: android.content.SharedPreferences, onStatusChange:
 
 @Composable
 fun LessonNineContent(prefs: android.content.SharedPreferences, onStatusChange: (Boolean) -> Unit) {
+    var selectedSubTab by remember { mutableStateOf(0) }
+    
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(
             text = "⛓️ Lesson 9: Overcoming Guilt & Shame",
@@ -9853,11 +11984,45 @@ fun LessonNineContent(prefs: android.content.SharedPreferences, onStatusChange: 
             color = MaterialTheme.colorScheme.primary
         )
         Text(
-            text = "Differentiating conduct (guilt) from identity (shame) using biblical wisdom and Brené Brown’s research.",
+            text = "Differentiating conduct (guilt) from identity (shame) using biblical wisdom and clinical research.",
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.secondary
         )
+
+        // Modern filter chips for sub-navigation
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilterChip(
+                selected = selectedSubTab == 0,
+                onClick = { selectedSubTab = 0 },
+                label = { Text("⚖️ Differences") },
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary)
+            )
+            FilterChip(
+                selected = selectedSubTab == 1,
+                onClick = { selectedSubTab = 1 },
+                label = { Text("🌳 Garden Study") },
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary)
+            )
+            FilterChip(
+                selected = selectedSubTab == 2,
+                onClick = { selectedSubTab = 2 },
+                label = { Text("🧼 Healing & Empathy") },
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary)
+            )
+            FilterChip(
+                selected = selectedSubTab == 3,
+                onClick = { selectedSubTab = 3 },
+                label = { Text("📖 Quotes & Verses") },
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary)
+            )
+        }
 
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -9867,51 +12032,160 @@ fun LessonNineContent(prefs: android.content.SharedPreferences, onStatusChange: 
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                Text(
-                    text = "⚖️ Guilt vs. Shame — What's the Difference?",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "• Guilt relates to our conduct. It’s an awareness of wrongdoing: \"I made a bad choice.\" Guilt can be healthy if it serves as a built-in warning system leading to genuine repentance. Guilt requires confession, mercy, and forgiveness.\n\n" +
-                           "• Shame relates to our identity. It’s an unhealthy feeling that: \"I AM a bad person.\" Shame makes you feel dirty, exposed, humiliated, and unworthy. It causes you to lie, hide (just as Adam and Eve hid in the garden because they were ashamed), and isolate yourself.",
-                    style = MaterialTheme.typography.bodySmall,
-                    lineHeight = 18.sp
-                )
+                when (selectedSubTab) {
+                    0 -> {
+                        // Tab 0: Differences
+                        Text(
+                            text = "⚖️ Guilt vs. Shame — The Core Differences",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "• Guilt has to do with our conduct. It is a fact or statement of wrongdoing. It is being responsible for having done something wrong. Guilt involves feeling bad about a specific action: \"I made a bad choice.\"\n\n" +
+                                   "• Shame is a painful feeling of being dirty, tainted, humiliated, and somehow less worthy because of wrongdoing. Shame has to do with who we are: \"I AM a bad person.\"\n\n" +
+                                   "• Healthy vs. Unhealthy: Guilt can be healthy (it serves as a built-in alarm system, signaling us when we violate what our hearts tell us is right, leading us to ask for forgiveness). Shame is never healthy. It causes us to hide, lie, isolate, and reinforces unhealthy beliefs that we are simply not capable of doing any better.\n\n" +
+                                   "• Brain Science: Scientists examining MRIs can see that shame sets off high activity in the right area of the brain (but not the amygdala), whereas guilt activates the amygdala in the frontal lobe. Shame is a much more complex and dangerous emotion.",
+                            style = MaterialTheme.typography.bodySmall,
+                            lineHeight = 18.sp
+                        )
+                        
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                        
+                        Text(
+                            text = "🔄 Opposites Overview:",
+                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Guilt Opposites:", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
+                                Text("• innocence\n• virtue\n• blameless\n• satisfaction\n• respect\n• sinlessness", style = MaterialTheme.typography.bodySmall, lineHeight = 16.sp)
+                            }
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Shame Opposites:", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
+                                Text("• honor\n• self-esteem\n• glory\n• regard\n• praise\n• worthiness", style = MaterialTheme.typography.bodySmall, lineHeight = 16.sp)
+                            }
+                        }
+                    }
+                    1 -> {
+                        // Tab 1: Garden Study
+                        Text(
+                            text = "🌳 Guilt & Shame in the Garden of Eden",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Adam and Eve were guilty of violating God's instruction and deserved the penalty of death because of their guilt. Instantly, they tried to avoid responsibility through blame-shifting:\n\n" +
+                                   "• Adam blamed Eve and God: \"The woman you gave me...\"\n" +
+                                   "• Eve blamed the serpent: \"The serpent deceived me...\"\n\n" +
+                                   "When God entered the garden, they hid because they were ashamed. Before they were guilty, they were naked and unashamed, and had no need to hide.\n\n" +
+                                   "But look at God's mercy: On that very day, God declared their guilt and declared their death sentence, but He also promised a Savior who would settle their guilt-debt (Genesis 3:14-15), and He provided a covering for their shame (Genesis 3:21 - garments of skin). God covered them!",
+                            style = MaterialTheme.typography.bodySmall,
+                            lineHeight = 18.sp
+                        )
+                        
+                        HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                        
+                        Text(
+                            text = "📖 Hebrews 12:2",
+                            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        Text(
+                            text = "\"...looking unto Jesus the author and finisher of our faith; who for the joy that was set before him endured the cross, despising the shame, and is set down at the right hand of the throne of God.\"",
+                            style = MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic),
+                            lineHeight = 17.sp
+                        )
+                    }
+                    2 -> {
+                        // Tab 2: Healing & Empathy
+                        Text(
+                            text = "🧼 Breaking the Cycle (Brené Brown's Research)",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "Shame researcher Brené Brown teaches that shame needs three things to grow exponentially in our lives:\n\n" +
+                                   "⚠️ SECRECY  •  ⚠️ SILENCE  •  ⚠️ JUDGMENT\n\n" +
+                                   "As an antidote, shame cannot survive being spoken, and it cannot survive empathy. The first step in overcoming shame is telling someone you trust. Bringing it into the light with someone who listens with empathy automatically reduces shame.\n\n" +
+                                   "Beware of the \"vulnerability hangover\" — that anxious worry after sharing where you wonder if people will judge you. Realize that empathetic connection destroys shame's power. Shame only has two lies: \"You are never good enough\" and \"Who do you think you are?\" Turn those lies off!",
+                            style = MaterialTheme.typography.bodySmall,
+                            lineHeight = 18.sp
+                        )
+                    }
+                    3 -> {
+                        // Tab 3: Quotes & Verses
+                        Text(
+                            text = "📝 Inspiring Quotes",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                            ) {
+                                Column(modifier = Modifier.padding(10.dp)) {
+                                    Text(
+                                        text = "\"Guilt says, 'You failed.' Shame says, 'You're a failure.' Grace says, 'Your failures are forgiven.'\"",
+                                        style = MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
+                                    )
+                                    Text(text = "— Lecrae", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.End)
+                                }
+                            }
+                            
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                            ) {
+                                Column(modifier = Modifier.padding(10.dp)) {
+                                    Text(
+                                        text = "\"The conscience is to our souls what pain sensors are to our bodies: it inflicts distress, in the form of guilt, whenever we violate what our hearts tell us is right.\"",
+                                        style = MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
+                                    )
+                                    Text(text = "— John MacArthur", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.End)
+                                }
+                            }
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                            ) {
+                                Column(modifier = Modifier.padding(10.dp)) {
+                                    Text(
+                                        text = "\"When he says we're forgiven, let's unload the guilt. When he says we're valuable, let's believe him... God's efforts are strongest when our efforts are useless.\"",
+                                        style = MaterialTheme.typography.bodySmall.copy(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
+                                    )
+                                    Text(text = "— Max Lucado", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.End)
+                                }
+                            }
+                        }
 
-                Text(
-                    text = "🧼 The Antidote to Shame:",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "Shame researcher Brené Brown states that shame needs three things to grow exponentially in our lives: SECRECY, SILENCE, and JUDGMENT.\n\n" +
-                           "The antidote to shame is speaking it aloud to an empathetic listener. Shame simply cannot survive connection and empathy. When we bring our darkest secrets into the light and share them with a trusted friend or spiritual companion, the hold of shame is instantly broken.",
-                    style = MaterialTheme.typography.bodySmall,
-                    lineHeight = 18.sp
-                )
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-
-                Text(
-                    text = "📖 Scriptural Foundations of Freedom:",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = "• Isaiah 43:25 — \"I, even I, am he who blots out your transgressions for my own sake, and remembers your sins no more.\"\n\n" +
-                           "• Romans 8:1 — \"There is now no condemnation for those who are in Christ Jesus.\"\n\n" +
-                           "• Psalm 32:5 — \"Then I acknowledged my sin to you and did not cover up my iniquity... and you forgave the guilt of my sin.\"\n\n" +
-                           "• Psalm 103:12 — \"As far as the east is from the west, so far has he removed our transgressions from us.\"\n\n" +
-                           "• 2 Corinthians 5:17 — \"So then, if anyone is in Christ, he is a new creation; the old has gone, the new is here!\"",
-                    style = MaterialTheme.typography.bodySmall,
-                    lineHeight = 18.sp
-                )
+                        Text(
+                            text = "📖 Scriptural Promises of Complete Cleansing:",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = "• Isaiah 53:5 — \"But he was pierced for our transgressions, he was crushed for our iniquities; the punishment that brought us peace was on him, and by his wounds we are healed.\"\n\n" +
+                                   "• Romans 8:1 — \"Therefore, there is now no condemnation for those who are in Christ Jesus.\"\n\n" +
+                                   "• 1 John 1:9 — \"If we confess our sins, he is faithful and reliable... and cleanses us from everything we've done wrong.\"\n\n" +
+                                   "• Psalm 32:5 — \"I said, 'I will confess my transgressions to the Lord' — and you forgave the guilt of my sin.\"\n\n" +
+                                   "• Isaiah 43:25 — \"I, even I, am he who blots out your transgressions for my own sake, and remembers your sins no more.\"\n\n" +
+                                   "• Hebrews 10:22 — \"...let us go right into the presence of God with sincere hearts fully trusting him. For our guilty consciences have been sprinkled with Christ's blood to make us clean...\"",
+                            style = MaterialTheme.typography.bodySmall,
+                            lineHeight = 18.sp
+                        )
+                    }
+                }
             }
         }
 
@@ -10016,25 +12290,60 @@ fun LessonTenContent(prefs: android.content.SharedPreferences, onStatusChange: (
                 )
 
                 val stages = listOf(
-                    "1. Fear" to "Scared to start / of potential failure.",
-                    "2. Guilt/Shame" to "Feelings of inadequacy; not working hard enough.",
-                    "3. Regret" to "Bitterly mourning where you could have been by now.",
-                    "4. Courage" to "Gaining early wins and building solid spiritual confidence.",
-                    "5. Desire" to "Seeing light at the end of the tunnel and pressing forward.",
-                    "6. Excitement" to "Receiving multiple victories, driving fresh encouragement.",
-                    "7. Pride" to "Celebrating your hard work and divine milestones.",
-                    "8. Anger" to "A dip in performance or progress. The scale/setback adds tension; you need your Word (Your Mentor).",
-                    "9. Willingness" to "Rediscovering resolve: 'I can truly do this through Christ.'",
-                    "10. Acceptance" to "Learning from the past; recognizing that you cannot do it alone.",
-                    "11. Freedom" to "The sweet, victorious relief of breaking all active chains.",
-                    "12. Giving Back" to "Desiring and being fully equipped to reach back and lift others up!"
+                    Triple("1. Fear", "Scared to start / of potential failure.", Icons.Default.Warning to Color(0xFFE53935)),
+                    Triple("2. Guilt/Shame", "Feelings of inadequacy; not working hard enough.", Icons.Default.Lock to Color(0xFF757575)),
+                    Triple("3. Regret", "Bitterly mourning where you could have been by now.", Icons.Default.Refresh to Color(0xFF1E88E5)),
+                    Triple("4. Courage", "Gaining early wins and building solid spiritual confidence.", Icons.Default.PlayArrow to Color(0xFF43A047)),
+                    Triple("5. Desire", "Seeing light at the end of the tunnel and pressing forward.", Icons.Default.CheckCircle to Color(0xFF00ACC1)),
+                    Triple("6. Excitement", "Receiving multiple victories, driving fresh encouragement.", Icons.Default.ThumbUp to Color(0xFFD81B60)),
+                    Triple("7. Pride", "Celebrating your hard work and divine milestones.", Icons.Default.Star to Color(0xFFFDD835)),
+                    Triple("8. Anger", "A dip in performance or progress. Setbacks add tension; you need your Word (Your Mentor).", Icons.Default.Close to Color(0xFFD32F2F)),
+                    Triple("9. Willingness", "Rediscovering resolve: 'I can truly do this through Christ.'", Icons.Default.Send to Color(0xFF3949AB)),
+                    Triple("10. Acceptance", "Learning from the past; recognizing that you cannot do it alone.", Icons.Default.Face to Color(0xFF00897B)),
+                    Triple("11. Freedom", "The sweet, victorious relief of breaking all active chains.", Icons.Default.Check to Color(0xFF2E7D32)),
+                    Triple("12. Giving Back", "Desiring and being fully equipped to reach back and lift others up!", Icons.Default.Favorite to Color(0xFFC2185B))
                 )
 
-                stages.forEach { (title, desc) ->
-                    Column {
-                        Text(text = title, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
-                        Text(text = desc, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Spacer(modifier = Modifier.height(4.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    stages.forEach { (title, desc, iconData) ->
+                        val (icon, color) = iconData
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
+                            border = BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .background(color.copy(alpha = 0.12f), shape = RoundedCornerShape(8.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = icon,
+                                        contentDescription = title,
+                                        tint = color,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = title,
+                                        style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        text = desc,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -10555,7 +12864,33 @@ fun LessonFourteenContent(prefs: android.content.SharedPreferences, onStatusChan
 fun TestimonyVictoryBoard(viewModel: OverComerViewModel, onNavigateToChat: () -> Unit) {
     val context = LocalContext.current
     var testimonyInput by remember { mutableStateOf("") }
+    var shareWithCommunity by remember { mutableStateOf(false) }
     var activeQuoteIndex by remember { mutableStateOf(0) }
+
+    val communityLogs by viewModel.communityTestimonies.collectAsStateWithLifecycle()
+    val removedPostNotes by viewModel.removedPostNotes.collectAsStateWithLifecycle()
+    val isUserAdmin by viewModel.isUserAdmin.collectAsStateWithLifecycle()
+    var devModeratorOverride by remember { mutableStateOf(false) }
+
+    val staticCommunityLogs = remember {
+        listOf(
+            Triple("Surrendered my chemical struggle wholly to Jesus. Remained completely free this entire week! He is so faithful!", System.currentTimeMillis() - 7200000L, "John D."),
+            Triple("Felt absolute peace during a heavy work trigger. Usually I would isolate, but the thought reframing and prayer broke the lock! Glory to God!", System.currentTimeMillis() - 21600000L, "Sarah M."),
+            Triple("My marriage is being renewed as my husband and I aligned vertically with Christ first. God restores marriage!", System.currentTimeMillis() - 86400000L, "Mark W."),
+            Triple("30 days of perfect freedom! Surrendering to Jesus broke the chains instantly. Walking as a new creation!", System.currentTimeMillis() - 172800000L, "Grace S.")
+        )
+    }
+
+    val displayedCommunityLogs = remember(communityLogs, removedPostNotes) {
+        val dbLogs = communityLogs
+            .filter { it.notes !in removedPostNotes }
+            .map { Triple(it.notes, it.timestamp, it.authorName.ifBlank { "Anonymous" }) to (it.id as Int?) }
+        val staticFiltered = staticCommunityLogs
+            .filter { it.first !in removedPostNotes }
+            .map { Triple(it.first, it.second, it.third) to (null as Int?) }
+        val all = dbLogs + staticFiltered
+        all.sortedByDescending { it.first.second }
+    }
 
     val quotes = remember {
         listOf(
@@ -10715,6 +13050,29 @@ fun TestimonyVictoryBoard(viewModel: OverComerViewModel, onNavigateToChat: () ->
                     color = Color(0xFF5D4037)
                 )
 
+                // Brief statement about the encouraging power of testimony
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF8E1)),
+                    border = BorderStroke(1.dp, Color(0xFFFFD54F)),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Text(
+                            text = "📖 The Encouragement of Your Story",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color(0xFFE65100)
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Sharing what God has done in your life is a powerful way to defeat despair and strengthen others! Revelation 12:11 says we overcome by the blood of the Lamb and the word of our testimony. Your story of victory can be the very hope a fellow OverComer needs today to keep moving forward in perfect freedom.",
+                            style = MaterialTheme.typography.bodySmall,
+                            lineHeight = 16.sp,
+                            color = Color(0xFF5D4037)
+                        )
+                    }
+                }
+
                 OutlinedTextField(
                     value = testimonyInput,
                     onValueChange = { testimonyInput = it },
@@ -10735,15 +13093,49 @@ fun TestimonyVictoryBoard(viewModel: OverComerViewModel, onNavigateToChat: () ->
                     )
                 )
 
+                // Optional Share Checkbox
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { shareWithCommunity = !shareWithCommunity }
+                        .padding(vertical = 4.dp)
+                ) {
+                    Checkbox(
+                        checked = shareWithCommunity,
+                        onCheckedChange = { shareWithCommunity = it },
+                        colors = CheckboxDefaults.colors(checkedColor = Color(0xFFE65100))
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text(
+                            text = "Share anonymously on Community Board 🌐 (Optional)",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color(0xFFE65100)
+                        )
+                        Text(
+                            text = "Checking this lets other users see your breakthrough on the community feed anonymously.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color(0xFF795548)
+                        )
+                    }
+                }
+
                 Button(
                     onClick = {
                         if (testimonyInput.isNotBlank()) {
-                            viewModel.addVictoryLog(
-                                type = "JOURNAL_SECURE",
-                                notes = testimonyInput
+                            viewModel.addVictoryTestimony(
+                                notes = testimonyInput,
+                                shareOnCommunityBoard = shareWithCommunity
                             )
+                            val message = if (shareWithCommunity) {
+                                "Recorded securely in your private journal and shared anonymously to encourage the community! 🙌🏆"
+                            } else {
+                                "Victory testimony recorded securely in your Private Journal! 🏆🔐"
+                            }
                             testimonyInput = ""
-                            Toast.makeText(context, "Victory testimony recorded securely in your Private Journal! 🏆📖", Toast.LENGTH_SHORT).show()
+                            shareWithCommunity = false
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                         }
                     },
                     modifier = Modifier
@@ -10761,7 +13153,179 @@ fun TestimonyVictoryBoard(viewModel: OverComerViewModel, onNavigateToChat: () ->
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Text("Log in Secure Private Journal 🔐", fontWeight = FontWeight.Bold)
+                        Text(
+                            text = if (shareWithCommunity) "Share & Record Testimony 🌐🔐" else "Log in Secure Private Journal 🔐",
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            // --- Community Victory Board Feed ---
+            Spacer(modifier = Modifier.height(4.dp))
+            HorizontalDivider(color = Color(0xFFFFB300).copy(alpha = 0.2f))
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "Encouragement Feed",
+                            tint = Color(0xFFE65100),
+                            modifier = Modifier.size(22.dp)
+                        )
+                        Text(
+                            text = "Community Victory Feed 📣",
+                            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                            color = Color(0xFFE65100)
+                        )
+                    }
+
+                    // Admin toggle / indicator
+                    if (isUserAdmin) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = Color(0xFFC8E6C9),
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        ) {
+                            Text(
+                                text = "🛡️ Admin Active",
+                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32)),
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    } else {
+                        // Demo switch for creator/reviewer to quickly test and verify moderation behavior
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = "Demo Admin",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color(0xFF8D6E63)
+                            )
+                            Switch(
+                                checked = devModeratorOverride,
+                                onCheckedChange = { devModeratorOverride = it },
+                                modifier = Modifier.scale(0.75f).testTag("dev_moderator_toggle"),
+                                colors = SwitchDefaults.colors(checkedThumbColor = Color(0xFFE65100))
+                            )
+                        }
+                    }
+                }
+
+                Text(
+                    text = "See how God is delivering and restoring other OverComers in our community:",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color(0xFF5D4037)
+                )
+
+                // Render community list using a simple loop to avoid scroll crashes inside parent LazyColumn
+                displayedCommunityLogs.take(12).forEach { (logInfo, logId) ->
+                    val (notesText, timestampValue, authorName) = logInfo
+                    val timeAgo = remember(timestampValue) {
+                        val diff = System.currentTimeMillis() - timestampValue
+                        when {
+                            diff < 60000L -> "Just now"
+                            diff < 3600000L -> "${diff / 60000L}m ago"
+                            diff < 86400000L -> "${diff / 3600000L}h ago"
+                            else -> "${diff / 86400000L}d ago"
+                        }
+                    }
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFFFFDE7), // Warm light yellow background
+                            contentColor = Color(0xFF5D4037)
+                        ),
+                        border = BorderStroke(1.dp, Color(0xFFFFE082))
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.CheckCircle,
+                                        contentDescription = "Verified OverComer",
+                                        tint = Color(0xFF4CAF50),
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Text(
+                                        text = authorName,
+                                        style = MaterialTheme.typography.labelSmall.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color(0xFF388E3C)
+                                        )
+                                    )
+                                }
+                                Text(
+                                    text = timeAgo,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF8D6E63)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = notesText,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFF4E342E),
+                                lineHeight = 16.sp
+                            )
+
+                            // Show Erase Post button if user is real admin OR demo admin mode is switched on
+                            if (isUserAdmin || devModeratorOverride) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.End,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    TextButton(
+                                        onClick = {
+                                            viewModel.removeCommunityPost(notesText, logId)
+                                            Toast.makeText(context, "Post erased from Victory Board permanently! 🛡️🧹", Toast.LENGTH_SHORT).show()
+                                        },
+                                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFD32F2F)),
+                                        modifier = Modifier.testTag("admin_erase_post_btn")
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Erase Post",
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                            Text(
+                                                text = "Erase Post (Admin)",
+                                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -10776,11 +13340,12 @@ fun SupportGroupLocatorSection(viewModel: OverComerViewModel) {
     var locationInput by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("Celebrate Recovery") } // "Celebrate Recovery", "Christian Support Groups", "Find a Church"
     var prioritizeAlignment by remember { mutableStateOf(true) }
+    var currentPage by remember { mutableStateOf(0) }
     
     val searchResults by viewModel.localResources.collectAsStateWithLifecycle()
     val isSearching by viewModel.isSearchingResources.collectAsStateWithLifecycle()
 
-    val categories = listOf("Celebrate Recovery", "Christian Support Groups", "Find a Church")
+    val categories = listOf("Celebrate Recovery", "Christian Support Groups", "Find a Church", "Veteran Support")
 
     Card(
         modifier = Modifier
@@ -10821,15 +13386,17 @@ fun SupportGroupLocatorSection(viewModel: OverComerViewModel) {
             }
 
             Text(
-                text = "Enter your Zip Code or City to find active Christ-centered support groups, Celebrate Recovery meetings, and local Bible-believing churches close to you.",
+                text = "Enter your Zip Code or City to find active Christ-centered support groups, Celebrate Recovery meetings, local Bible-believing churches, and post-military assistance close to you.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 18.sp
             )
 
-            // Category Selector Chips
+            // Category Selector Chips (horizontally scrollable to avoid overflow)
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -10838,15 +13405,17 @@ fun SupportGroupLocatorSection(viewModel: OverComerViewModel) {
                     val displayLabel = when (cat) {
                         "Celebrate Recovery" -> "Celebrate Recovery"
                         "Christian Support Groups" -> "Support Groups"
-                        else -> "Find a Church ⛪"
+                        "Find a Church" -> "Find a Church ⛪"
+                        else -> "Veteran Support 🎖️"
                     }
                     FilterChip(
                         selected = isSelected,
                         onClick = { 
                             selectedCategory = cat
+                            currentPage = 0
                             if (locationInput.isNotBlank()) {
                                 val apiCategory = if (cat == "Find a Church") "Churches" else cat
-                                viewModel.searchLocalResources(locationInput, apiCategory, prioritizeAlignment)
+                                viewModel.searchLocalResources(locationInput, apiCategory, prioritizeAlignment, page = 0)
                             }
                         },
                         label = {
@@ -10879,9 +13448,10 @@ fun SupportGroupLocatorSection(viewModel: OverComerViewModel) {
                         checked = prioritizeAlignment,
                         onCheckedChange = { 
                             prioritizeAlignment = it
+                            currentPage = 0
                             if (locationInput.isNotBlank()) {
                                 val apiCategory = if (selectedCategory == "Find a Church") "Churches" else selectedCategory
-                                viewModel.searchLocalResources(locationInput, apiCategory, it)
+                                viewModel.searchLocalResources(locationInput, apiCategory, it, page = 0)
                             }
                         },
                         colors = CheckboxDefaults.colors(
@@ -10932,8 +13502,9 @@ fun SupportGroupLocatorSection(viewModel: OverComerViewModel) {
                     keyboardActions = KeyboardActions(
                         onSearch = {
                             if (locationInput.isNotBlank()) {
+                                currentPage = 0
                                 val apiCategory = if (selectedCategory == "Find a Church") "Churches" else selectedCategory
-                                viewModel.searchLocalResources(locationInput, apiCategory, prioritizeAlignment)
+                                viewModel.searchLocalResources(locationInput, apiCategory, prioritizeAlignment, page = 0)
                             }
                         }
                     )
@@ -10942,8 +13513,9 @@ fun SupportGroupLocatorSection(viewModel: OverComerViewModel) {
                 Button(
                     onClick = {
                         if (locationInput.isNotBlank()) {
+                            currentPage = 0
                             val apiCategory = if (selectedCategory == "Find a Church") "Churches" else selectedCategory
-                            viewModel.searchLocalResources(locationInput, apiCategory, prioritizeAlignment)
+                            viewModel.searchLocalResources(locationInput, apiCategory, prioritizeAlignment, page = 0)
                         } else {
                             Toast.makeText(context, "Please enter a location first", Toast.LENGTH_SHORT).show()
                         }
@@ -11017,6 +13589,7 @@ fun SupportGroupLocatorSection(viewModel: OverComerViewModel) {
                                             text = when (resource.type) {
                                                 "Celebrate Recovery" -> "CR Group"
                                                 "Christian Support Group" -> "Support Group"
+                                                "Veteran Support" -> "Veteran Support"
                                                 else -> "Church"
                                             },
                                             fontSize = 9.sp,
@@ -11115,6 +13688,43 @@ fun SupportGroupLocatorSection(viewModel: OverComerViewModel) {
                         }
                     }
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = {
+                        currentPage += 1
+                        val apiCategory = if (selectedCategory == "Find a Church") "Churches" else selectedCategory
+                        viewModel.searchLocalResources(locationInput, apiCategory, prioritizeAlignment, page = currentPage)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("locator_next_btn"),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        if (isSearching) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.ArrowForward,
+                                contentDescription = "Next",
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                        Text("Next Results", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    }
+                }
             } else if (isSearching) {
                 Column(
                     modifier = Modifier
@@ -11140,7 +13750,9 @@ fun SupportGroupLocatorSection(viewModel: OverComerViewModel) {
 
 @Composable
 fun PostIncarcerationSupportSection() {
-    var expandedSection by remember { mutableStateOf<Int?>(null) }
+    var showReentryDetails by remember { mutableStateOf(false) }
+    var showVeteransDetails by remember { mutableStateOf(false) }
+    var selectedTab by remember { mutableStateOf(0) }
 
     Card(
         modifier = Modifier
@@ -11171,7 +13783,7 @@ fun PostIncarcerationSupportSection() {
                     modifier = Modifier.size(26.dp)
                 )
                 Text(
-                    text = "REENTRY & TRANSITION FREEDOM",
+                    text = "RE-ENTRY & VETERANS ASSISTANCE",
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.5.sp
@@ -11181,170 +13793,833 @@ fun PostIncarcerationSupportSection() {
             }
 
             Text(
-                text = "Transitioning back to society after long-term incarceration can feel overwhelming. If you feel like 'something is broken' inside or you are struggling to adjust, know that you are not alone, and you are NOT permanently broken. Here are powerful tools and guidance designed specifically to help you walk in full freedom.",
+                text = "Transitioning back to society after separation or military service can feel overwhelming. Access customized guidance, supportive networks, and professional databases below.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 18.sp
             )
 
-            // Section 1: Understanding Post-Incarceration Challenges (PICS)
-            PostIncarcerationSectionHeader(
-                title = "1. Understanding Post-Incarceration Struggles",
-                isExpanded = expandedSection == 1,
-                onClick = { expandedSection = if (expandedSection == 1) null else 1 }
-            )
-            AnimatedVisibility(visible = expandedSection == 1) {
+            // 1. REENTRY SUPPORT AND TRANSITION FREEDOM RESOURCES - CLICK HERE
+            Card(
+                onClick = { showReentryDetails = !showReentryDetails },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("reentry_support_toggle_btn"),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (showReentryDetails) MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.25f) 
+                                     else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                ),
+                border = BorderStroke(1.dp, if (showReentryDetails) MaterialTheme.colorScheme.secondary else Color.Transparent)
+            ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    modifier = Modifier.padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "After years in a hyper-controlled, high-vigilance prison environment, your mind and nervous system naturally adapted to survive. Returning to the fast-paced, choice-heavy outside world can make you feel:",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        BulletPointItem("Hypervigilance: Constantly scanning rooms, sitting facing doors, or feeling suspicious of others' intentions.")
-                        BulletPointItem("Sensory Overload: Overwhelmed by bright lights, loud/sudden noises, crowds, or traffic.")
-                        BulletPointItem("Decision Fatigue: Struggling or feeling anxious when faced with everyday choices that others take for granted.")
-                        BulletPointItem("Emotional Numbing: Difficulty connecting with loved ones or feeling flat, a shield used to survive inside.")
-                    }
-
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
-                            text = "💡 Spiritual Truth: This is not a biological disease that makes you permanently broken. It is a natural response to long-term survival mode. 2 Corinthians 5:17 promises that you are a new creation in Christ. God's grace can completely retrain your mind and restore your peace.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.padding(12.dp),
-                            lineHeight = 18.sp
-                        )
-                    }
-                }
-            }
-
-            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-            // Section 2: Thought Reframing (Lie-to-Truth Transformation)
-            PostIncarcerationSectionHeader(
-                title = "2. Renewing Your Mind (Lie Transformation)",
-                isExpanded = expandedSection == 2,
-                onClick = { expandedSection = if (expandedSection == 2) null else 2 }
-            )
-            AnimatedVisibility(visible = expandedSection == 2) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "To walk in lasting freedom, we must identify internal 'prison rules' and replace them with Christ's truth:",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        LieToTruthItem(
-                            lie = "I am institutionalized and will never fully adapt. I'm broken forever.",
-                            truth = "I am a new creation (2 Corinthians 5:17). God is working in me, renewing my mind day by day, restoring everything the locusts have eaten."
-                        )
-                        LieToTruthItem(
-                            lie = "I must keep my guard up and trust absolutely no one to stay safe.",
-                            truth = "While wisdom is necessary, Christ is my ultimate protector. I can safely build healthy, Christ-centered boundaries with a trustworthy brotherhood."
-                        )
-                        LieToTruthItem(
-                            lie = "I am a burden to my family and society because of my past.",
-                            truth = "God has a custom, redemptive purpose for my life (Ephesians 2:10). My testimony of deliverance has immense power to help free others."
-                        )
-                    }
-                }
-            }
-
-            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-            // Section 3: Calming Grounding (Handling Sensory Overload)
-            PostIncarcerationSectionHeader(
-                title = "3. Calming Grounding (Sensory Overload Tool)",
-                isExpanded = expandedSection == 3,
-                onClick = { expandedSection = if (expandedSection == 3) null else 3 }
-            )
-            AnimatedVisibility(visible = expandedSection == 3) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Text(
-                        text = "When crowds, traffic, or loud environments trigger anxiety or panic, use these quick physical and spiritual grounding steps to tell your nervous system that you are safe in the present moment:",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        BulletPointItem("1. Stop & Pause: Step away from the crowd or sit in a quiet spot if possible.")
-                        BulletPointItem("2. The 3-3-3 Rule: Look around and name 3 things you can see, 3 things you can hear, and physically touch or move 3 parts of your body (e.g. tap your foot, roll your shoulders). This brings your mind out of survival-mode memory and back to current safety.")
-                        BulletPointItem("3. Paced Breathing: Inhale slowly for 4 seconds, hold for 4, and exhale for 4. Tell your body: 'I am safe here, God is with me.'")
-                        BulletPointItem("4. Anchor Scripture: Recite Psalm 46:10 in your mind: 'Be still, and know that I am God.'")
-                    }
-                }
-            }
-
-            Divider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-            // Section 4: Reentry Community & Discipleship Support
-            PostIncarcerationSectionHeader(
-                title = "4. Reentry Mentorship & Supportive Networks",
-                isExpanded = expandedSection == 4,
-                onClick = { expandedSection = if (expandedSection == 4) null else 4 }
-            )
-            AnimatedVisibility(visible = expandedSection == 4) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Text(
-                        text = "Walking alone is the primary cause of struggles. Active redemptive community is essential:",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        BulletPointItem("Establish a Stable Daily Routine: Structure your day with set times for prayer, bible reading, exercise, and fellowship. Routine restores a feeling of safety and control.")
-                        BulletPointItem("Seek a Mature Mentor: Find a pastor, a spiritual leader, or a brother/sister who has walked a similar path of long-term freedom.")
-                        BulletPointItem("Reentry Support Groups: Join specialized Christian reentry support networks like Prison Fellowship, local Teen Challenge outreach centers, or Celebrate Recovery groups.")
-                    }
-
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.25f)),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Explore,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
                             Text(
-                                text = "💡 Locator Hint:",
-                                style = MaterialTheme.typography.labelSmall,
+                                text = "reentry support and transition freedom resources click here",
+                                style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.secondary
+                                color = MaterialTheme.colorScheme.onSurface
                             )
-                            Text(
-                                text = "Use the Support & Church Locator above to find active Celebrate Recovery groups, Christian support networks, and local bible-believing fellowships near your zipcode that will welcome you with open arms and walk with you without judgment.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                lineHeight = 16.sp
+                        }
+                        Icon(
+                            imageVector = if (showReentryDetails) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Toggle Details",
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+
+                    if (showReentryDetails) {
+                        Text(
+                            text = "Transitioning back to society after long-term incarceration can feel overwhelming. If you feel like 'something is broken' inside or you are struggling to adjust, know that you are not alone, and you are NOT permanently broken. Here are powerful tools, curated resources, and coping strategies designed specifically to help you walk in full freedom.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 16.sp,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+
+                        ScrollableTabRow(
+                            selectedTabIndex = selectedTab,
+                            containerColor = Color.Transparent,
+                            contentColor = MaterialTheme.colorScheme.secondary,
+                            edgePadding = 0.dp,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Tab(
+                                selected = selectedTab == 0,
+                                onClick = { selectedTab = 0 },
+                                text = { Text("📘 Coping", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
                             )
+                            Tab(
+                                selected = selectedTab == 1,
+                                onClick = { selectedTab = 1 },
+                                text = { Text("💼 Resources", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                            )
+                            Tab(
+                                selected = selectedTab == 2,
+                                onClick = { selectedTab = 2 },
+                                text = { Text("🛡️ Mind Renewal", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                            )
+                            Tab(
+                                selected = selectedTab == 3,
+                                onClick = { selectedTab = 3 },
+                                text = { Text("🧠 Post-Prison Habits", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        when (selectedTab) {
+                            0 -> ReentryCopingStrategiesTab()
+                            1 -> ReentryCuratedResourcesTab()
+                            2 -> ReentryMindRenewalTab()
+                            3 -> ReentryConditioningTab()
                         }
                     }
                 }
+            }
+
+            // 2. VETERANS SUPPORT AND RESOURCES - CLICK HERE
+            Card(
+                onClick = { showVeteransDetails = !showVeteransDetails },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("veterans_support_toggle_btn"),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (showVeteransDetails) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f) 
+                                     else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                ),
+                border = BorderStroke(1.dp, if (showVeteransDetails) MaterialTheme.colorScheme.primary else Color.Transparent)
+            ) {
+                Column(
+                    modifier = Modifier.padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = "veterans support and resourses click here",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        Icon(
+                            imageVector = if (showVeteransDetails) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Toggle Details",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    if (showVeteransDetails) {
+                        VeteransSupportDetailsSection()
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun VeteransSupportDetailsSection() {
+    val context = LocalContext.current
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = "Honoring your service. If you are a veteran transitioning back into life or seeking mental/spiritual stability, you have unique, dedicated networks of support ready to serve you.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            lineHeight = 16.sp
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f))
+        ) {
+            Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    text = "🚨 National Veterans Crisis Line",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Free, confidential, 24/7 support. Connect with compassionate responders who understand military life.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Button(
+                    onClick = {
+                        val intent = android.content.Intent(
+                            android.content.Intent.ACTION_DIAL,
+                            android.net.Uri.parse("tel:988")
+                        )
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White
+                    )
+                ) {
+                    Text("Dial 988 (Press 1 for Veterans)", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    text = "⚖️ Veterans Justice Outreach (VJO)",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "VA program designed to avoid unnecessary criminalization and incarceration of veterans by facilitating access to VA clinical services, housing, and rehabilitation programs.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                BulletPointItem("Housing Solutions: Connect with VASH (VA Supportive Housing) vouchers.")
+                BulletPointItem("Direct Healthcare Integration: Seamless connection with VA health clinics.")
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    text = "⚔️ Combat & PTSD Spiritual Recovery",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                BulletPointItem("REBOOT Recovery Courses: Christian combat trauma healing. Free 12-week courses designed specifically for veterans and spouses. (rebootrecovery.com)")
+                BulletPointItem("Point Man Ministries: Veteran-to-veteran local peer support networks, teaching deep biblical restoration. (pointmanlr.org)")
+            }
+        }
+    }
+}
+
+@Composable
+fun ReentryCopingStrategiesTab() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.08f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "👁️ Managing Hypervigilance & Overload",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Prison requires constant alertness. In society, this can manifest as anxiety in loud, crowded places (like grocery stores) or always wanting to sit facing the door.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    BulletPointItem("Gradual Exposure: Start small. Visit supermarkets or malls during slow, off-peak hours first.")
+                    BulletPointItem("Safe Seating: It is perfectly okay to sit facing the door in public to keep your nervous system calm while you adapt.")
+                    BulletPointItem("Mindful Grounding: Take slow breaths. Inhale 4s, hold 4s, exhale 4s. Recite Psalm 46:10: 'Be still, and know that I am God.'")
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.08f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "⚖️ Overcoming Decision Fatigue",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = "When choices are made for you for years, everyday decisions (what to wear, buy, or eat) can suddenly trigger intense overwhelm or shutdown.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    BulletPointItem("The 3-Choice Rule: Limit your immediate choices to three options to prevent cognitive overload.")
+                    BulletPointItem("Write a Daily Plan: Spend 5 minutes every morning mapping out a basic schedule. Structure provides a safety net.")
+                    BulletPointItem("Ask for Time: If pushed for a fast choice, practice saying: 'Let me think about that and get back to you.'")
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "❤️ Rebuilding Family & Relationship Boundaries",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Separation changes family dynamics. Rushing to restore roles too fast can lead to misunderstanding and friction.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    BulletPointItem("Take it Slow: Trust is rebuilt through small, consistent acts of service and integrity, not overnight grand gestures.")
+                    BulletPointItem("Healthy Boundaries: Be honest about your limits. Seek mutual respect. (See Cloud & Townsend's 'Boundaries').")
+                    BulletPointItem("The Love & Respect Cycle: Break recursive arguments. Listen carefully, validate feelings, and seek first to understand.")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReentryCuratedResourcesTab() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "🏠 Clean & Safe Housing Support",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BulletPointItem("Oxford House: Over 3,000 self-run, self-supported, drug-free homes nationwide. Excellent, affordable, felon-friendly sober housing option. (Website: oxfordhouse.org)")
+                    BulletPointItem("Christian Transition Homes: Many local ministries operate reentry discipleship housing. Connect with a pastor via our Locator to find safe listings.")
+                    BulletPointItem("Local Reentry Coalitions: County social services maintain directories of transitional housing specifically funded for newly released individuals.")
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "💼 Second-Chance Employment",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BulletPointItem("Honest Jobs: The largest employment platform designed specifically for people with criminal histories. Matches you with second-chance employers. (Website: honestjobs.com)")
+                    BulletPointItem("Goodwill Reentry Programs: Offers specialized job training, resume preparation workshops, and direct local employment placement.")
+                    BulletPointItem("Dave's Killer Bread Foundation: Active resources and guidance on finding and thriving in second-chance jobs.")
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "🤝 Mentorship & Discipleship Networks",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BulletPointItem("Prison Fellowship Academy: Direct post-release community networks, discipleship groups, and personal mentorship matching. (Website: prisonfellowship.org)")
+                    BulletPointItem("Teen Challenge Reentry Outreach: Christian discipleship, community service support, and local fellowships welcoming OverComers without judgment.")
+                    BulletPointItem("Celebrate Recovery: A safe, Christ-centered peer fellowship helping you walk free of hurts, habits, and hang-ups.")
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "💳 ID Recovery & Legal Aid",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BulletPointItem("Local Social Services: Reentry specialists can help obtain birth certificates, Social Security cards, and state IDs, often waiving standard fees.")
+                    BulletPointItem("Legal Aid Societies: Non-profit legal networks offering free counsel for clearing backgrounds, restoring driver's licenses, and child support adjustments.")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReentryMindRenewalTab() {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            text = "Renewing the mind means replacing survival 'prison rules' with Christ's liberating truth. Here are key transformations to pray over daily:",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+
+        LieToTruthItem(
+            lie = "I am institutionalized and will never fully adapt. I'm permanently broken.",
+            truth = "I am a new creation (2 Corinthians 5:17). God is working in me daily, renewing my mind, and restoring everything that was lost."
+        )
+
+        LieToTruthItem(
+            lie = "I must keep my guard up and trust absolutely no one to stay safe.",
+            truth = "While wisdom is necessary, Christ is my ultimate shield. I can build healthy, grace-filled boundaries with a trusted brotherhood."
+        )
+
+        LieToTruthItem(
+            lie = "I am a permanent burden because of my record and my past.",
+            truth = "God has a custom, redemptive purpose for my life (Ephesians 2:10). My testimony of deliverance is a powerful beacon of hope."
+        )
+
+        LieToTruthItem(
+            lie = "I am powerless against the system and my circumstances.",
+            truth = "In Christ, I am an OverComer. Choice is the root, dependence is the fruit. I choose to depend fully on God's grace."
+        )
+    }
+}
+
+data class PrisonizationTrait(
+    val id: Int,
+    val title: String,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val summary: String,
+    val behaviorPoints: List<String>,
+    val overcomerAdvice: String
+)
+
+val prisonizationTraits = listOf(
+    PrisonizationTrait(
+        1,
+        "1. Strong Dependence on Structure",
+        Icons.Default.Settings,
+        "Need for a strict daily routine and feeling lost or anxious when plans change.",
+        listOf(
+            "Becoming anxious, irritable, or lost when plans change.",
+            "Expecting meals, sleep, work, and activities to happen at exact times.",
+            "Struggling to organize the day without external direction.",
+            "Functioning better at work than at home because work has strict rules.",
+            "Saying, 'Just tell me what I’m supposed to do,' rather than deciding independently."
+        ),
+        "Christ's freedom means we are active participants in our lives, not passive subjects. Start small by scheduling your own day with flexible buffer times. Pray for peace when plans shift."
+    ),
+    PrisonizationTrait(
+        2,
+        "2. Difficulty Making Ordinary Decisions",
+        Icons.Default.Help,
+        "Feeling overwhelmed by small, everyday choices after years of having choices controlled.",
+        listOf(
+            "Struggling to choose simple things: what to eat, what to wear, or how to spend free time.",
+            "Procrastinating, repeatedly asking others what to do, or avoiding decisions altogether.",
+            "Fearing making the wrong choice, which can resemble laziness or irresponsibility."
+        ),
+        "Overcoming this requires practice. Give yourself permission to make small, harmless mistakes. Remind yourself: 'God's grace covers my steps. I am allowed to choose.'"
+    ),
+    PrisonizationTrait(
+        3,
+        "3. Constant Hypervigilance",
+        Icons.Default.Warning,
+        "Remaining alert for danger, sitting near doors, watching exits, and sleeping lightly.",
+        listOf(
+            "Sitting where they can see the door and watching everyone who enters.",
+            "Disliking people walking behind them or scanning crowds constantly.",
+            "Sleeping lightly and reacting strongly to unexpected noises or touch.",
+            "Interpreting ordinary behavior as disrespect, manipulation, or a potential threat."
+        ),
+        "Acknowledge that this survival response protected you inside, but thank God that you are now safe. Practice deep, paced breathing and pray: 'The Lord is my shield; I will lay down and sleep in peace.'"
+    ),
+    PrisonizationTrait(
+        4,
+        "4. Emotional Suppression",
+        Icons.Default.Lock,
+        "Appearing emotionally cold or detached because showing feelings inside was unsafe.",
+        listOf(
+            "Appearing emotionally cold, detached, or refusing to talk about feelings.",
+            "Turning feelings of sadness or fear into anger.",
+            "Refusing help, viewing vulnerability as weakness, or withdrawing from discussions."
+        ),
+        "Jesus wept and showed deep emotion. Vulnerability is a spiritual strength. Begin sharing small feelings with a trusted mentor, and allow the Holy Spirit to soften your heart."
+    ),
+    PrisonizationTrait(
+        5,
+        "5. Distrust & Difficulty with Close Relationships",
+        Icons.Default.Person,
+        "Questioning people's motives, assuming betrayal, and pushing people away.",
+        listOf(
+            "Questioning people's motives or assuming they will betray or abandon you.",
+            "Testing people's loyalty or keeping secrets unnecessarily.",
+            "Avoiding depending on anyone and pushing people away before they can reject you."
+        ),
+        "Trust is rebuilt slowly. Healing from isolation requires taking small risks of vulnerability in a safe, Christian community. Let God be the anchor of your trust."
+    ),
+    PrisonizationTrait(
+        6,
+        "6. Strong Reactions to Authority",
+        Icons.Default.Info,
+        "Either extreme compliance or intense defensiveness around authority figures.",
+        listOf(
+            "Automatically complying or needing permission for things that do not require it.",
+            "Becoming unusually nervous around police, supervisors, or officials.",
+            "Or becoming defensive, hostile, and resistant whenever someone gives instructions.",
+            "Interpreting a simple correction or request as an attempt to dominate or humiliate you."
+        ),
+        "Authority inside was often punitive. True leadership is servant-hearted. Learn to pause, breathe, and distinguish between helper feedback and attempts to control."
+    ),
+    PrisonizationTrait(
+        7,
+        "7. Prison-Style Communication & Conflict",
+        Icons.Default.Warning,
+        "Viewing disagreement as disrespect and responding with threats or guardedness.",
+        listOf(
+            "Viewing disagreement as personal disrespect and believing you must never appear weak.",
+            "Responding intensely to staring, touching possessions, or invading personal space.",
+            "Using threats, intimidation, silence, or physical presence instead of conversation."
+        ),
+        "Proverbs says, 'A gentle answer turns away wrath.' Disagreement is a normal part of relationships. Practice walking away to cool down before discussing issues calmly."
+    ),
+    PrisonizationTrait(
+        8,
+        "8. Guarding Possessions & Personal Space",
+        Icons.Default.Star,
+        "Hoarding food, hiding belongings, or getting highly upset when items are touched.",
+        listOf(
+            "Hoarding food, toiletries, clothing, or money; hiding belongings.",
+            "Becoming unusually upset when someone touches your things.",
+            "Eating very quickly, guarding your plate, or keeping shoes close while sleeping."
+        ),
+        "In prison, privacy was zero and items were scarce. In freedom, God is your provider. Work on sharing small items and declaring: 'My Father supply all my needs according to His riches.'"
+    ),
+    PrisonizationTrait(
+        9,
+        "9. Social Discomfort & Isolation",
+        Icons.Default.Home,
+        "Avoiding crowds, restaurants, or malls; preferring to remain alone in one room.",
+        listOf(
+            "Avoiding crowds, unfamiliar places, celebrations, or malls.",
+            "Feeling highly uncomfortable with casual conversation or reading social cues.",
+            "Maintaining relationships mainly with other formerly incarcerated people."
+        ),
+        "Adjustment takes time, especially if you experienced prolonged isolation. Take small trips to quiet public places, and gradually increase your exposure. God did not create us for isolation."
+    ),
+    PrisonizationTrait(
+        10,
+        "10. Trouble Adjusting to Freedom & Tech",
+        Icons.Default.Refresh,
+        "Anxiety about smartphones, apps, social changes, and feeling left behind.",
+        listOf(
+            "Feeling overwhelmed by smartphones, online banking, transportation, or social media.",
+            "Feeling embarrassed about asking for help or frustrated with too many options.",
+            "Avoiding learning because not knowing makes you feel ashamed or powerless."
+        ),
+        "Shame is a lie. Everyone has to learn. Ask a trusted friend or family member to teach you one tech skill a week. Celebrate your small victories of learning!"
+    ),
+    PrisonizationTrait(
+        11,
+        "11. A Deeply Rooted Prison Identity",
+        Icons.Default.Person,
+        "Defining yourself as an inmate or felon rather than a child of God.",
+        listOf(
+            "Continuing to define yourself primarily as an inmate, felon, or convict.",
+            "Believing you must always be tough and do not belong in ordinary society.",
+            "Sabotaging positive opportunities because success feels unfamiliar or undeserved."
+        ),
+        "Your past record does not define your future potential. In Christ, you are a son, a spouse, a parent, a neighbor, and an OverComer. Speak your true identity in Christ daily."
+    ),
+    PrisonizationTrait(
+        12,
+        "12. Difficulty with Intimacy & Family Roles",
+        Icons.Default.Favorite,
+        "Struggling to share authority, express tenderness, or rebuild family trust.",
+        listOf(
+            "Trouble sharing authority with a spouse or parenting children who grew up without you.",
+            "Difficulty receiving affection, expressing tenderness, or handling disagreements without withdrawing.",
+            "Expecting immediate loyalty but struggling to understand that trust must be rebuilt over time."
+        ),
+        "Family roles shifted while you were away. Re-entry requires humility. Listen first, apologize when needed, and understand that rebuilding deep trust is a gradual process."
+    ),
+    PrisonizationTrait(
+        13,
+        "13. Survival Mentality Despite Stability",
+        Icons.Default.Warning,
+        "Expecting everything to disappear tomorrow, keeping bags packed, and avoiding long-term plans.",
+        listOf(
+            "Constantly expecting to return to prison or keeping bags packed.",
+            "Spending money immediately or hiding it; avoiding emotional investment in stable things.",
+            "Sabotaging employment/relationships when stable because chaos feels safer than calm."
+        ),
+        "Chaos may feel familiar, but Christ is your Prince of Peace. God's promise is stable and secure. Practice making 1-year and 5-year plans. Your future is secure in His hands."
+    )
+)
+
+@Composable
+fun ReentryConditioningTab() {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier.padding(bottom = 16.dp)
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f)
+            ),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    text = "Understanding Post-Prison Habits (\"Prisonization\")",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "Physical release is immediate, but mental and behavioral conditioning can linger for years—even after being home for five years. This process is often called 'prisonization'—learned survival strategies that were necessary inside but cause friction in ordinary life. It is not a formal mental-health diagnosis, and not everyone who has been incarcerated develops the same traits.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp
+                )
+            }
+        }
+
+        Text(
+            text = "Tap a trait below to explore signs & biblical advice:",
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        var expandedIndex by remember { mutableStateOf<Int?>(null) }
+
+        prisonizationTraits.forEach { trait ->
+            val isExpanded = expandedIndex == trait.id
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expandedIndex = if (isExpanded) null else trait.id }
+                    .testTag("prisonization_trait_${trait.id}"),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isExpanded) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surface
+                ),
+                border = BorderStroke(1.dp, if (isExpanded) MaterialTheme.colorScheme.primary.copy(alpha = 0.4f) else MaterialTheme.colorScheme.outlineVariant),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(14.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = trait.icon,
+                            contentDescription = trait.title,
+                            tint = if (isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Text(
+                            text = trait.title,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            contentDescription = if (isExpanded) "Collapse" else "Expand",
+                            tint = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    Text(
+                        text = trait.summary,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 16.sp
+                    )
+
+                    if (isExpanded) {
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
+
+                        Text(
+                            text = "Common Behaviors:",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+
+                        trait.behaviorPoints.forEach { point ->
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                            ) {
+                                Text("•", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
+                                Text(
+                                    text = point,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    lineHeight = 16.sp
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f))
+                                .padding(12.dp)
+                        ) {
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text(
+                                    text = "RENEWING THE MIND COUNSEL:",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    text = trait.overcomerAdvice,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    lineHeight = 16.sp
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Why would it still be present after five years?
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Why Does Conditioning Persist After 5 Years?",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = "Five years outside does not automatically undo more than ten years of conditioning. The person may have physically left prison but never received support to relearn independent decision-making, emotional regulation, healthy conflict resolution, relationship/parenting skills, trauma recovery, financial management, community living, and establishing a positive identity beyond incarceration. Effective reentry is highly individualized—it requires deeper, loving guidance rather than simply telling someone to 'make better choices.'",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp
+                )
+            }
+        }
+
+        // Institutionalization vs Manipulation / Accountability
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f)
+            ),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.4f)),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Conditioning vs. Accountability",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error
+                )
+                Text(
+                    text = "Institutionalization explains behavior, but it does not excuse harmful actions. A person can be genuinely struggling with prison-related conditioning and still be responsible for treating others with respect. Compassion and accountability must exist together:",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.4f))
+                        .padding(12.dp)
+                ) {
+                    Text(
+                        text = "\"I understand why you learned this behavior inside, but it is no longer safe or acceptable outside, and you are responsible for learning another way.\"",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        lineHeight = 16.sp
+                    )
+                }
+                Text(
+                    text = "Working with a trauma-informed therapist, reentry-trained counselor, or peer support specialist with lived incarceration experience can help determine whether behaviors are due to institutionalization, PTSD, depression, or substance concerns. Lived-experience peers are especially helpful in challenging prison-thinking without shaming.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 16.sp
+                )
             }
         }
     }
@@ -11449,6 +14724,877 @@ fun LieToTruthItem(lie: String, truth: String) {
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
                     lineHeight = 16.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun VeteranSupportSection() {
+    var selectedTab by remember { mutableStateOf(0) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+            .testTag("veteran_support_card"),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        border = BorderStroke(1.5.dp, Color(0xFF1B5E20).copy(alpha = 0.4f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            // Header Row
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = "Veteran Support Icon",
+                    tint = Color(0xFF1B5E20),
+                    modifier = Modifier.size(26.dp)
+                )
+                Text(
+                    text = "VETERAN TRANSITION & HONOR FREEDOM",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.5.sp
+                    ),
+                    color = Color(0xFF1B5E20)
+                )
+            }
+
+            Text(
+                text = "Transitioning from military service to civilian life carries deep, unseen battles. Whether you served in active combat or support operations, coping with PTSD, moral weight, or loss of mission can feel isolating. Know that it is a sign of ultimate strength—not weakness—to reach out for support. You are not permanently damaged; in Christ, you are an OverComer. Here is powerful biblical advice, mental tools, and curated resources to guide your walk.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 18.sp
+            )
+
+            TabRow(
+                selectedTabIndex = selectedTab,
+                containerColor = Color.Transparent,
+                contentColor = Color(0xFF1B5E20),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Tab(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    text = { Text("🛡️ Biblical Guidance", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                )
+                Tab(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    text = { Text("🏛️ Resources", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                )
+                Tab(
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
+                    text = { Text("🔑 Mind Alignment", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            when (selectedTab) {
+                0 -> VeteranCopingStrategiesTab()
+                1 -> VeteranCuratedResourcesTab()
+                2 -> VeteranMindRenewalTab()
+            }
+        }
+    }
+}
+
+@Composable
+fun VeteranCopingStrategiesTab() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1B5E20).copy(alpha = 0.05f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "👁️ Managing Hypervigilance & PTSD",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1B5E20)
+                )
+                Text(
+                    text = "Constant alertness keeps you alive in service, but in civilian environments (like malls, traffic, or loud settings), this hyper-arousal triggers intense anxiety, weariness, or anger.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    BulletPointItem("Tactical Seating: Sit in positions where your nervous system feels secure (e.g., facing the room or exit) as you adapt. Do not feel guilty about taking this space.")
+                    BulletPointItem("The 4-4-4 Grounding: When triggered, slowly inhale for 4s, hold for 4s, and exhale for 4s. Recite Psalm 18:2: 'The Lord is my rock, my fortress, and my deliverer.'")
+                    BulletPointItem("Acknowledge the Shift: Consciously tell your mind, 'The battle is behind me. I am safe under Christ's banner.'")
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.08f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "🗺️ Restoring Mission & Purpose",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Text(
+                    text = "Moving from a highly structured, unified platoon to a fragmented civilian world can trigger deep feelings of isolation, loss of identity, or aimlessness.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    BulletPointItem("Identify Your Commander: Your commission has not ended. Christ has called you into His sovereign kingdom to represent grace and truth (2 Timothy 2:3-4).")
+                    BulletPointItem("Set Micro-Missions: Establish 2-3 daily spiritual or physical goals. Rebuilding starts with structured daily victories.")
+                    BulletPointItem("Gather a New Platoon: Connect with other believers, local small groups, or Christian veterans who understand absolute freedom.")
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "❤️ Overcoming Moral Injury & Guilt",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "Decisions made or witnessed in intense conditions can leave deep spiritual wounds or 'moral injury,' making you feel permanently stained or distant from God.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    BulletPointItem("Complete Deliverance: You are a brand new creation (2 Corinthians 5:17). Christ's blood cleanses you of all unrighteousness; there is absolutely zero condemnation (Romans 8:1).")
+                    BulletPointItem("It's Safe to Ask: Confession is not a weakness. Reach out to a trusted pastor, Christian counselor, or peer mentor who values absolute grace.")
+                    BulletPointItem("Renew the Temple: Treat your body and mind with respect. Exercise, get healthy rest, and spend time in God's peaceful creation.")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun VeteranCuratedResourcesTab() {
+    val context = LocalContext.current
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "🎖️ Christ-Centered Veteran Healing Courses",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1B5E20)
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BulletPointItem("REBOOT Recovery: A free, 12-week faith-based trauma healing course designed specifically for veterans and first responders. Over 20,000 graduates. (Website: rebootrecovery.com)")
+                    BulletPointItem("Mighty Oaks Warrior Programs: Offers free, intensive recovery retreats to help veterans discover purpose, recover from PTSD, and build a godly home. (Website: mightyoaksprograms.org)")
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Button(
+                    onClick = {
+                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://rebootrecovery.com/military"))
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20))
+                ) {
+                    Text("Explore REBOOT Recovery 🎖️", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "🏛️ Federal & National Veteran Agencies",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BulletPointItem("Veterans Crisis Line: Free, confidential support available 24/7. Dial 988, then press 1. Text support to 838255.")
+                    BulletPointItem("VA PTSD Program: Clinical assistance, coping guides, and expert medical directories tailored to military trauma.")
+                    BulletPointItem("Military OneSource: Comprehensive resources, transition coaching, and free confidential non-medical counseling. (Call 800-342-9647)")
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Button(
+                    onClick = {
+                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.va.gov"))
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Visit VA.gov Portal 🏛️", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "🤝 Advocacy, Community, & Local Support",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    BulletPointItem("VFW & American Legion: Local community chapters offering advocacy, benefits claim navigation, peer mentorship, and veteran camaraderie.")
+                    BulletPointItem("State Dept of Veterans Affairs: Access state-specific veteran benefits, property tax exemptions, and transition grants.")
+                    BulletPointItem("Support Locator: Use the 'Support & Church Locator' above and search the 'Veteran Support' category with your Zip Code to find veteran-focused resources near you!")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun VeteranMindRenewalTab() {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(
+            text = "Renewing your mind means swapping military-transition lies for God's sovereign, liberating truth. Pray over these daily:",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+
+        VeteranLieToTruthItem(
+            lie = "I am permanently broken or damaged by the combat or struggles I experienced.",
+            truth = "I am a new creation in Christ Jesus (2 Corinthians 5:17). He heals the brokenhearted, binds up their wounds, and restores my life completely."
+        )
+
+        VeteranLieToTruthItem(
+            lie = "Asking for help is a sign of weakness and failure as a strong warrior.",
+            truth = "Seeking help is a tactical sign of strength and alignment. King David, a fierce warrior, cried out to God and relied on trusted brothers in times of distress (Psalm 18:6)."
+        )
+
+        VeteranLieToTruthItem(
+            lie = "My best years are behind me, and I have lost my purpose since taking off the uniform.",
+            truth = "God's calling on my life is irrevocable (Romans 11:29). He has plans to give me a hope and a glorious future representing His kingdom (Jeremiah 29:11)."
+        )
+
+        VeteranLieToTruthItem(
+            lie = "No civilian can ever understand or walk with me; I am entirely alone.",
+            truth = "Christ has tasted death and pain for me; He understands me perfectly. I can find an authentic, loving platoon of brothers in a Bible-believing local church."
+        )
+    }
+}
+
+@Composable
+fun VeteranLieToTruthItem(lie: String, truth: String) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = "Lie",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(16.dp)
+                )
+                Text(
+                    text = "Military/Transition Lie: \"$lie\"",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error,
+                    lineHeight = 16.sp
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Truth",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp)
+                )
+                Text(
+                    text = "Biblical Freedom: \"$truth\"",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    lineHeight = 16.sp
+                )
+            }
+        }
+    }
+}
+
+data class BookResource(
+    val title: String,
+    val author: String,
+    val focus: String,
+    val whyItWorks: String,
+    val quote: String
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CuratedBiblicalLibrarySection() {
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedCategoryIndex by remember { mutableStateOf(-1) }
+
+    val categories = listOf(
+        "Substance Recovery",
+        "Mental Health",
+        "Marriage & Family",
+        "Christian Counseling",
+        "Biblical Care",
+        "Specialty & Trauma"
+    )
+
+    val recoveryBooks = listOf(
+        BookResource(
+            title = "The Cross and the Switchblade / Global Teen Challenge Curriculum",
+            author = "David Wilkerson",
+            focus = "Spiritual power of deliverance & structured faith-based recovery.",
+            whyItWorks = "As the founder of Teen Challenge, his foundational approach to addiction remains the gold standard in Pentecostal and Charismatic recovery ministries.",
+            quote = "The Holy Spirit will always meet you on the level of your faith, and if you believe that Jesus is able to deliver you completely, He will do it."
+        ),
+        BookResource(
+            title = "Crossroads: A Step-by-Step Guide Away from Addiction",
+            author = "Edward T. Welch",
+            focus = "Strictly biblical personal accountability and peer-support.",
+            whyItWorks = "This workbook is excellent for peer support specialists leading small groups because it requires heavy personal accountability and directly addresses the behavioral choices that fuel addiction.",
+            quote = "Addiction is worship gone wrong. True freedom begins when we reorient our hearts to worship the living God instead of our desires."
+        ),
+        BookResource(
+            title = "Celebrate Recovery Curriculum",
+            author = "John Baker",
+            focus = "Christ-centered 12-step translation.",
+            whyItWorks = "It translates the traditional 12-step model into a purely Christ-centered framework. It is highly structured, relies on peer leadership, and is easily integrated into transitional housing mandates.",
+            quote = "You cannot heal a wound by saying it's not there. We must bring our hurts, habits, and hang-ups into the healing light of Jesus Christ."
+        ),
+        BookResource(
+            title = "Nicky Cruz Outreach & Run Baby Run",
+            author = "Nicky Cruz",
+            focus = "Absolute deliverance and street-level transformation.",
+            whyItWorks = "Demonstrates the power of the Gospel to reach the most hardened hearts, serving under David Wilkerson and later founding his own global outreach.",
+            quote = "I looked at David Wilkerson and said, 'If you come near me, I'll kill you.' He looked back with tears in his eyes and said, 'You could cut me into a thousand pieces, Nicky, and every piece would love you.' That love broke my heart."
+        )
+    )
+
+    val mentalHealthBooks = listOf(
+        BookResource(
+            title = "Grace for the Afflicted: A Clinical and Biblical Perspective on Mental Illness",
+            author = "Dr. Matthew S. Stanford",
+            focus = "Definitively bridging neuroscientific insights and spiritual dynamics.",
+            whyItWorks = "Dr. Stanford is a Christian neuroscientist. This is the definitive book for ministry leaders trying to navigate the boundary between spiritual warfare and clinical mental illness. Reassures users that treating chemical imbalances is medically sound.",
+            quote = "Mental illness is not a character flaw or a spiritual failure; it is a physical condition in a broken world that responds to medical treatment and is sustained by the grace of God."
+        ),
+        BookResource(
+            title = "Boundaries: When to Say Yes, How to Say No to Take Control of Your Life",
+            author = "Dr. Henry Cloud & Dr. John Townsend",
+            focus = "Theological and psychological framework for healthy limits.",
+            whyItWorks = "For a ministry operating on the philosophy of a 'hand up, not a handout,' this is essential reading. It provides a theological and psychological framework for deep compassion combined with strict, uncompromising accountability.",
+            quote = "We change our behavior when the pain of staying the same becomes greater than the pain of changing. Boundaries help create that healthy pressure."
+        ),
+        BookResource(
+            title = "Blame It on the Brain? Distinguishing Chemical Imbalances, Brain Disorders, and Disobedience",
+            author = "Edward T. Welch",
+            focus = "Discerning medical/clinical issues from spiritual/choice issues.",
+            whyItWorks = "Helps ministry leaders and chaplains discern when a behavior is a spiritual/choice issue and when it is a medical/clinical issue requiring professional bridging.",
+            quote = "Brain problems may explain our limitations, but they do not excuse our sins. We must treat the physical brain with medicine while caring for the spiritual soul with the Word."
+        ),
+        BookResource(
+            title = "The Christian Counseling Companion & The Struggle is Real",
+            author = "Dr. Jared Pingleton",
+            focus = "Integrating clinical psychology with deep, pastoral, church-based care.",
+            whyItWorks = "Written by a clinical psychologist and minister, it provides highly practical guidelines for caring for mental and relational health directly inside the church.",
+            quote = "The church must be the safest place on earth to struggle. We must destigmatize mental health and provide a compassionate bridge between clinical excellence and biblical truth."
+        )
+    )
+
+    val marriageFamilyBooks = listOf(
+        BookResource(
+            title = "Sacred Marriage: What if God Designed Marriage to Make Us Holy More Than to Make Us Happy?",
+            author = "Gary Thomas",
+            focus = "Marriage as an engine for spiritual sanctification and holiness.",
+            whyItWorks = "This is a cornerstone book that shifts the focus of marriage from mere personal fulfillment to spiritual sanctification. It is excellent for pastoral counseling and helping couples in crisis find a higher, God-centered purpose.",
+            quote = "God did not design marriage to be an easy path to personal happiness, but a sacred crucible that refines our character and makes us more like Christ."
+        ),
+        BookResource(
+            title = "Love & Respect: The Love She Desires; The Respect He Desperately Needs",
+            author = "Dr. Emerson Eggerichs",
+            focus = "Grounded in Ephesians 5:33 communication cycles.",
+            whyItWorks = "Grounded purely in Ephesians 5:33, this book breaks down the communication cycles that destroy marriages. It is highly practical, action-oriented, and universally applicable.",
+            quote = "Without love, she reacts without respect. Without respect, he reacts without love. This is the crazy cycle. We must choose to break it with Christlike grace."
+        ),
+        BookResource(
+            title = "Vertical Marriage: The One Secret That Will Change Your Marriage",
+            author = "Dave & Ann Wilson",
+            focus = "Prioritizing the vertical relationship with Christ first.",
+            whyItWorks = "A highly accessible, engaging resource that emphasizes that a couple's horizontal relationship can only be fixed by addressing their vertical relationship with Christ first.",
+            quote = "If you are looking to your spouse to satisfy the deepest longings of your soul, you are setting them up to fail. Only Jesus can fill that void. Align vertically first."
+        ),
+        BookResource(
+            title = "Saving Your Marriage Before It Starts (SYMBIS)",
+            author = "Dr. Les and Leslie Parrott",
+            focus = "Premarital and marital structured assessment and relationship strengthening.",
+            whyItWorks = "Provides highly structured, evidence-based relationship strengthening and assessments to build a lasting, bulletproof marriage under God.",
+            quote = "A good marriage isn't something you find; it's something you make. It requires intentionality, communication, and a shared spiritual foundation."
+        ),
+        BookResource(
+            title = "The New Dare to Discipline / Focus on the Family",
+            author = "Dr. James Dobson",
+            focus = "Biblical family foundations, healthy boundaries, and behavioral discipline.",
+            whyItWorks = "Strong, compassionate family guidance that teaches respect, healthy behavioral boundaries, and character development under Christ.",
+            quote = "Children do not respect a parent who allows them to dominate the household. Healthy discipline is an act of deep, protective love, not anger."
+        )
+    )
+
+    val christianCounselingBooks = listOf(
+        BookResource(
+            title = "Christian Counseling: A Comprehensive Guide",
+            author = "Dr. Gary R. Collins",
+            focus = "Standard, comprehensive pastoral care and counseling textbook.",
+            whyItWorks = "Widely considered the standard textbook for Christian counselors, this resource covers a vast range of counseling scenarios, developmental stages, and structural frameworks for running a counseling ministry.",
+            quote = "Pastoral counseling is not about giving easy answers, but walking with people in their deepest pain while pointing them to the healing presence of Christ."
+        ),
+        BookResource(
+            title = "Competent Christian Counseling: Foundations and Practice",
+            author = "Dr. Timothy Clinton (and the AACC)",
+            focus = "Clinical competence coupled with strict biblical grounding.",
+            whyItWorks = "A definitive contemporary guide that combines clinical competence with strict biblical grounding, mapping out effective strategies for a modern landscape.",
+            quote = "We are called to love people with our minds fully engaged. True competence is where cutting-edge clinical insight meets absolute scriptural authority."
+        ),
+        BookResource(
+            title = "Understanding People: Why We Do What We Do & Connecting",
+            author = "Dr. Larry Crabb",
+            focus = "Deep psychological insight paired with understanding inner core longings.",
+            whyItWorks = "Known for deep psychological insight paired with spiritual maturity, Crabb's work focuses on understanding inner core longings and how true community fosters healing.",
+            quote = "Healing does not happen in isolation. The deepest wounds of our hearts are healed when we connect with others in a safe, grace-saturated fellowship."
+        )
+    )
+
+    val biblicalCareBooks = listOf(
+        BookResource(
+            title = "Instruments in the Redeemer's Hands: People in Need of Change Helping People in Need of Change",
+            author = "Paul David Tripp",
+            focus = "Ordinary believers acting as tools of active grace in others' lives.",
+            whyItWorks = "A highly respected book detailing how ordinary believers and ministers can engage in personal, transformative ministry with others in a safe redemptive community.",
+            quote = "We are all people in need of change helping other people in need of change. None of us have arrived; we are simply walk-companions under God's grace."
+        ),
+        BookResource(
+            title = "Seeing with New Eyes: Counseling and the Human Condition Through the Lens of Scripture",
+            author = "Dr. David Powlison",
+            focus = "Diagnosing human motives, core cravings, and worries.",
+            whyItWorks = "Powlison offers profound insights into how Scripture diagnoses human motives and brings practical, grace-centered change to daily struggles.",
+            quote = "The Bible is not a self-help manual; it is a story of a Rescuer. When we see our struggles through the lens of God's Word, everything changes."
+        ),
+        BookResource(
+            title = "When People Are Big and God Is Small",
+            author = "Edward T. Welch",
+            focus = "Overcoming peer pressure, codependency, and the fear of man.",
+            whyItWorks = "Welch expertly navigates how we become trapped by the fear of others' opinions, and shows how to find absolute safety, security, and identity in Christ.",
+            quote = "We fear people because they can hurt us, reject us, or expose us. But when God becomes big, we see that His love is the only opinion that truly defines us."
+        )
+    )
+
+    val specialtyTraumaBooks = listOf(
+        BookResource(
+            title = "The Wounded Heart: Hope for Adult Victims of Childhood Sexual Abuse",
+            author = "Dr. Dan B. Allender",
+            focus = "Restoring emotional and spiritual damage from abuse and childhood trauma.",
+            whyItWorks = "A landmark text in Christian trauma care, addressing the deep emotional and spiritual damage of abuse with immense empathy and theological depth.",
+            quote = "To run from our story of pain is to run from the very place where God wants to meet us and write a story of redemption. Healing requires facing the wounds with courage."
+        )
+    )
+
+    val allBooks = mapOf(
+        0 to recoveryBooks,
+        1 to mentalHealthBooks,
+        2 to marriageFamilyBooks,
+        3 to christianCounselingBooks,
+        4 to biblicalCareBooks,
+        5 to specialtyTraumaBooks
+    )
+
+    val displayedBooks = if (searchQuery.isNotBlank()) {
+        allBooks.values.flatten().filter {
+            it.title.contains(searchQuery, ignoreCase = true) ||
+            it.author.contains(searchQuery, ignoreCase = true) ||
+            it.focus.contains(searchQuery, ignoreCase = true) ||
+            it.whyItWorks.contains(searchQuery, ignoreCase = true)
+        }
+    } else {
+        allBooks[selectedCategoryIndex] ?: emptyList()
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .testTag("curated_library_card"),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MenuBook,
+                    contentDescription = "Library Icon",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(26.dp)
+                )
+                Text(
+                    text = "VETTED BIBLICAL LIBRARY & RESOURCES",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.5.sp
+                    ),
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            Text(
+                text = "Discover highly vetted, theologically sound resources that align with a biblically orthodox worldview while bridging faith and practical clinical competence.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 18.sp
+            )
+
+            // Search Bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text("Search by book, author, or keyword...", style = MaterialTheme.typography.bodySmall) },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search icon") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                textStyle = MaterialTheme.typography.bodySmall,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                )
+            )
+
+            if (searchQuery.isBlank()) {
+                // Category Selector (chips scroll)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    categories.forEachIndexed { index, category ->
+                        val isSelected = selectedCategoryIndex == index
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = { selectedCategoryIndex = index },
+                            label = { Text(category, style = MaterialTheme.typography.labelSmall) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = isSelected,
+                                borderColor = MaterialTheme.colorScheme.outlineVariant,
+                                selectedBorderColor = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+                }
+            }
+
+            // Book Resources List
+            if (searchQuery.isBlank() && selectedCategoryIndex == -1) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                            modifier = Modifier.size(36.dp)
+                        )
+                        Text(
+                            text = "Search by keyword or select a category button above to view our vetted libraries of biblical counseling & recovery resources.",
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            lineHeight = 16.sp
+                        )
+                    }
+                }
+            } else if (displayedBooks.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No matching resources found.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    displayedBooks.forEach { book ->
+                        LibraryBookItem(book = book)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun LibraryBookItem(book: BookResource) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Column {
+                Text(
+                    text = book.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "By ${book.author}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Focus Area",
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.size(14.dp)
+                )
+                Text(
+                    text = "Focus: ${book.focus}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary
+                )
+            }
+
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.08f)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = "Why it works: ${book.whyItWorks}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.padding(8.dp),
+                    lineHeight = 16.sp
+                )
+            }
+
+            // Left-accent Quote Card
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+                    .padding(10.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(4.dp)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(MaterialTheme.colorScheme.primary)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "\"${book.quote}\"",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                            lineHeight = 16.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun TheFaithConnectionSection() {
+    val context = LocalContext.current
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+            .testTag("the_faith_connection_card"),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            // Header Row
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Faith Connection Icon",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(26.dp)
+                )
+                Text(
+                    text = "THE FAITH CONNECTION",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.5.sp
+                    ),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Text(
+                text = "We are dedicated to providing compassionate, Christ-centered, clinical-bridging support to individuals and families absolutely free of charge. Your generosity makes this refuge possible. To help us keep our resources, courses, and digital companions completely free, please consider viewing our ministry or donating to the cause.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 20.sp
+            )
+
+            Button(
+                onClick = {
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.thefaithconnection.org"))
+                    context.startActivity(intent)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("donate_button"),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Donate Icon",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        text = "To Donate & Keep Services Free",
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            TextButton(
+                onClick = {
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.thefaithconnection.org"))
+                    context.startActivity(intent)
+                },
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .testTag("visit_website_button")
+            ) {
+                Text(
+                    text = "Visit www.thefaithconnection.org",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
             }
         }

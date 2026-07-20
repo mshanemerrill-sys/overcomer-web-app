@@ -74,3 +74,30 @@ The following resources are approved to glean from, quote, or reference in spiri
 * Run `compile_applet` to verify changes build successfully.
 * Retain the existing custom adaptive launcher icons.
 * Minimize large-scale structural resets; maintain precise spacing and Material 3 custom light/dark schemes.
+
+---
+
+## 4. Google Play Policy Guidelines (July 15, 2026 Update)
+The following Google Play Policy updates are persisted here to guide app development, feature integration, and security compliance:
+
+### A. Core Deadlines & Target API Requirements
+* **API Level Deadline**: All apps on Google Play must meet the latest target API level requirements by **August 31, 2026**.
+* **Policy Compliance**: Implementations must comply with all updated rules within **30 days** of the July 15, 2026 announcement.
+
+### B. Child Safety & Families Policy
+* **Anonymous/Random Chats**: New restrictions apply to anonymous and random chat features to protect minors.
+* **Target Audience**: Under the **Families Policy Requirements**, anonymous chat apps are strictly prohibited from targeting children.
+
+### C. Permissions & Verification Rules
+* **SMS & Call Logs**: Verification of user accounts via phone call is **no longer permitted** as a valid use case for the `READ_CALL_LOG` permission.
+* **Recommended Alternatives**: Secure account verification must use either:
+  * **Digital Credentials API** (direct integration or through supported verification providers).
+  * **SMS Retriever API**.
+* **Console Registration**: Ensure all app distributions (including those distributed outside Google Play on certified devices) are registered in the Play Console to prevent global removal and ensure a seamless installation.
+
+### D. Data Privacy, AI, & Financial Compliance
+* **AI & User Data**: Standard **User Data requirements** apply fully to all third-party AI integrations (e.g., Gemini). The developer remains fully responsible for user consent, disclosures, limited use, and data privacy compliance.
+* **Earned Wage Access (EWA) Apps**: Must adhere to strict **Personal Loans policy requirements** with high standards for transparency and user privacy.
+* **Content Ratings**: Google Play does not permit unrated apps. All apps must have a complete, accurate content rating.
+* **Location Disclosures**: Accurate disclosures for both precise and approximate location permissions must be provided in the Play Data safety section.
+

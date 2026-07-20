@@ -6,7 +6,7 @@
   :root {
     --color-primary: #6750A4;
     --color-secondary: #21005D;
-    --color-background: #FCF8FF;
+    --color-background: #FEF7FF;
     --color-surface: #FFFFFF;
     --color-text: #1C1B1F;
     --color-text-muted: #79747E;
@@ -41,6 +41,7 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
+    overscroll-behavior-y: none;
   }
 }
 
