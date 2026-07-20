@@ -1,42 +1,42 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAppStore } from '../../store/useAppStore'
 import { generateVerseOfTheDay } from '../../lib/geminiClient'
 import { academyLessons } from '../../lib/data'
 import {
   Target, Star, BookOpen, ChevronDown, ChevronUp, Check,
   Wind, MapPin, Phone, ExternalLink, MessageCircle, RefreshCw, Download,
-  X, Search, ArrowRight, Medal, Heart, Globe
+  X, Search, ArrowRight, Medal, Heart, Globe, Brain
 } from 'lucide-react'
 import type { FocusPath, VerseOfTheDay, AcademyLesson } from '../../lib/types'
+import VeteransTab from './VeteransTab'
+import ReentryTab from './ReentryTab'
+import MentalHealthSupport from './MentalHealthSupport'
+import { TrustedVoicesLibrary } from './InspirationTab'
 
 interface FreedomTabProps {
   onNavigateToCompanion: () => void
 }
 
 export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
-  const { userPath, freedomGoal, setFreedomGoal, verseOfTheDay, setVerseOfTheDay } = useAppStore()
+  const { userPath, freedomGoal, freedomGoals, setFreedomGoal, verseOfTheDay, setVerseOfTheDay } = useAppStore()
   const [showSettings, setShowSettings] = useState(false)
   const [showAcademy, setShowAcademy] = useState(false)
   const [isLoadingVerse, setIsLoadingVerse] = useState(false)
   const [selectedLesson, setSelectedLesson] = useState<AcademyLesson | null>(null)
 
   const path = userPath || 'SUBSTANCE_RECOVERY'
+  const pathGoal = freedomGoals[path] || (path === 'SUBSTANCE_RECOVERY' ? freedomGoal : null)
 
   const defaultDeclaration = {
     SUBSTANCE_RECOVERY: 'An OverComer has submitted their life wholly to Christ and no longer fights FOR victory over addiction — rather FROM a position of victory. I AM Loved By God. I AM NOT Who Others Say I Am. I AM NOT Who I Used To Be. I AM Who God Says I Am.',
     MENTAL_HEALTH: 'My mind belongs to Christ. God has not given me a spirit of fear, but of power, love, and a sound mind. I cast every anxious thought on Him, for He cares for me. I AM NOT Who I Used To Be — I AM a New Creation.',
     TOUGH_DAY: 'This day does not define me. Greater is He that is in me than he that is in the world. I choose to seek God first today. His grace is sufficient for me.',
     TESTIMONY_VICTORY: 'I am more than a conqueror through Christ who loves me! They overcame him by the blood of the Lamb and by the word of their testimony. My story is not over — God is still writing it!',
-    VETERANS: 'I served with honor and I carry that honor still. My battles do not define me — my Creator does. The Lord is my strength and my shield. He has not given me a spirit of fear, but of power, love, and a sound mind. I am still being shaped by the God who knew me before I put on the uniform.'
+    VETERAN_TRANSITION: 'I am commissioned by King Jesus. He is my shield, my deliverer, and my secure fortress in every battle.',
+    REENTRY_RESTORATION: 'My past is nailed to the cross, and I am a new creation in Christ. God has a future and a hope for me to lead and thrive in society.'
   }
 
-  useEffect(() => {
-    if (!verseOfTheDay) {
-      refreshVerse()
-    }
-  }, [])
-
-  const refreshVerse = async () => {
+  const refreshVerse = useCallback(async () => {
     setIsLoadingVerse(true)
     try {
       const verse = await generateVerseOfTheDay()
@@ -46,10 +46,14 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
     } finally {
       setIsLoadingVerse(false)
     }
-  }
+  }, [setVerseOfTheDay])
 
-  const daysCount = freedomGoal?.startDate
-    ? Math.floor((Date.now() - freedomGoal.startDate) / (1000 * 60 * 60 * 24))
+  useEffect(() => {
+    if (!verseOfTheDay) void refreshVerse()
+  }, [refreshVerse, verseOfTheDay])
+
+  const daysCount = pathGoal?.startDate
+    ? Math.floor((Date.now() - pathGoal.startDate) / (1000 * 60 * 60 * 24))
     : 0
 
   return (
@@ -61,44 +65,77 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
         onRefresh={refreshVerse}
       />
 
-      {/* The Faith Connection */}
-      <FaithConnectionCard />
+      <PathEncouragement path={path} />
 
       {/* Freedom Day Counter */}
       <FreedomCounterCard
         daysCount={daysCount}
-        struggleType={freedomGoal?.struggleType || getDefaultStruggle(path)}
+        struggleType={pathGoal?.struggleType || getDefaultStruggle(path)}
         path={path}
         onSettingsClick={() => setShowSettings(true)}
       />
 
       {/* Personal Declaration / Creed */}
       <DeclarationCard
-        declaration={freedomGoal?.customDeclaration || defaultDeclaration[path]}
+        declaration={pathGoal?.customDeclaration || defaultDeclaration[path]}
         path={path}
       />
 
       {/* Bible Affirmations */}
       <AffirmationsCard path={path} />
 
-      {/* OverComer Obedience Academy */}
-      <AcademyCard
-        isExpanded={showAcademy}
-        onToggle={() => setShowAcademy(!showAcademy)}
-        onSelectLesson={setSelectedLesson}
-      />
+      {path === 'TESTIMONY_VICTORY' && <TestimonyVictoryBoard onNavigateToCompanion={onNavigateToCompanion} />}
+
+      {/* The Android app shows the OverComer lessons on the recovery path. */}
+      {path === 'SUBSTANCE_RECOVERY' && (
+        <AcademyCard
+          isExpanded={showAcademy}
+          onToggle={() => setShowAcademy(!showAcademy)}
+          onSelectLesson={setSelectedLesson}
+        />
+      )}
+
+      {path === 'MENTAL_HEALTH' && (
+        <EmbeddedSupportSection title="Vetted Biblical Clinical Counseling" icon={<Brain className="w-5 h-5" />}>
+          <MentalHealthSupport />
+        </EmbeddedSupportSection>
+      )}
+
+      {path === 'VETERAN_TRANSITION' && (
+        <EmbeddedSupportSection title="The Next Mission: Veteran Support & Wellness" icon={<Medal className="w-5 h-5" />}>
+          <div className="p-4 pb-0"><VeteranCrisisBanner /></div>
+          <VeteransTab />
+        </EmbeddedSupportSection>
+      )}
+
+      {path === 'REENTRY_RESTORATION' && (
+        <EmbeddedSupportSection title="Steps to Restoration & Freedom" icon={<RefreshCw className="w-5 h-5" />}>
+          <ReentryTab />
+        </EmbeddedSupportSection>
+      )}
 
       {/* Support & Church Locator */}
       <SupportLocatorCard />
 
-      {/* Veteran Crisis Banner */}
-      {path === 'VETERANS' && <VeteranCrisisBanner />}
+      {/* Vetted biblical resource library */}
+      <div className="bg-white rounded-3xl border border-[#CAC4D0]/60 p-4 shadow-sm">
+        <TrustedVoicesLibrary />
+      </div>
 
-      {/* Calming Breathing Support */}
-      <BreathingCard />
+      {/* The Faith Connection */}
+      <FaithConnectionCard />
 
-      {/* SOS Support Network */}
-      <SOSNetworkCard />
+      {path !== 'TESTIMONY_VICTORY' && (
+        <>
+          <GroundingSkillsLibrary />
+
+          {/* Calming Breathing Support */}
+          <BreathingCard />
+
+          {/* SOS Support Network */}
+          <SOSNetworkCard />
+        </>
+      )}
 
       {/* Open Companion Button */}
       <button
@@ -113,9 +150,9 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
       {showSettings && (
         <SettingsModal
           path={path}
-          startDate={freedomGoal?.startDate || Date.now() - (3 * 24 * 60 * 60 * 1000)}
-          struggleType={freedomGoal?.struggleType || getDefaultStruggle(path)}
-          declaration={freedomGoal?.customDeclaration || defaultDeclaration[path]}
+          startDate={pathGoal?.startDate || Date.now() - (3 * 24 * 60 * 60 * 1000)}
+          struggleType={pathGoal?.struggleType || getDefaultStruggle(path)}
+          declaration={pathGoal?.customDeclaration || defaultDeclaration[path]}
           onSave={(startDate, struggleType, declaration) => {
             setFreedomGoal({ startDate, struggleType, customDeclaration: declaration })
             setShowSettings(false)
@@ -140,9 +177,27 @@ function getDefaultStruggle(path: FocusPath): string {
     case 'MENTAL_HEALTH': return 'Anxiety & Depression'
     case 'TESTIMONY_VICTORY': return 'Victorious Breakthrough'
     case 'TOUGH_DAY': return 'Daily Stress'
-    case 'VETERANS': return 'Military Transition & PTSD'
+    case 'VETERAN_TRANSITION': return 'Veteran Transition & PTSD'
+    case 'REENTRY_RESTORATION': return 'Re-entry Reintegration'
     default: return 'Substance Use'
   }
+}
+
+function PathEncouragement({ path }: { path: FocusPath }) {
+  const encouragement: Record<FocusPath, string> = {
+    SUBSTANCE_RECOVERY: 'Remember: You are not defined by your struggle, but by His grace. You are a new creation in Christ. Renew your mind, breathe deeply, and walk in absolute victory today.',
+    MENTAL_HEALTH: 'Remember: You are loved, cherished, and chosen by God. Rest in His peace and walk in emotional strength today.',
+    TOUGH_DAY: 'Today might feel like an all-around tough day, but God is your present help in times of trouble. Let His supernatural grace carry your load today.',
+    VETERAN_TRANSITION: 'Remember: Your identity is anchored in Jesus Christ, who has won the ultimate battle for you. It is alright to ask for help—God is your shield, your fortress, and your deliverer.',
+    REENTRY_RESTORATION: 'Remember: Your past is completely forgiven and forgotten by God. Christ has broken every chain of the past and has chosen you to lead with honor and integrity. Walk in His restoration today.',
+    TESTIMONY_VICTORY: 'Today is a Testimony and Victory Day! Praise God for His absolute faithfulness, rejoice in His mercy, and walk in the fullness of His triumph today.'
+  }
+
+  return (
+    <div className="rounded-2xl border border-primary-100 bg-primary-50 px-4 py-3">
+      <p className="text-sm leading-relaxed font-semibold text-primary-800">{encouragement[path]}</p>
+    </div>
+  )
 }
 
 function VerseCard({
@@ -204,7 +259,8 @@ function FreedomCounterCard({
     MENTAL_HEALTH: 'Days of Peace',
     TOUGH_DAY: 'Days of Strength',
     TESTIMONY_VICTORY: 'Days of Victory',
-    VETERANS: 'Days of Healing'
+    VETERAN_TRANSITION: 'Days since taking off the uniform & entering civilian strength',
+    REENTRY_RESTORATION: 'Days since my release & step into restoration'
   }
 
   return (
@@ -242,7 +298,8 @@ function DeclarationCard({
     MENTAL_HEALTH: 'My Mental Peace Covenant',
     TOUGH_DAY: "Today's Declaration",
     TESTIMONY_VICTORY: 'My Victory Declaration',
-    VETERANS: "My Warrior's Covenant"
+    VETERAN_TRANSITION: "My Warrior's Covenant",
+    REENTRY_RESTORATION: 'My Restoration Declaration'
   }
 
   return (
@@ -785,7 +842,178 @@ function LessonModal({
   )
 }
 
+function EmbeddedSupportSection({ title, icon, children }: {
+  title: string
+  icon: React.ReactNode
+  children: React.ReactNode
+}) {
+  const [expanded, setExpanded] = useState(false)
+  return (
+    <section className="bg-white rounded-3xl border border-[#CAC4D0]/60 shadow-sm overflow-hidden">
+      <button onClick={() => setExpanded(value => !value)} className="w-full p-5 flex items-center gap-3 text-left">
+        <span className="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center flex-shrink-0">{icon}</span>
+        <span className="flex-1">
+          <span className="block font-extrabold text-[#1D1B20]">{title}</span>
+          <span className="block text-xs text-[#49454F] mt-0.5">Biblical guidance, practical tools, and trusted resources</span>
+        </span>
+        {expanded ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+      </button>
+      {expanded && <div className="border-t border-gray-100 bg-[#FEF7FF]">{children}</div>}
+    </section>
+  )
+}
+
+function TestimonyVictoryBoard({ onNavigateToCompanion }: { onNavigateToCompanion: () => void }) {
+  const shared = useAppStore(state => state.victoryLogs.filter(log => log.type === 'TESTIMONY' && log.isShared))
+
+  return (
+    <section className="rounded-3xl border-[1.5px] border-[#FFA000] bg-[#FFF8E1] p-5 shadow-sm">
+      <div className="flex items-center gap-3">
+        <span className="w-11 h-11 rounded-full bg-[#FFA000]/15 flex items-center justify-center"><Star className="w-6 h-6 text-[#FFA000]" /></span>
+        <div>
+          <h3 className="font-extrabold text-[#E65100]">Testimony & Victory Board</h3>
+          <p className="text-xs text-amber-800">Celebrate what God has done through other OverComers.</p>
+        </div>
+      </div>
+      {shared.length === 0 ? (
+        <div className="mt-4 rounded-2xl bg-white/70 p-4 text-center">
+          <p className="text-sm font-semibold text-amber-900">No testimonies have been shared on this device yet.</p>
+          <p className="text-xs text-amber-700 mt-1">Open Logs, add a Testimony entry, and choose “Add to Testimony & Victory Board.”</p>
+        </div>
+      ) : (
+        <div className="mt-4 space-y-3">
+          {shared.slice(0, 8).map(log => (
+            <article key={log.id} className="rounded-2xl bg-white p-4 border border-amber-100">
+              <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">“{log.notes}”</p>
+              <p className="text-xs font-bold text-[#E65100] mt-2">— {log.authorName || 'An OverComer'}</p>
+            </article>
+          ))}
+        </div>
+      )}
+      <button onClick={onNavigateToCompanion} className="mt-4 w-full rounded-xl bg-[#FFA000] hover:bg-[#F57C00] text-white py-3 font-bold flex items-center justify-center gap-2">
+        <MessageCircle className="w-4 h-4" /> Share Your Victory with the Companion
+      </button>
+    </section>
+  )
+}
+
+interface GroundingSkill {
+  name: string
+  motto: string
+  intensity: 'Gentle' | 'Strong' | 'Immediate'
+  description: string
+  steps: string[]
+  verse: string
+  reference: string
+}
+
+const groundingSkills: GroundingSkill[] = [
+  {
+    name: 'Pause, Breathe, Observe, Choose', motto: 'Create space before the next decision.', intensity: 'Immediate',
+    description: 'Use this when an urge, panic, anger, or racing thought tries to take control.',
+    steps: ['Stop moving for one safe moment.', 'Take one slow breath in and a longer breath out.', 'Notice what is happening in your body and thoughts without agreeing with every thought.', 'Choose the next faithful, safe action.'],
+    verse: 'Be still, and know that I am God.', reference: 'Psalm 46:10'
+  },
+  {
+    name: 'Cold-Water Reset', motto: 'Help your body slow down quickly.', intensity: 'Immediate',
+    description: 'A brief cool-temperature reset can interrupt escalating physical distress.',
+    steps: ['Splash cool—not dangerously cold—water on your face.', 'Hold a cool cloth over your cheeks for 20–30 seconds.', 'Breathe slowly while your body settles.', 'Avoid extreme cold if you have a heart or circulation condition.'],
+    verse: 'He leads me beside quiet waters, he refreshes my soul.', reference: 'Psalm 23:2–3'
+  },
+  {
+    name: 'Five-Senses Grounding', motto: 'Return your attention to the present.', intensity: 'Strong',
+    description: 'Use your senses to step out of a flashback, craving, or spiraling thought.',
+    steps: ['Name 5 things you can see.', 'Name 4 things you can feel.', 'Name 3 things you can hear.', 'Name 2 things you can smell.', 'Name 1 thing you can taste or are thankful for.'],
+    verse: 'This is the day the Lord has made; we will rejoice and be glad in it.', reference: 'Psalm 118:24'
+  },
+  {
+    name: 'Ride the Urge', motto: 'An urge rises, crests, and passes.', intensity: 'Strong',
+    description: 'Observe an urge like a wave instead of treating it as a command.',
+    steps: ['Rate the urge from 1 to 10.', 'Notice where you feel it physically.', 'Breathe and watch the intensity change for 90 seconds.', 'Call support and move toward a safe place while the wave passes.'],
+    verse: 'God is faithful; he will also provide a way out so that you can endure it.', reference: '1 Corinthians 10:13'
+  },
+  {
+    name: 'Name the Truth', motto: 'Replace the loud lie with God’s truth.', intensity: 'Gentle',
+    description: 'Separate what you feel from what is eternally true.',
+    steps: ['Write the thought exactly as it appeared.', 'Ask: Is this completely true, or is fear speaking?', 'Write one balanced, truthful statement.', 'Anchor that truth to a specific Scripture.'],
+    verse: 'You will know the truth, and the truth will set you free.', reference: 'John 8:32'
+  },
+  {
+    name: 'Opposite Faithful Action', motto: 'Move in the direction of freedom.', intensity: 'Strong',
+    description: 'When an emotion pushes you toward an unsafe action, choose a safe action in the opposite direction.',
+    steps: ['Name what the emotion is urging you to do.', 'Check whether that action is safe and consistent with your values.', 'Choose one small opposite action.', 'Ask a trusted person to stay with you while you do it.'],
+    verse: 'Do not be overcome by evil, but overcome evil with good.', reference: 'Romans 12:21'
+  }
+]
+
+function GroundingSkillsLibrary() {
+  const [expanded, setExpanded] = useState(false)
+  const [query, setQuery] = useState('')
+  const [intensity, setIntensity] = useState<'All' | GroundingSkill['intensity']>('All')
+  const [openSkill, setOpenSkill] = useState<string | null>(null)
+  const visible = useMemo(() => groundingSkills.filter(skill => {
+    const matchesText = `${skill.name} ${skill.motto} ${skill.description}`.toLowerCase().includes(query.toLowerCase())
+    return matchesText && (intensity === 'All' || skill.intensity === intensity)
+  }), [query, intensity])
+
+  return (
+    <section className="bg-white rounded-3xl border border-[#CAC4D0]/60 shadow-sm overflow-hidden">
+      <button onClick={() => setExpanded(value => !value)} className="w-full p-5 flex items-center gap-3 text-left">
+        <span className="w-11 h-11 rounded-full bg-teal-50 text-teal-700 flex items-center justify-center"><Target className="w-6 h-6" /></span>
+        <span className="flex-1"><span className="block font-extrabold text-[#1D1B20]">Calming Distress Grounding Library</span><span className="block text-xs text-[#49454F] mt-0.5">Interactive skills for urges and intense feelings</span></span>
+        {expanded ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+      </button>
+      {expanded && (
+        <div className="border-t border-gray-100 p-4 space-y-3">
+          <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" /><input value={query} onChange={event => setQuery(event.target.value)} className="input-field pl-9" placeholder="Search grounding skills..." /></div>
+          <div className="flex gap-2 overflow-x-auto">
+            {(['All', 'Gentle', 'Strong', 'Immediate'] as const).map(value => <button key={value} onClick={() => setIntensity(value)} className={`rounded-full px-3 py-1.5 text-xs font-bold whitespace-nowrap ${intensity === value ? 'bg-teal-700 text-white' : 'bg-gray-100 text-gray-600'}`}>{value}</button>)}
+          </div>
+          {visible.map(skill => {
+            const open = openSkill === skill.name
+            return (
+              <article key={skill.name} className="rounded-2xl border border-gray-100 bg-[#FEF7FF] overflow-hidden">
+                <button onClick={() => setOpenSkill(open ? null : skill.name)} className="w-full p-4 flex items-start gap-3 text-left">
+                  <span className="w-9 h-9 rounded-full bg-teal-100 text-teal-700 flex items-center justify-center flex-shrink-0"><Wind className="w-4 h-4" /></span>
+                  <span className="flex-1"><span className="block text-sm font-extrabold text-[#1D1B20]">{skill.name}</span><span className="block text-xs text-[#49454F] mt-1">{skill.motto}</span></span>
+                  <span className="text-[10px] font-bold rounded-full bg-white px-2 py-1 text-teal-700">{skill.intensity}</span>
+                </button>
+                {open && <div className="px-4 pb-4 text-sm text-[#49454F] space-y-3"><p>{skill.description}</p><ol className="space-y-2">{skill.steps.map((step, index) => <li key={step} className="flex gap-2"><span className="w-5 h-5 rounded-full bg-teal-700 text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">{index + 1}</span><span>{step}</span></li>)}</ol><blockquote className="rounded-xl bg-white p-3 text-primary-700 italic">“{skill.verse}”<br /><strong className="not-italic text-xs">— {skill.reference}</strong></blockquote></div>}
+              </article>
+            )
+          })}
+          <p className="text-[11px] text-center text-gray-400 px-3">These calming steps draw from established distress-tolerance practices and are presented through OverComer’s biblical framework.</p>
+        </div>
+      )}
+    </section>
+  )
+}
+
 function BreathingCard() {
+  const [active, setActive] = useState(false)
+  const [seconds, setSeconds] = useState(4)
+  const [phaseIndex, setPhaseIndex] = useState(0)
+  const phases = useMemo(() => [
+    { name: 'Breathe in', seconds: 4, scale: 'scale-110', color: 'bg-teal-500' },
+    { name: 'Hold gently', seconds: 2, scale: 'scale-110', color: 'bg-primary-400' },
+    { name: 'Breathe out', seconds: 6, scale: 'scale-75', color: 'bg-primary-600' },
+    { name: 'Rest', seconds: 2, scale: 'scale-75', color: 'bg-gray-400' }
+  ], [])
+  const phase = phases[phaseIndex]
+
+  useEffect(() => {
+    if (!active) return
+    const timer = window.setTimeout(() => {
+      if (seconds > 1) setSeconds(seconds - 1)
+      else {
+        const next = (phaseIndex + 1) % phases.length
+        setPhaseIndex(next)
+        setSeconds(phases[next].seconds)
+      }
+    }, 1000)
+    return () => window.clearTimeout(timer)
+  }, [active, seconds, phaseIndex, phases])
+
   return (
     <div className="bg-gradient-to-br from-accent-teal/10 to-primary-50 rounded-2xl p-5 shadow-md border border-accent-teal/20">
       <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
@@ -795,8 +1023,16 @@ function BreathingCard() {
       <p className="text-sm text-gray-600 mb-3">
         Practice paced breathing to reduce stress and anxiety.
       </p>
-      <button className="w-full bg-accent-teal hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors">
-        Start Breathing Exercise
+      {active && (
+        <div className="py-5 flex flex-col items-center">
+          <div className={`w-28 h-28 ${phase.color} ${phase.scale} rounded-full transition-all duration-1000 text-white flex flex-col items-center justify-center shadow-lg`}>
+            <span className="font-extrabold">{phase.name}</span><span className="text-3xl font-black">{seconds}</span>
+          </div>
+          <p className="mt-5 text-xs text-gray-500">Let the longer exhale tell your body it is safe to settle.</p>
+        </div>
+      )}
+      <button onClick={() => { setActive(value => !value); setPhaseIndex(0); setSeconds(4) }} className="w-full bg-accent-teal hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors">
+        {active ? 'Stop Breathing Exercise' : 'Start Breathing Exercise'}
       </button>
     </div>
   )
@@ -961,7 +1197,7 @@ function VeteranCrisisBanner() {
         </a>
       </div>
       <p className="text-white/60 text-xs mt-3 text-center">
-        Tap "Veteran Support" in the bottom nav for full resources + local zip code search
+        Expand the Veteran Transition & Freedom section for guidance, resources, and local support.
       </p>
     </div>
   )
@@ -1017,4 +1253,3 @@ function FaithConnectionCard() {
     </div>
   )
 }
-

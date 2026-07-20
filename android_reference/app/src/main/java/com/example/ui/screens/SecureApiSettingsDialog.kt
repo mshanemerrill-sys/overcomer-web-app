@@ -35,8 +35,12 @@ fun SecureApiSettingsDialog(
     onDismissRequest: () -> Unit
 ) {
     val customApiKey by viewModel.customApiKey.collectAsStateWithLifecycle()
+    val customApiKeyStatus by viewModel.customApiKeyStatus.collectAsStateWithLifecycle()
     var keyInput by remember(customApiKey) { mutableStateOf(customApiKey) }
     var showKey by remember { mutableStateOf(false) }
+    
+    val isTesting by viewModel.isTestingKey.collectAsStateWithLifecycle()
+    var testResult by remember { mutableStateOf<Pair<Boolean, String>?>(null) }
 
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -167,7 +171,21 @@ fun SecureApiSettingsDialog(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     
-                    val isCustomActive = customApiKey.isNotBlank()
+                    val isCustomActive = keyInput.isNotBlank()
+                    val verifiedFp by viewModel.verifiedApiKeyFingerprint.collectAsStateWithLifecycle()
+                    val editedFp = viewModel.getSha256Fingerprint(keyInput)
+                    
+                    val (statusText, statusColor) = if (!isCustomActive) {
+                        "System Fallback Active 🛡️" to MaterialTheme.colorScheme.primary
+                    } else if (isTesting) {
+                        "Testing connection..." to Color(0xFF2196F3)
+                    } else if (customApiKeyStatus == "failed") {
+                        "Connection failed ❌" to Color(0xFFE53935)
+                    } else if (editedFp == verifiedFp && verifiedFp.isNotBlank() && keyInput == customApiKey) {
+                        "Custom API key verified ✨" to Color(0xFF4CAF50)
+                    } else {
+                        "Custom key saved—not yet verified" to Color(0xFFFF9800)
+                    }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -176,27 +194,70 @@ fun SecureApiSettingsDialog(
                             modifier = Modifier
                                 .size(8.dp)
                                 .background(
-                                    color = if (isCustomActive) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary,
+                                    color = statusColor,
                                     shape = CircleShape
                                 )
                         )
                         Text(
-                            text = if (isCustomActive) "Custom API Key Active ✨" else "System Fallback Active 🛡️",
+                            text = statusText,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
-                            color = if (isCustomActive) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary
+                            color = statusColor
                         )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                val context = androidx.compose.ui.platform.LocalContext.current
+                Button(
+                    onClick = {
+                        try {
+                            val intent = android.content.Intent(
+                                android.content.Intent.ACTION_VIEW,
+                                android.net.Uri.parse("https://aistudio.google.com/")
+                            )
+                            context.startActivity(intent)
+                        } catch (e: Exception) {
+                            android.widget.Toast.makeText(context, "Could not open browser. Please visit https://aistudio.google.com/ in your browser.", android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp)
+                        .testTag("get_free_api_key_btn")
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Launch,
+                            contentDescription = "Get Key Icon",
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            text = "Get Free Key from Google AI Studio",
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
+                        )
+                    }
+                }
+
                 // Outlined Input field for API Key
                 OutlinedTextField(
                     value = keyInput,
-                    onValueChange = { keyInput = it },
+                    onValueChange = { newValue ->
+                        keyInput = newValue
+                        testResult = null
+                        viewModel.onKeyInputChanged(newValue)
+                    },
                     label = { Text("Gemini API Key") },
-                    placeholder = { Text("Enter your AI Studio key (AIzaSy...)") },
+                    placeholder = { Text("Enter your Google AI Studio API key") },
                     singleLine = true,
                     visualTransformation = if (showKey) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(
@@ -229,6 +290,81 @@ fun SecureApiSettingsDialog(
                     textAlign = TextAlign.Start,
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)
                 )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Test Connection Button
+                Button(
+                    onClick = {
+                        viewModel.testCustomApiKey(keyInput.trim()) { success, msg ->
+                            testResult = Pair(success, msg)
+                        }
+                    },
+                    enabled = !isTesting && keyInput.isNotBlank(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (testResult?.first == true) Color(0xFFE8F5E9) else MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = if (testResult?.first == true) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("test_api_key_btn")
+                ) {
+                    if (isTesting) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Testing Connection...")
+                    } else {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (testResult?.first == true) Icons.Default.CheckCircle else Icons.Default.NetworkCheck,
+                                contentDescription = "Test Connection Icon",
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Text(
+                                text = if (testResult?.first == true) "Connection Active & Verified" else "Test Connection",
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+
+                testResult?.let { (success, msg) ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (success) Color(0xFFE8F5E9) else Color(0xFFFFEBEE),
+                            contentColor = if (success) Color(0xFF2E7D32) else Color(0xFFC62828)
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth().testTag("api_key_test_result_card")
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.Top,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (success) Icons.Default.CheckCircle else Icons.Default.Error,
+                                contentDescription = if (success) "Success" else "Error",
+                                modifier = Modifier.size(20.dp).padding(top = 2.dp)
+                            )
+                            Text(
+                                text = msg,
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium,
+                                lineHeight = 15.sp
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(24.dp))
 

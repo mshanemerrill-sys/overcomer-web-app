@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../../store/useAppStore'
 import { generateSupportResponse, checkDailyLimit, getTodayUsageCount, isCustomKeyActive } from '../../lib/geminiClient'
-import { Send, Save, Trash2, History, Loader as Loader2, Key, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react'
+import {
+  Send, Save, Trash2, History, Loader as Loader2, Key, ExternalLink,
+  ChevronDown, ChevronUp, Mic, Volume2, X, Radio, MessageCircle
+} from 'lucide-react'
 import ApiSettingsDialog from '../../components/ApiSettingsDialog'
 
 export default function CompanionTab() {
@@ -9,6 +12,8 @@ export default function CompanionTab() {
   const [isLoading, setIsLoading] = useState(false)
   const [showApiDialog, setShowApiDialog] = useState(false)
   const [showInstructions, setShowInstructions] = useState(false)
+  const [showSavedSessions, setShowSavedSessions] = useState(false)
+  const [showLiveVoice, setShowLiveVoice] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -21,6 +26,9 @@ export default function CompanionTab() {
     pendingCompanionMessage,
     setPendingCompanionMessage,
     customApiKey,
+    savedChats,
+    loadSavedChat,
+    deleteSavedChat,
   } = useAppStore()
 
   const hasApiKey = Boolean(customApiKey?.trim())
@@ -154,7 +162,7 @@ export default function CompanionTab() {
             <Trash2 className="w-5 h-5" />
           </button>
           <button
-            onClick={() => {}}
+            onClick={() => setShowSavedSessions(value => !value)}
             className="p-2 rounded-lg hover:bg-gray-100 text-gray-500"
             title="Saved Chats"
           >
@@ -169,6 +177,23 @@ export default function CompanionTab() {
         <p className="text-xs text-amber-700 leading-relaxed">
           Your AI OverComer's Companion for biblical encouragement. For professional medical or clinical crisis support, please see the <strong>Re-entry</strong> resource tab.
         </p>
+      </div>
+
+      {/* Browser equivalent of the Android Gemini Live voice session */}
+      <div className="bg-white border-b border-gray-100 p-3">
+        <button
+          onClick={() => setShowLiveVoice(true)}
+          className="w-full rounded-2xl bg-gradient-to-r from-primary-600 to-primary-400 text-white px-4 py-3 flex items-center gap-3 text-left shadow-sm"
+        >
+          <span className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+            <Mic className="w-5 h-5" />
+          </span>
+          <span className="flex-1">
+            <span className="block text-sm font-extrabold">Walk in Victory Hands-Free</span>
+            <span className="block text-xs text-white/80 mt-0.5">Talk live and hear your Companion answer aloud.</span>
+          </span>
+          <Radio className="w-5 h-5 text-white/80" />
+        </button>
       </div>
 
       {/* Daily limit warning */}
@@ -186,6 +211,42 @@ export default function CompanionTab() {
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+
+        {showSavedSessions && (
+          <div className="bg-white rounded-2xl border border-primary-100 shadow-sm overflow-hidden">
+            <div className="px-4 py-3 bg-primary-50 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-extrabold text-primary-800">Saved Sessions ({savedChats.length})</p>
+                <p className="text-xs text-primary-600">Continue a previous Companion conversation.</p>
+              </div>
+              <button onClick={() => setShowSavedSessions(false)} className="p-1.5 text-primary-500"><X className="w-4 h-4" /></button>
+            </div>
+            {savedChats.length === 0 ? (
+              <p className="p-4 text-sm text-gray-500 text-center">No sessions saved yet.</p>
+            ) : (
+              <div className="divide-y divide-gray-100 max-h-64 overflow-y-auto">
+                {savedChats.map(chat => (
+                  <div key={chat.id} className="flex items-center gap-2 p-3">
+                    <button
+                      onClick={() => { loadSavedChat(chat); setShowSavedSessions(false) }}
+                      className="flex-1 text-left min-w-0"
+                    >
+                      <p className="text-sm font-bold text-gray-900 truncate">{chat.title}</p>
+                      <p className="text-xs text-gray-400">{new Date(chat.timestamp).toLocaleString()} · {chat.messages.length} messages</p>
+                    </button>
+                    <button
+                      onClick={() => { if (window.confirm('Delete this saved Companion session?')) deleteSavedChat(chat.id) }}
+                      className="p-2 text-gray-400 hover:text-red-600"
+                      aria-label="Delete saved session"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* API Key Setup Card — always shown at top when no key, or after a NO_API_KEY response */}
         {!hasApiKey && (
@@ -245,6 +306,192 @@ export default function CompanionTab() {
       </div>
 
       {showApiDialog && <ApiSettingsDialog onClose={() => setShowApiDialog(false)} />}
+      {showLiveVoice && <LiveVoiceSessionDialog onClose={() => setShowLiveVoice(false)} />}
+    </div>
+  )
+}
+
+type VoiceState = 'READY' | 'LISTENING' | 'THINKING' | 'SPEAKING'
+
+interface SpeechRecognitionResultLike {
+  results: ArrayLike<{ 0: { transcript: string } }>
+}
+
+interface SpeechRecognitionLike {
+  continuous: boolean
+  interimResults: boolean
+  lang: string
+  onresult: ((event: SpeechRecognitionResultLike) => void) | null
+  onerror: ((event: { error?: string }) => void) | null
+  onend: (() => void) | null
+  start: () => void
+  stop: () => void
+  abort: () => void
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike
+
+function LiveVoiceSessionDialog({ onClose }: { onClose: () => void }) {
+  const { chatMessages, addChatMessage, userPath, customApiKey } = useAppStore()
+  const [state, setState] = useState<VoiceState>('READY')
+  const [transcript, setTranscript] = useState('')
+  const [spokenResponse, setSpokenResponse] = useState('Tap the microphone and speak freely.')
+  const [error, setError] = useState('')
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([])
+  const [voiceName, setVoiceName] = useState('')
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
+
+  useEffect(() => {
+    const loadVoices = () => {
+      const available = window.speechSynthesis?.getVoices() || []
+      setVoices(available)
+      if (!voiceName && available.length) {
+        const preferred = available.find(voice => voice.lang.startsWith('en') && /female|samantha|zira|ava|google us english/i.test(voice.name))
+          || available.find(voice => voice.lang.startsWith('en'))
+          || available[0]
+        setVoiceName(preferred.name)
+      }
+    }
+    loadVoices()
+    window.speechSynthesis?.addEventListener('voiceschanged', loadVoices)
+    return () => {
+      recognitionRef.current?.abort()
+      window.speechSynthesis?.cancel()
+      window.speechSynthesis?.removeEventListener('voiceschanged', loadVoices)
+    }
+  }, [voiceName])
+
+  const speak = (text: string) => {
+    if (!window.speechSynthesis) {
+      setState('READY')
+      return
+    }
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(text.replace(/[*#_`]/g, '').replace(/\s+/g, ' ').trim())
+    utterance.rate = 0.95
+    utterance.pitch = 1
+    utterance.voice = voices.find(voice => voice.name === voiceName) || null
+    utterance.onstart = () => setState('SPEAKING')
+    utterance.onend = () => setState('READY')
+    utterance.onerror = () => setState('READY')
+    window.speechSynthesis.speak(utterance)
+  }
+
+  const respond = async (text: string) => {
+    addChatMessage({ text, isUser: true, timestamp: Date.now() })
+    setState('THINKING')
+    try {
+      const response = await generateSupportResponse(text, chatMessages, userPath || 'SUBSTANCE_RECOVERY')
+      if (response === 'NO_API_KEY_SETUP') {
+        setError('Add your Gemini API key before starting a live Companion session.')
+        setState('READY')
+        return
+      }
+      addChatMessage({ text: response, isUser: false, timestamp: Date.now() })
+      setSpokenResponse(response)
+      speak(response)
+    } catch {
+      setError('I could not complete that response. Please try again.')
+      setState('READY')
+    }
+  }
+
+  const listen = () => {
+    setError('')
+    if (!customApiKey?.trim()) {
+      setError('Add your Gemini API key before starting a live Companion session.')
+      return
+    }
+    if (state === 'SPEAKING') {
+      window.speechSynthesis.cancel()
+      setState('READY')
+    }
+    const browserWindow = window as typeof window & {
+      SpeechRecognition?: SpeechRecognitionConstructor
+      webkitSpeechRecognition?: SpeechRecognitionConstructor
+    }
+    const Recognition = browserWindow.SpeechRecognition || browserWindow.webkitSpeechRecognition
+    if (!Recognition) {
+      setError('Live speech recognition is not available in this browser. Chrome or Edge usually provides the best support.')
+      return
+    }
+    const recognition = new Recognition()
+    recognition.continuous = false
+    recognition.interimResults = false
+    recognition.lang = 'en-US'
+    recognition.onresult = event => {
+      const text = event.results[0]?.[0]?.transcript?.trim() || ''
+      setTranscript(text)
+      if (text) void respond(text)
+    }
+    recognition.onerror = event => {
+      setError(event.error === 'not-allowed' ? 'Microphone permission was denied. Allow microphone access in your browser settings.' : 'I could not hear that clearly. Please tap and try again.')
+      setState('READY')
+    }
+    recognition.onend = () => setState(current => current === 'LISTENING' ? 'READY' : current)
+    recognitionRef.current = recognition
+    setState('LISTENING')
+    recognition.start()
+  }
+
+  return (
+    <div className="fixed inset-0 z-[70] bg-[#141218]/95 text-white flex items-center justify-center p-4">
+      <div className="w-full max-w-lg max-h-[94vh] overflow-y-auto rounded-3xl bg-[#211F26] border border-white/10 shadow-2xl p-5">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs font-bold tracking-[0.18em] text-primary-200">GEMINI LIVE SESSION</p>
+            <h3 className="text-xl font-extrabold mt-1">OverComer’s Companion</h3>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-full bg-white/10 hover:bg-white/20"><X className="w-5 h-5" /></button>
+        </div>
+
+        <div className="py-8 flex flex-col items-center text-center">
+          <div className={`relative w-36 h-36 rounded-full flex items-center justify-center transition-all ${
+            state === 'LISTENING' ? 'bg-teal-500/25 scale-105' : state === 'SPEAKING' ? 'bg-primary-400/25 animate-pulse' : 'bg-white/5'
+          }`}>
+            <div className={`absolute inset-3 rounded-full border-2 ${state === 'LISTENING' ? 'border-teal-300 animate-ping' : 'border-primary-300/40'}`} />
+            {state === 'THINKING' ? <Loader2 className="w-12 h-12 animate-spin text-primary-200" />
+              : state === 'SPEAKING' ? <Volume2 className="w-12 h-12 text-primary-200" />
+              : <Mic className="w-12 h-12 text-white" />}
+          </div>
+          <p className="mt-5 text-sm font-extrabold tracking-wide">
+            {state === 'LISTENING' ? 'LISTENING… SPEAK FREELY'
+              : state === 'THINKING' ? 'COMPANION IS REFLECTING…'
+              : state === 'SPEAKING' ? 'COMPANION IS SPEAKING'
+              : 'READY WHEN YOU ARE'}
+          </p>
+          {transcript && <p className="mt-4 text-sm text-white/65">“{transcript}”</p>}
+        </div>
+
+        <div className="rounded-2xl bg-white/5 p-4 min-h-24">
+          <div className="flex items-center gap-2 mb-2 text-primary-200">
+            <MessageCircle className="w-4 h-4" />
+            <p className="text-xs font-bold">COMPANION RESPONSE</p>
+          </div>
+          <p className="text-sm leading-relaxed text-white/85 whitespace-pre-wrap">{spokenResponse}</p>
+        </div>
+
+        {voices.length > 0 && (
+          <label className="block mt-4 text-xs font-bold text-white/60">
+            COMPANION VOICE
+            <select value={voiceName} onChange={event => setVoiceName(event.target.value)} className="mt-2 w-full rounded-xl bg-[#2D2A33] border border-white/10 px-3 py-3 text-sm text-white">
+              {voices.filter(voice => voice.lang.startsWith('en')).map(voice => <option key={voice.name} value={voice.name}>{voice.name}</option>)}
+            </select>
+          </label>
+        )}
+
+        {error && <p className="mt-4 rounded-xl bg-red-500/15 border border-red-300/30 p-3 text-sm text-red-100">{error}</p>}
+
+        <button
+          onClick={listen}
+          disabled={state === 'THINKING' || state === 'LISTENING'}
+          className="mt-5 w-full rounded-2xl bg-primary-400 hover:bg-primary-300 disabled:opacity-50 py-4 font-extrabold flex items-center justify-center gap-2"
+        >
+          <Mic className="w-5 h-5" />
+          {state === 'SPEAKING' ? 'Interrupt to Speak' : 'Tap to Talk'}
+        </button>
+        <p className="mt-3 text-[11px] text-center text-white/40">Your browser will ask permission to use the microphone. Voice processing availability depends on the browser and device.</p>
+      </div>
     </div>
   )
 }
@@ -304,7 +551,7 @@ function ApiKeySetupCard({
             { step: '1', text: 'Tap "Get Free Key" above — this opens Google AI Studio in your browser.' },
             { step: '2', text: 'Sign in with any Google account (Gmail, etc.). It\'s free.' },
             { step: '3', text: 'Click "Create API Key" — Google generates your personal key instantly.' },
-            { step: '4', text: 'Copy the key (starts with "AIzaSy...").' },
+            { step: '4', text: 'Copy the complete key exactly as Google displays it.' },
             { step: '5', text: 'Tap "Enter Key" above, paste your key, and tap Save. You\'re done!' }
           ].map(({ step, text }) => (
             <div key={step} className="flex items-start gap-2.5">
@@ -316,7 +563,7 @@ function ApiKeySetupCard({
           ))}
           <div className="bg-green-50 border border-green-200 rounded-xl p-3 mt-2">
             <p className="text-xs text-green-800 font-medium">
-              Your key is stored only on this device — it never leaves your phone. Google's free tier is more than enough for daily use.
+              Your key is stored only in this browser and is sent directly to Google only when the app requests a response. It is not synced to The Faith Connection.
             </p>
           </div>
         </div>

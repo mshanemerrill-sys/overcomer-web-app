@@ -6,7 +6,13 @@ export interface User {
 }
 
 // Focus path types
-export type FocusPath = 'TOUGH_DAY' | 'SUBSTANCE_RECOVERY' | 'MENTAL_HEALTH' | 'TESTIMONY_VICTORY' | 'VETERANS'
+export type FocusPath =
+  | 'TOUGH_DAY'
+  | 'SUBSTANCE_RECOVERY'
+  | 'MENTAL_HEALTH'
+  | 'VETERAN_TRANSITION'
+  | 'REENTRY_RESTORATION'
+  | 'TESTIMONY_VICTORY'
 
 // Chat message types
 export interface ChatMessage {
@@ -19,7 +25,7 @@ export interface ChatMessage {
 export interface VictoryLog {
   id: string
   timestamp: number
-  type: 'REFLECT' | 'TRIGGER' | 'CBT'
+  type: 'REFLECT' | 'TRIGGER' | 'CBT' | 'TESTIMONY'
   notes: string
   triggerContext?: string
   automaticThought?: string
@@ -28,6 +34,21 @@ export interface VictoryLog {
   scriptureReference?: string
   userId: string
   userPath: FocusPath
+  isShared?: boolean
+  authorName?: string
+}
+
+// PIN-protected private journal. Only encrypted bytes are persisted.
+export interface SecureJournalEntry {
+  id: string
+  timestamp: number
+  iv: string
+  cipherText: string
+}
+
+export interface SecureJournalPayload {
+  notes: string
+  analysis?: DistortionAnalysis
 }
 
 // Freedom goal types

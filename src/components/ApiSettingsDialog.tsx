@@ -92,7 +92,7 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
                 type={showKey ? 'text' : 'password'}
                 value={keyInput}
                 onChange={(e) => { setKeyInput(e.target.value); setTestState('idle') }}
-                placeholder="Enter your API key (AIzaSy...)"
+                placeholder="Enter your Google AI Studio API key"
                 className="input-field pr-12"
               />
               <button
