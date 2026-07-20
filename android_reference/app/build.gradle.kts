@@ -41,8 +41,8 @@ android {
     applicationId = "com.aistudio.overcomer.kwldsq"
     minSdk = 24
     targetSdk = 35
-    versionCode = 37
-    versionName = "37.0"
+    versionCode = 39
+    versionName = "39.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }

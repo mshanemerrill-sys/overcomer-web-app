@@ -16,13 +16,26 @@ const categoryInfo: Record<Category, { label: string; icon: React.ReactNode; col
 
 export default function InspirationTab({ onNavigateToCompanion }: { onNavigateToCompanion: () => void }) {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
-  const { setPendingCompanionMessage } = useAppStore()
+  const { setPendingCompanionMessage, userPath } = useAppStore()
 
-  const filteredQuotes = selectedCategory
-    ? inspirationQuotes.filter(q => q.category === selectedCategory)
-    : inspirationQuotes
+  const categoriesForPath: Partial<Record<NonNullable<typeof userPath>, Category[]>> = {
+    SUBSTANCE_RECOVERY: ['OVERCOMING_CRAVINGS', 'GRACE_FORGIVENESS', 'STRENGTH_FAITH'],
+    MENTAL_HEALTH: ['PEACE_ANXIETY', 'STRENGTH_FAITH', 'GRACE_FORGIVENESS'],
+    TOUGH_DAY: ['PEACE_ANXIETY', 'STRENGTH_FAITH'],
+    VETERAN_TRANSITION: ['STRENGTH_FAITH', 'PEACE_ANXIETY'],
+    REENTRY_RESTORATION: ['GRACE_FORGIVENESS', 'STRENGTH_FAITH']
+  }
 
-  const categories = Object.keys(categoryInfo) as Category[]
+  const relevantCategories = userPath ? categoriesForPath[userPath] : undefined
+
+  const filteredQuotes = inspirationQuotes.filter(q =>
+    (!selectedCategory || q.category === selectedCategory) &&
+    (!relevantCategories || relevantCategories.includes(q.category))
+  )
+
+  const categories = (Object.keys(categoryInfo) as Category[]).filter(category =>
+    !relevantCategories || relevantCategories.includes(category)
+  )
 
   const handleRenewMind = (quote: InspirationQuote) => {
     setPendingCompanionMessage(

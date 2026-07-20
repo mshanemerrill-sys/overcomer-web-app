@@ -227,17 +227,27 @@ fun FocusSelectionScreen(
                 testTag = "focus_mental_health_card"
             )
 
-            // Option 4: Veteran Transition & Freedom
+            // Option 4: The Next Mission: Veteran Support & Wellness
             FocusOptionCard(
-                title = "Veteran Transition & Freedom",
-                description = "Sound biblical counsel for PTSD, transition struggles, and civilian reintegration. Includes national, state, and local support resources.",
+                title = "The Next Mission: Veteran Support & Wellness",
+                description = "You were trained to endure the hardest battles, but you don't have to fight the invisible ones alone. Whether you are navigating the transition to civilian life, processing the weight of your service, or simply having a tough day, find faith-based tools and a community that understands. Seeking support isn't stepping down—it's stepping up. Click here for specialized veteran resources and daily strength.",
                 icon = Icons.Default.Star,
                 color = Color(0xFF1B5E20), // Dark military green
                 onClick = { onSelect("VETERAN_TRANSITION") },
                 testTag = "focus_veteran_transition_card"
             )
 
-            // Option 5: Today is a Testimony/Victory Day
+            // Option 5: Steps to Restoration: Life and Leadership After Incarceration
+            FocusOptionCard(
+                title = "Steps to Restoration: Life and Leadership After Incarceration",
+                description = "Your past does not dictate your destiny; Christ does. Moving forward requires strength, patience, and a strong support network. This space provides daily encouragement, targeted scripture, and a brotherhood of believers who understand the road you are walking. Your story isn't over—it’s just getting started. Click here to discover your value, your worth, and your next steps toward victory.",
+                icon = Icons.Default.Refresh,
+                color = Color(0xFF3F51B5), // Deep royal blue
+                onClick = { onSelect("REENTRY_RESTORATION") },
+                testTag = "focus_reentry_restoration_card"
+            )
+
+            // Option 6: Today is a Testimony/Victory Day
             FocusOptionCard(
                 title = "Today is a Testimony/Victory Day",
                 description = "Celebrate what God has done! Enjoy victorious scriptures, battle-winning quotes, and share your triumphs with your OverComer companion.",
@@ -583,6 +593,7 @@ fun MainAppScreen(
                                         "MENTAL_HEALTH" -> "Wellness"
                                         "TOUGH_DAY" -> "Tough Day"
                                         "VETERAN_TRANSITION" -> "Veteran"
+                                        "REENTRY_RESTORATION" -> "Restoration"
                                         else -> "Select"
                                     },
                                     style = MaterialTheme.typography.labelSmall,
@@ -765,16 +776,22 @@ fun FreedomTabScreen(
     val defaultStruggle = when (pathKey) {
         "MENTAL_HEALTH" -> "Anxiety & Depression"
         "TESTIMONY_VICTORY" -> "Victorious Breakthrough"
+        "REENTRY_RESTORATION" -> "Re-entry Reintegration"
+        "VETERAN_TRANSITION" -> "Veteran Transition & PTSD"
         else -> "Substance Use"
     }
     val defaultDeclaration = when (pathKey) {
         "MENTAL_HEALTH" -> "In Christ, My mind is filled with quietness and stability. I declare that worry has no dominion over my thoughts, and He keeps me in perfect peace."
         "TESTIMONY_VICTORY" -> "I am more than a conqueror through Him who loved me! Today, I walk in absolute victory, sharing my testimony and glorifying Christ!"
+        "REENTRY_RESTORATION" -> "My past is nailed to the cross, and I am a new creation in Christ. God has a future and a hope for me to lead and thrive in society."
+        "VETERAN_TRANSITION" -> "I am commissioned by King Jesus. He is my shield, my deliverer, and my secure fortress in every battle."
         else -> "An OverComer has submitted their life wholly to Christ and no longer fights FOR victory over addiction but rather FROM a position of victory!"
     }
     val defaultMilestone = when (pathKey) {
         "MENTAL_HEALTH" -> "The date my mental health began to feel good"
         "TESTIMONY_VICTORY" -> "since I celebrated my victory testimony"
+        "REENTRY_RESTORATION" -> "since my release & step into restoration"
+        "VETERAN_TRANSITION" -> "since taking off the uniform & entering civilian strength"
         else -> "since I OverCome addiction"
     }
 
@@ -812,6 +829,7 @@ fun FreedomTabScreen(
         "MENTAL_HEALTH" -> "Remember: You are loved, cherished, and chosen by God. You are a new creation in Christ. Cleanse your mind, rest in His peace, and walk in emotional resilience today."
         "TOUGH_DAY" -> "Today might feel like an all round tough day, but God is your present help in times of trouble. Let His supernatural grace carry your load today."
         "VETERAN_TRANSITION" -> "Remember: Your identity is anchored in Jesus Christ, who has won the ultimate battle for you. It is alright to ask for help—God is your shield, your fortress, and your deliverer. Walk in His peace today."
+        "REENTRY_RESTORATION" -> "Remember: Your past is completely forgiven and forgotten by God. Christ has broken every chain of the past and has chosen you to lead with honor and integrity. Walk in His restoration today."
         "TESTIMONY_VICTORY" -> "Today is a Testimony and Victory Day! Let's praise God for His absolute faithfulness, rejoice in His mercy, and walk in the fullness of His triumph today."
         else -> "Remember: You are not defined by your struggle, but by His grace. You are a new creation in Christ. Cleanse your mind, breathe deep, and walk in absolute victory today."
     }
@@ -1222,38 +1240,111 @@ fun FreedomTabScreen(
             BibleAffirmationsSection()
         }
 
-        if (userPath == "TESTIMONY_VICTORY") {
-            item {
-                TestimonyVictoryBoard(viewModel = viewModel, onNavigateToChat = onNavigateToChat)
+        when (userPath) {
+            "TESTIMONY_VICTORY" -> {
+                item {
+                    TestimonyVictoryBoard(viewModel = viewModel, onNavigateToChat = onNavigateToChat)
+                }
+                item {
+                    SupportGroupLocatorSection(viewModel = viewModel)
+                }
+                item {
+                    CuratedBiblicalLibrarySection()
+                }
+                item {
+                    TheFaithConnectionSection()
+                }
             }
-        }
-
-        if (userPath == "SUBSTANCE_RECOVERY") {
-            item {
-                RecoveryLessonsSection()
+            "SUBSTANCE_RECOVERY" -> {
+                item {
+                    RecoveryLessonsSection()
+                }
+                item {
+                    SupportGroupLocatorSection(viewModel = viewModel)
+                }
+                item {
+                    CuratedBiblicalLibrarySection()
+                }
+                item {
+                    TheFaithConnectionSection()
+                }
             }
-        }
-
-        if (userPath == "VETERAN_TRANSITION") {
-            item {
-                VeteranSupportSection()
+            "MENTAL_HEALTH" -> {
+                item {
+                    MentalHealthSupportSection()
+                }
+                item {
+                    SupportGroupLocatorSection(viewModel = viewModel)
+                }
+                item {
+                    CuratedBiblicalLibrarySection()
+                }
+                item {
+                    TheFaithConnectionSection()
+                }
             }
-        }
-
-        item {
-            SupportGroupLocatorSection(viewModel = viewModel)
-        }
-
-        item {
-            PostIncarcerationSupportSection()
-        }
-
-        item {
-            CuratedBiblicalLibrarySection()
-        }
-
-        item {
-            TheFaithConnectionSection()
+            "VETERAN_TRANSITION" -> {
+                item {
+                    VeteranTargetedStruggleSupportCard()
+                }
+                item {
+                    VeteranSupportSection()
+                }
+                item {
+                    VeteranSupportResourcesOnlyCard()
+                }
+                item {
+                    SupportGroupLocatorSection(viewModel = viewModel)
+                }
+                item {
+                    CuratedBiblicalLibrarySection()
+                }
+                item {
+                    TheFaithConnectionSection()
+                }
+            }
+            "REENTRY_RESTORATION" -> {
+                item {
+                    ReentryTargetedStruggleSupportCard()
+                }
+                item {
+                    ReentrySupportSection()
+                }
+                item {
+                    ReentrySupportResourcesOnlyCard()
+                }
+                item {
+                    SupportGroupLocatorSection(viewModel = viewModel)
+                }
+                item {
+                    CuratedBiblicalLibrarySection()
+                }
+                item {
+                    TheFaithConnectionSection()
+                }
+            }
+            "TOUGH_DAY" -> {
+                item {
+                    SupportGroupLocatorSection(viewModel = viewModel)
+                }
+                item {
+                    CuratedBiblicalLibrarySection()
+                }
+                item {
+                    TheFaithConnectionSection()
+                }
+            }
+            else -> {
+                item {
+                    SupportGroupLocatorSection(viewModel = viewModel)
+                }
+                item {
+                    CuratedBiblicalLibrarySection()
+                }
+                item {
+                    TheFaithConnectionSection()
+                }
+            }
         }
 
         item {
@@ -7568,8 +7659,30 @@ fun InspirationalQuotesTabScreen(viewModel: OverComerViewModel) {
             }
         }
 
-        val filteredVerses = inspirationalQuotes.filter { (it.id in 1..12) && (selectedCategory == "All" || it.category == selectedCategory) }
-        val filteredFamousQuotes = inspirationalQuotes.filter { (it.id in 13..24) && (selectedCategory == "All" || it.category == selectedCategory) }
+        val userPath by viewModel.userPath.collectAsStateWithLifecycle()
+
+        fun isRelevantToPath(category: String, path: String?): Boolean {
+            if (path.isNullOrEmpty()) return true
+            return when (path) {
+                "SUBSTANCE_RECOVERY" -> category == "Overcoming Cravings" || category == "Grace & Forgiveness" || category == "Strength & Faith"
+                "MENTAL_HEALTH" -> category == "Peace & Anxiety" || category == "Strength & Faith" || category == "Grace & Forgiveness"
+                "TOUGH_DAY" -> category == "Peace & Anxiety" || category == "Strength & Faith"
+                "VETERAN_TRANSITION" -> category == "Strength & Faith" || category == "Peace & Anxiety"
+                "REENTRY_RESTORATION" -> category == "Grace & Forgiveness" || category == "Strength & Faith"
+                else -> true
+            }
+        }
+
+        val filteredVerses = inspirationalQuotes.filter { 
+            (it.id in 1..12) && 
+            (selectedCategory == "All" || it.category == selectedCategory) && 
+            isRelevantToPath(it.category, userPath) 
+        }
+        val filteredFamousQuotes = inspirationalQuotes.filter { 
+            (it.id in 13..24) && 
+            (selectedCategory == "All" || it.category == selectedCategory) && 
+            isRelevantToPath(it.category, userPath) 
+        }
 
         var currentVerseIdx by remember(selectedCategory) { mutableStateOf(0) }
         var currentFamousQuoteIdx by remember(selectedCategory) { mutableStateOf(0) }
@@ -14763,7 +14876,7 @@ fun VeteranSupportSection() {
                     modifier = Modifier.size(26.dp)
                 )
                 Text(
-                    text = "VETERAN TRANSITION & HONOR FREEDOM",
+                    text = "THE NEXT MISSION: VETERAN SUPPORT & WELLNESS",
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.5.sp
@@ -14773,32 +14886,41 @@ fun VeteranSupportSection() {
             }
 
             Text(
-                text = "Transitioning from military service to civilian life carries deep, unseen battles. Whether you served in active combat or support operations, coping with PTSD, moral weight, or loss of mission can feel isolating. Know that it is a sign of ultimate strength—not weakness—to reach out for support. You are not permanently damaged; in Christ, you are an OverComer. Here is powerful biblical advice, mental tools, and curated resources to guide your walk.",
+                text = "You were trained to endure the hardest battles, but you don't have to fight the invisible ones alone. Whether you are navigating the transition to civilian life, processing the weight of your service, or simply having a tough day, find faith-based tools and a community that understands. Seeking support isn't stepping down—it's stepping up. Click here for specialized veteran resources and daily strength.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 18.sp
             )
 
-            TabRow(
+            // Dynamic daily reminders/bulletins
+            VeteranDailyFeedReminders()
+
+            ScrollableTabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = Color.Transparent,
                 contentColor = Color(0xFF1B5E20),
+                edgePadding = 0.dp,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Tab(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    text = { Text("🛡️ Biblical Guidance", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                    text = { Text("🛡️ Guidance", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
                 )
                 Tab(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    text = { Text("🏛️ Resources", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                    text = { Text("🏛️ Experts", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
                 )
                 Tab(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    text = { Text("🔑 Mind Alignment", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                    text = { Text("🔑 Truths", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                )
+                Tab(
+                    selected = selectedTab == 3,
+                    onClick = { selectedTab = 3 },
+                    text = { Text("🧰 Toolbox", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
                 )
             }
 
@@ -14808,6 +14930,7 @@ fun VeteranSupportSection() {
                 0 -> VeteranCopingStrategiesTab()
                 1 -> VeteranCuratedResourcesTab()
                 2 -> VeteranMindRenewalTab()
+                3 -> VeteranToolboxTab()
             }
         }
     }
@@ -14815,78 +14938,127 @@ fun VeteranSupportSection() {
 
 @Composable
 fun VeteranCopingStrategiesTab() {
+    var expandedIndex by remember { mutableStateOf<Int?>(null) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().clickable { expandedIndex = if (expandedIndex == 0) null else 0 },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color(0xFF1B5E20).copy(alpha = 0.05f))
         ) {
             Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = "👁️ Managing Hypervigilance & PTSD",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1B5E20)
-                )
-                Text(
-                    text = "Constant alertness keeps you alive in service, but in civilian environments (like malls, traffic, or loud settings), this hyper-arousal triggers intense anxiety, weariness, or anger.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    BulletPointItem("Tactical Seating: Sit in positions where your nervous system feels secure (e.g., facing the room or exit) as you adapt. Do not feel guilty about taking this space.")
-                    BulletPointItem("The 4-4-4 Grounding: When triggered, slowly inhale for 4s, hold for 4s, and exhale for 4s. Recite Psalm 18:2: 'The Lord is my rock, my fortress, and my deliverer.'")
-                    BulletPointItem("Acknowledge the Shift: Consciously tell your mind, 'The battle is behind me. I am safe under Christ's banner.'")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "👁️ Managing Hypervigilance & PTSD",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1B5E20)
+                    )
+                    Icon(
+                        imageVector = if (expandedIndex == 0) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Toggle",
+                        tint = Color(0xFF1B5E20)
+                    )
+                }
+                
+                AnimatedVisibility(visible = expandedIndex == 0) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Constant alertness keeps you alive in service, but in civilian environments (like malls, traffic, or loud settings), this hyper-arousal triggers intense anxiety, weariness, or anger.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            BulletPointItem("Tactical Seating: Sit in positions where your nervous system feels secure (e.g., facing the room or exit) as you adapt. Do not feel guilty about taking this space.")
+                            BulletPointItem("The 4-4-4 Grounding: When triggered, slowly inhale for 4s, hold for 4s, and exhale for 4s. Recite Psalm 18:2: 'The Lord is my rock, my fortress, and my deliverer.'")
+                            BulletPointItem("Acknowledge the Shift: Consciously tell your mind, 'The battle is behind me. I am safe under Christ's banner.'")
+                        }
+                    }
                 }
             }
         }
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().clickable { expandedIndex = if (expandedIndex == 1) null else 1 },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.08f))
         ) {
             Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = "🗺️ Restoring Mission & Purpose",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-                Text(
-                    text = "Moving from a highly structured, unified platoon to a fragmented civilian world can trigger deep feelings of isolation, loss of identity, or aimlessness.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    BulletPointItem("Identify Your Commander: Your commission has not ended. Christ has called you into His sovereign kingdom to represent grace and truth (2 Timothy 2:3-4).")
-                    BulletPointItem("Set Micro-Missions: Establish 2-3 daily spiritual or physical goals. Rebuilding starts with structured daily victories.")
-                    BulletPointItem("Gather a New Platoon: Connect with other believers, local small groups, or Christian veterans who understand absolute freedom.")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "🗺️ Restoring Mission & Purpose",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Icon(
+                        imageVector = if (expandedIndex == 1) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Toggle",
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                AnimatedVisibility(visible = expandedIndex == 1) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Moving from a highly structured, unified platoon to a fragmented civilian world can trigger deep feelings of isolation, loss of identity, or aimlessness.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            BulletPointItem("Identify Your Commander: Your commission has not ended. Christ has called you into His sovereign kingdom to represent grace and truth (2 Timothy 2:3-4).")
+                            BulletPointItem("Set Micro-Missions: Establish 2-3 daily spiritual or physical goals. Rebuilding starts with structured daily victories.")
+                            BulletPointItem("Gather a New Platoon: Connect with other believers, local small groups, or Christian veterans who understand absolute freedom.")
+                        }
+                    }
                 }
             }
         }
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().clickable { expandedIndex = if (expandedIndex == 2) null else 2 },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
         ) {
             Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = "❤️ Overcoming Moral Injury & Guilt",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = "Decisions made or witnessed in intense conditions can leave deep spiritual wounds or 'moral injury,' making you feel permanently stained or distant from God.",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                    BulletPointItem("Complete Deliverance: You are a brand new creation (2 Corinthians 5:17). Christ's blood cleanses you of all unrighteousness; there is absolutely zero condemnation (Romans 8:1).")
-                    BulletPointItem("It's Safe to Ask: Confession is not a weakness. Reach out to a trusted pastor, Christian counselor, or peer mentor who values absolute grace.")
-                    BulletPointItem("Renew the Temple: Treat your body and mind with respect. Exercise, get healthy rest, and spend time in God's peaceful creation.")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "❤️ Overcoming Moral Injury & Guilt",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Icon(
+                        imageVector = if (expandedIndex == 2) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Toggle",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                AnimatedVisibility(visible = expandedIndex == 2) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Decisions made or witnessed in intense conditions can leave deep spiritual wounds or 'moral injury,' making you feel permanently stained or distant from God.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            BulletPointItem("Complete Deliverance: You are a brand new creation (2 Corinthians 5:17). Christ's blood cleanses you of all unrighteousness; there is absolutely zero condemnation (Romans 8:1).")
+                            BulletPointItem("It's Safe to Ask: Confession is not a weakness. Reach out to a trusted pastor, Christian counselor, or peer mentor who values absolute grace.")
+                            BulletPointItem("Renew the Temple: Treat your body and mind with respect. Exercise, get healthy rest, and spend time in God's peaceful creation.")
+                        }
+                    }
                 }
             }
         }
@@ -14897,6 +15069,84 @@ fun VeteranCopingStrategiesTab() {
 fun VeteranCuratedResourcesTab() {
     val context = LocalContext.current
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Christian Veteran Authors & Experts Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)),
+            border = BorderStroke(1.dp, Color(0xFF1B5E20).copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🎖️ Trusted Christian Leaders & Trauma Experts",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1B5E20)
+                )
+
+                // Expert 1: Chad Robichaux
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "• Chad Robichaux (Mighty Oaks Warrior Programs)",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Former USMC Force Recon Marine. Mighty Oaks offers free, intensive recovery retreats helping veterans overcome PTS (Post-Traumatic Stress) through spiritual warfare, family restoration, and discipleship. Author of 'An Unfair Advantage'.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+
+                // Expert 2: Evan Owens
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "• Evan Owens (REBOOT Recovery)",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Co-founder of REBOOT Recovery, the largest Christian trauma-healing program for military veterans. Focuses deeply on overcoming the 'soul wounds' of combat that clinical therapy often overlooks. Author of 'Healing What's Hidden'.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+
+                // Expert 3: H. Norman Wright
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "• Dr. H. Norman Wright",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "A pioneer in Christian trauma, grief, and crisis counseling. His clinically sound, scripture-grounded worksheets are the gold standard for processing deep combat-related loss.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+
+                // Expert 4: Chaplain Doug Carver
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "• Chaplain (Major General) Doug Carver, US Army (Ret.)",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Former Chief of Chaplains for the US Army. His publications on spiritual readiness, troop resilience, and moral injury are vital resources for military families.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+            }
+        }
+
+        // Fast Link Buttons
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -14904,29 +15154,39 @@ fun VeteranCuratedResourcesTab() {
         ) {
             Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "🎖️ Christ-Centered Veteran Healing Courses",
+                    text = "🌐 Direct Veteran Program Portals",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1B5E20)
                 )
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    BulletPointItem("REBOOT Recovery: A free, 12-week faith-based trauma healing course designed specifically for veterans and first responders. Over 20,000 graduates. (Website: rebootrecovery.com)")
-                    BulletPointItem("Mighty Oaks Warrior Programs: Offers free, intensive recovery retreats to help veterans discover purpose, recover from PTSD, and build a godly home. (Website: mightyoaksprograms.org)")
-                }
-                Spacer(modifier = Modifier.height(4.dp))
                 Button(
                     onClick = {
                         val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://rebootrecovery.com/military"))
-                        context.startActivity(intent)
+                        try {
+                            context.startActivity(intent)
+                        } catch (_: Exception) {}
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20))
                 ) {
-                    Text("Explore REBOOT Recovery 🎖️", fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Explore REBOOT Recovery Portal 🎖️", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+                Button(
+                    onClick = {
+                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.mightyoaksprograms.org"))
+                        try {
+                            context.startActivity(intent)
+                        } catch (_: Exception) {}
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
+                ) {
+                    Text("Visit Mighty Oaks Warrior Programs 🌲", fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
         }
 
+        // Crisis Support Info
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -14948,7 +15208,9 @@ fun VeteranCuratedResourcesTab() {
                 Button(
                     onClick = {
                         val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.va.gov"))
-                        context.startActivity(intent)
+                        try {
+                            context.startActivity(intent)
+                        } catch (_: Exception) {}
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -14958,6 +15220,7 @@ fun VeteranCuratedResourcesTab() {
             }
         }
 
+        // Community Advocacy & Local Support
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -14974,6 +15237,425 @@ fun VeteranCuratedResourcesTab() {
                     BulletPointItem("VFW & American Legion: Local community chapters offering advocacy, benefits claim navigation, peer mentorship, and veteran camaraderie.")
                     BulletPointItem("State Dept of Veterans Affairs: Access state-specific veteran benefits, property tax exemptions, and transition grants.")
                     BulletPointItem("Support Locator: Use the 'Support & Church Locator' above and search the 'Veteran Support' category with your Zip Code to find veteran-focused resources near you!")
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun VeteranToolboxTab() {
+    val context = LocalContext.current
+    val sharedPrefs = remember { context.getSharedPreferences("veteran_toolbox_prefs", android.content.Context.MODE_PRIVATE) }
+
+    // State for A.A.R.
+    var aarObjective by remember { mutableStateOf("") }
+    var aarExecution by remember { mutableStateOf("") }
+    var aarAmbush by remember { mutableStateOf("") }
+    var aarAdjustment by remember { mutableStateOf("") }
+    var aarSavedMessage by remember { mutableStateOf("") }
+
+    var savedAarsCount by remember { mutableStateOf(sharedPrefs.getInt("aar_count", 0)) }
+    var showSavedAars by remember { mutableStateOf(false) }
+
+    // State for 5-4-3-2-1 Drill
+    var drillStep by remember { mutableStateOf(0) } // 0 = start, 1 = see, 2 = feel, 3 = hear, 4 = smell, 5 = scripture
+
+    // State for Buddy Check
+    var buddyCheckDone by remember { mutableStateOf(sharedPrefs.getBoolean("buddy_check_done_today", false)) }
+    var buddyCheckSuccessMsg by remember { mutableStateOf("") }
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        // 1. The Daily After Action Review (A.A.R.)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+            border = BorderStroke(1.dp, Color(0xFF1B5E20).copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "📋 The Daily After Action Review (A.A.R.)",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1B5E20)
+                    )
+                    if (savedAarsCount > 0) {
+                        TextButton(
+                            onClick = { showSavedAars = !showSavedAars },
+                            colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF1B5E20))
+                        ) {
+                            Text(if (showSavedAars) "Hide History" else "History ($savedAarsCount)", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                        }
+                    }
+                }
+                Text(
+                    text = "A military-style post-mission debrief translated into a daily spiritual exercise. Evaluate today objectively to secure tomorrow's victory.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                if (!showSavedAars) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedTextField(
+                            value = aarObjective,
+                            onValueChange = { aarObjective = it },
+                            label = { Text("1. Objective: What was my main spiritual goal today?", style = MaterialTheme.typography.bodySmall) },
+                            modifier = Modifier.fillMaxWidth().testTag("aar_objective_input"),
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        OutlinedTextField(
+                            value = aarExecution,
+                            onValueChange = { aarExecution = it },
+                            label = { Text("2. Execution: What actually happened? (Did I isolate?)", style = MaterialTheme.typography.bodySmall) },
+                            modifier = Modifier.fillMaxWidth().testTag("aar_execution_input"),
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        OutlinedTextField(
+                            value = aarAmbush,
+                            onValueChange = { aarAmbush = it },
+                            label = { Text("3. Ambush: What triggered me today, and how did I react?", style = MaterialTheme.typography.bodySmall) },
+                            modifier = Modifier.fillMaxWidth().testTag("aar_ambush_input"),
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        OutlinedTextField(
+                            value = aarAdjustment,
+                            onValueChange = { aarAdjustment = it },
+                            label = { Text("4. Adjustment: What tactic will I change tomorrow?", style = MaterialTheme.typography.bodySmall) },
+                            modifier = Modifier.fillMaxWidth().testTag("aar_adjustment_input"),
+                            textStyle = MaterialTheme.typography.bodySmall,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+
+                        Button(
+                            onClick = {
+                                if (aarObjective.isNotBlank() || aarAdjustment.isNotBlank()) {
+                                    val count = savedAarsCount + 1
+                                    sharedPrefs.edit()
+                                        .putInt("aar_count", count)
+                                        .putString("aar_obj_$count", aarObjective)
+                                        .putString("aar_exec_$count", aarExecution)
+                                        .putString("aar_ambush_$count", aarAmbush)
+                                        .putString("aar_adj_$count", aarAdjustment)
+                                        .apply()
+                                    savedAarsCount = count
+                                    aarSavedMessage = "Tactical After Action Review saved successfully. Mission secure!"
+                                    aarObjective = ""; aarExecution = ""; aarAmbush = ""; aarAdjustment = ""
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth().testTag("save_aar_button"),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20)),
+                            shape = RoundedCornerShape(12.dp),
+                            enabled = aarObjective.isNotBlank() || aarAdjustment.isNotBlank()
+                        ) {
+                            Text("Save After Action Review 💾", fontWeight = FontWeight.Bold, color = Color.White)
+                        }
+
+                        if (aarSavedMessage.isNotEmpty()) {
+                            Text(
+                                text = aarSavedMessage,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color(0xFF1B5E20),
+                                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                            )
+                        }
+                    }
+                } else {
+                    // Show Saved History
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        for (i in savedAarsCount downTo Math.max(1, savedAarsCount - 4)) {
+                            val obj = sharedPrefs.getString("aar_obj_$i", "") ?: ""
+                            val exec = sharedPrefs.getString("aar_exec_$i", "") ?: ""
+                            val ambush = sharedPrefs.getString("aar_ambush_$i", "") ?: ""
+                            val adj = sharedPrefs.getString("aar_adj_$i", "") ?: ""
+
+                            Card(
+                                colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                                shape = RoundedCornerShape(10.dp)
+                            ) {
+                                Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Text("A.A.R. Entry #$i", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = Color(0xFF1B5E20))
+                                    if (obj.isNotEmpty()) Text("🎯 Obj: $obj", style = MaterialTheme.typography.bodySmall)
+                                    if (exec.isNotEmpty()) Text("📋 Exec: $exec", style = MaterialTheme.typography.bodySmall)
+                                    if (ambush.isNotEmpty()) Text("⚠️ Ambush: $ambush", style = MaterialTheme.typography.bodySmall)
+                                    if (adj.isNotEmpty()) Text("🔄 Adjustment: $adj", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, color = Color(0xFF1B5E20))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. The 5-4-3-2-1 "Stand Firm" Drill
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+            border = BorderStroke(1.dp, Color(0xFF1B5E20).copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🛡️ The 5-4-3-2-1 \"Stand Firm\" Drill",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1B5E20)
+                )
+                Text(
+                    text = "High anxiety or PTSD trigger flares? Instantly ground your nervous system in the present and stand on God's Word.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(14.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        when (drillStep) {
+                            0 -> {
+                                Text("Engage Tactical Grounding", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color(0xFF1B5E20))
+                                Text("Click below to start the step-by-step physical-spiritual sensory alignment drill.", style = MaterialTheme.typography.bodySmall, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                                Button(
+                                    onClick = { drillStep = 1 },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20)),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text("Start Stand Firm Drill 🛡️", color = Color.White)
+                                }
+                            }
+                            1 -> {
+                                Text("👀 STEP 5: VISUAL SCAN", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color(0xFF1B5E20))
+                                Text("Name 5 things you can see around you right now out loud (e.g. wall clock, chair, tree, lamp, paper).", style = MaterialTheme.typography.bodySmall, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                                Button(
+                                    onClick = { drillStep = 2 },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20)),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text("Next Step (Step 4) 👉", color = Color.White)
+                                }
+                            }
+                            2 -> {
+                                Text("👉 STEP 4: PHYSICAL TOUCH", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color(0xFF1B5E20))
+                                Text("Focus on 4 things you can physically feel (e.g. your feet on the hard floor, the shirt on your back, the breeze, the cool desk).", style = MaterialTheme.typography.bodySmall, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                                Button(
+                                    onClick = { drillStep = 3 },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20)),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text("Next Step (Step 3) 👉", color = Color.White)
+                                }
+                            }
+                            3 -> {
+                                Text("👂 STEP 3: AUDITORY DETECT", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color(0xFF1B5E20))
+                                Text("Listen closely. Name 3 distinct things you can hear (e.g. traffic outside, the hum of the refrigerator, birds chirping).", style = MaterialTheme.typography.bodySmall, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                                Button(
+                                    onClick = { drillStep = 4 },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20)),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text("Next Step (Step 2) 👉", color = Color.White)
+                                }
+                            }
+                            4 -> {
+                                Text("👃 STEP 2: OLFACTORY CHECK", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color(0xFF1B5E20))
+                                Text("Focus on 2 things you can smell or taste (e.g. soap, coffee, rain, fresh cut wood).", style = MaterialTheme.typography.bodySmall, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                                Button(
+                                    onClick = { drillStep = 5 },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20)),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text("Final Anchor (Step 1) 🛡️", color = Color.White)
+                                }
+                            }
+                            5 -> {
+                                Text("🛡️ STEP 1: SPIRITUAL SHIELD", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                Text("Now stand firm on this Scripture. Speak it out loud:\n\n\"The Lord is my rock, my fortress, and my deliverer; my God is my strength, in whom I will trust!\" (Psalm 18:2)", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center, color = Color(0xFF1B5E20))
+                                Button(
+                                    onClick = { drillStep = 0 },
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20)),
+                                    shape = RoundedCornerShape(8.dp)
+                                ) {
+                                    Text("Secure Victory (Complete) ✅", color = Color.White)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. The Buddy Check Protocol
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+            border = BorderStroke(1.dp, Color(0xFF1B5E20).copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🤝 The Buddy Check Protocol",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1B5E20)
+                )
+                Text(
+                    text = "In the military, you never operate without a battle buddy. In civilian life, isolation is your number one enemy. Conduct one buddy check every 24 hours.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            val nextVal = !buddyCheckDone
+                            buddyCheckDone = nextVal
+                            sharedPrefs.edit().putBoolean("buddy_check_done_today", nextVal).apply()
+                            buddyCheckSuccessMsg = if (nextVal) "Buddy Check completed today! Tactical connection secure. Iron sharpens iron." else ""
+                        }
+                        .padding(vertical = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = if (buddyCheckDone) Icons.Default.CheckCircle else Icons.Default.Info,
+                        contentDescription = null,
+                        tint = if (buddyCheckDone) Color(0xFF2E7D32) else Color(0xFF1B5E20),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "I completed my Buddy Check for today!",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = if (buddyCheckDone) Color(0xFF1B5E20) else MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                if (buddyCheckSuccessMsg.isNotEmpty()) {
+                    Text(
+                        text = buddyCheckSuccessMsg,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF2E7D32),
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "Quick Encouragement Templates (Tap to Copy):",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1B5E20)
+                )
+
+                listOf(
+                    "Hey battle buddy, just conducting a Buddy Check. Standing with you in the unit today, hope you are securing victories!",
+                    "Just checking in on you, brother. If you ever need anything or want to chat, I'm here. You're an OverComer!"
+                ).forEachIndexed { idx, msg ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                                val clip = android.content.ClipData.newPlainText("Buddy Check Message", msg)
+                                clipboard.setPrimaryClip(clip)
+                                buddyCheckSuccessMsg = "Message #${idx + 1} copied to clipboard! Send it to your Battle Buddy."
+                            },
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Row(modifier = Modifier.padding(8.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Icon(imageVector = Icons.Default.Share, contentDescription = "Copy", tint = Color(0xFF1B5E20), modifier = Modifier.size(16.dp))
+                            Text(text = "\"$msg\"", style = MaterialTheme.typography.bodySmall, fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun VeteranDailyFeedReminders() {
+    val feedItems = listOf(
+        "🤝 BATTLE RECON: It’s time for your daily Buddy Check. Reach out, send a text, or call a battle buddy right now to check on their unit status. Isolation is the enemy's trap!",
+        "🛡️ TACTICAL AMBUSH? Feeling high hyperarousal or panic? Tap into the 5-4-3-2-1 Grounding Drill right now. End on Psalm 18:2 - He is your ultimate fortress!",
+        "📋 MISSION REVIEW: Don't forget to conduct your daily After Action Review (A.A.R.) tonight. Evaluate today's triggers, adjustments, and secure tomorrow's victory.",
+        "👑 BRAND NEW UNIT: Your military training gave you incredible resilience. In Christ, that is supercharged by the Holy Spirit. You are not damaged; you are a brand new creation!"
+    )
+    var currentIndex by remember { mutableStateOf(0) }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E9)),
+        border = BorderStroke(1.dp, Color(0xFF1B5E20).copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Icon(imageVector = Icons.Default.Info, contentDescription = null, tint = Color(0xFF1B5E20), modifier = Modifier.size(18.dp))
+                    Text(
+                        text = "📢 DAILY VETERAN BULLETIN",
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp),
+                        color = Color(0xFF1B5E20)
+                    )
+                }
+                Text(
+                    text = "${currentIndex + 1}/${feedItems.size}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFF1B5E20)
+                )
+            }
+            
+            Text(
+                text = feedItems[currentIndex],
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(vertical = 4.dp),
+                lineHeight = 18.sp
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(
+                    onClick = { currentIndex = if (currentIndex > 0) currentIndex - 1 else feedItems.size - 1 },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF1B5E20))
+                ) {
+                    Text("Previous", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                TextButton(
+                    onClick = { currentIndex = if (currentIndex < feedItems.size - 1) currentIndex + 1 else 0 },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF1B5E20))
+                ) {
+                    Text("Next Bulletin", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -15596,6 +16278,1129 @@ fun TheFaithConnectionSection() {
                         fontWeight = FontWeight.Bold
                     )
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun MentalHealthSupportSection() {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "VETTED BIBLICAL CLINICAL COUNSELING",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.5.sp
+                    ),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Text(
+                text = "We align spiritual healing with healthy mind alignment under Christ, drawing from leading biblical and clinical counseling experts. Note: This app does not promote or utilize medication-assisted treatment (MAT) or chemical dependencies for soul care.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+
+            Text(
+                text = "Trusted Counseling Guides & Literature",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+
+            // Author 1
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = "• Dr. Gary R. Collins (Christian Counseling)",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "Comprehensive clinical-spiritual integration framework for anxiety, depression, and personal crisis management.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 12.dp)
+                )
+            }
+
+            // Author 2
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = "• Dr. Timothy Clinton & AACC (Competent Christian Counseling)",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "Clinically competent, scripture-grounded approaches for renewing the mind and processing deep trauma.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 12.dp)
+                )
+            }
+
+            // Author 3
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    text = "• Dr. Larry Crabb (Connecting & Understanding People)",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "Deep relational healing model that addresses inner core longings and finding complete security in God.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 12.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun VeteranTargetedStruggleSupportCard() {
+    var selectedSubtab by remember { mutableStateOf(0) }
+    val struggles = listOf("PTSD & Anxiety", "Moral Injury", "Transition Fatigue", "Other")
+    var customStruggleText by remember { mutableStateOf("") }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, Color(0xFF1B5E20).copy(alpha = 0.3f))
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "🎯 CHOOSE YOUR FOCUS",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.2.sp
+                ),
+                color = Color(0xFF1B5E20)
+            )
+
+            // Horizontal Tab Row for Struggles
+            ScrollableTabRow(
+                selectedTabIndex = selectedSubtab,
+                containerColor = Color.Transparent,
+                contentColor = Color(0xFF1B5E20),
+                edgePadding = 0.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                struggles.forEachIndexed { index, label ->
+                    Tab(
+                        selected = selectedSubtab == index,
+                        onClick = { selectedSubtab = index },
+                        text = { Text(label, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            when (selectedSubtab) {
+                0 -> {
+                    Text(
+                        text = "Managing PTSD & Hypervigilance",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1B5E20)
+                    )
+                    Text(
+                        text = "Your brain was trained to recognize and alert on any potential threat. In civilian settings, this response triggers false alarms. Ground your mind in Jesus. He is your fortress.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                1 -> {
+                    Text(
+                        text = "Resolving Moral Guilt & Sorrow",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1B5E20)
+                    )
+                    Text(
+                        text = "Combat or operational stress can leave deep spiritual wounds. Understand that your past is completely covered under Christ's perfect blood. You are a clean, new creation.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                2 -> {
+                    Text(
+                        text = "Navigating Transition Fatigue",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1B5E20)
+                    )
+                    Text(
+                        text = "Leaving a highly structured, close-knit platoon can feel highly isolating. Create micro-missions daily for spiritual growth and stay connected to local church small groups.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                3 -> {
+                    Text(
+                        text = "Custom Reflection Focus",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1B5E20)
+                    )
+                    OutlinedTextField(
+                        value = customStruggleText,
+                        onValueChange = { customStruggleText = it },
+                        label = { Text("Describe what you are navigating today...", style = MaterialTheme.typography.bodySmall) },
+                        modifier = Modifier.fillMaxWidth().testTag("veteran_custom_struggle_input"),
+                        textStyle = MaterialTheme.typography.bodySmall,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    if (customStruggleText.isNotEmpty()) {
+                        Text(
+                            text = "Take this to the Lord in prayer today. He cares for you deeply.",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun VeteranSupportResourcesOnlyCard() {
+    val context = LocalContext.current
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1B5E20).copy(alpha = 0.08f)),
+        border = BorderStroke(1.dp, Color(0xFF1B5E20).copy(alpha = 0.4f))
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Need Immediate Assistance?",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1B5E20)
+            )
+            Button(
+                onClick = {
+                    val intent = android.content.Intent(android.content.Intent.ACTION_DIAL, android.net.Uri.parse("tel:988"))
+                    context.startActivity(intent)
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B5E20)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().testTag("veteran_support_resources_button")
+            ) {
+                Icon(imageVector = Icons.Default.Phone, contentDescription = null, tint = Color.White)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Veterans support and resources click here", color = Color.White, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
+fun ReentryTargetedStruggleSupportCard() {
+    var selectedSubtab by remember { mutableStateOf(0) }
+    val struggles = listOf("Structure & Habits", "Decision Fatigue", "Boundary Building", "Other")
+    var customStruggleText by remember { mutableStateOf("") }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, Color(0xFF3F51B5).copy(alpha = 0.3f))
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "🎯 CHOOSE YOUR RE-ENTRY FOCUS",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.2.sp
+                ),
+                color = Color(0xFF3F51B5)
+            )
+
+            ScrollableTabRow(
+                selectedTabIndex = selectedSubtab,
+                containerColor = Color.Transparent,
+                contentColor = Color(0xFF3F51B5),
+                edgePadding = 0.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                struggles.forEachIndexed { index, label ->
+                    Tab(
+                        selected = selectedSubtab == index,
+                        onClick = { selectedSubtab = index },
+                        text = { Text(label, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            when (selectedSubtab) {
+                0 -> {
+                    Text(
+                        text = "Managing Institutional Habits (Structure)",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF3F51B5)
+                    )
+                    Text(
+                        text = "Transitioning to ordinary life often means dealing with prisonization—seeking rigid schedules and finding changes highly disorienting. God is your ultimate orchestrator of time; build flexible schedules anchored in His peace.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                1 -> {
+                    Text(
+                        text = "Overcoming Decision Fatigue",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF3F51B5)
+                    )
+                    Text(
+                        text = "When every choice was once made for you, simple civilian options can feel completely paralyzing. Practice deep breathing, make simple decisions, and remember that Christ holds your hand.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                2 -> {
+                    Text(
+                        text = "Healthy Boundary Building",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF3F51B5)
+                    )
+                    Text(
+                        text = "Rebuilding relationships with family, friends, or coworkers requires wisdom and structure. Learn the power of honest, compassionate, biblical boundaries to guard your focus.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                3 -> {
+                    Text(
+                        text = "Custom Reflection Focus",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF3F51B5)
+                    )
+                    OutlinedTextField(
+                        value = customStruggleText,
+                        onValueChange = { customStruggleText = it },
+                        label = { Text("Describe what you are navigating today...", style = MaterialTheme.typography.bodySmall) },
+                        modifier = Modifier.fillMaxWidth().testTag("reentry_custom_struggle_input"),
+                        textStyle = MaterialTheme.typography.bodySmall,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    if (customStruggleText.isNotEmpty()) {
+                        Text(
+                            text = "Commit your plans to the Lord, and your thoughts will be established (Proverbs 16:3).",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReentrySupportSection() {
+    var selectedTab by remember { mutableStateOf(0) }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, Color(0xFF3F51B5).copy(alpha = 0.3f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = null,
+                    tint = Color(0xFF3F51B5)
+                )
+                Text(
+                    text = "STEPS TO RESTORATION & FREEDOM",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.5.sp
+                    ),
+                    color = Color(0xFF3F51B5)
+                )
+            }
+
+            Text(
+                text = "Transitioning to ordinary life after incarceration is a journey that requires strength, structure, and active redemptive community. Draw from targeted scripture, mental exercises, and trusted biblical leaders below.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                lineHeight = 18.sp
+            )
+
+            // Dynamic daily reminders
+            ReentryDailyFeedReminders()
+
+            TabRow(
+                selectedTabIndex = selectedTab,
+                containerColor = Color.Transparent,
+                contentColor = Color(0xFF3F51B5),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Tab(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    text = { Text("🛡️ Guidance", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                )
+                Tab(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    text = { Text("🏛️ Experts", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                )
+                Tab(
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
+                    text = { Text("🧰 Toolbox", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            when (selectedTab) {
+                0 -> RestorationCopingStrategiesTab()
+                1 -> ReentryExpertAdviceTab()
+                2 -> ReentryToolboxTab()
+            }
+        }
+    }
+}
+
+@Composable
+fun RestorationCopingStrategiesTab() {
+    var expandedIndex by remember { mutableStateOf<Int?>(null) }
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth().clickable { expandedIndex = if (expandedIndex == 0) null else 0 },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF3F51B5).copy(alpha = 0.05f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "👁️ Managing Institutional Structure Habits",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF3F51B5)
+                    )
+                    Icon(
+                        imageVector = if (expandedIndex == 0) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Toggle",
+                        tint = Color(0xFF3F51B5)
+                    )
+                }
+                
+                AnimatedVisibility(visible = expandedIndex == 0) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Institutional conditioning, or 'prisonization,' often leads individuals to struggle to organize their day without rigid schedules or strict, directed rules.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            BulletPointItem("Own Your Routine: Create a healthy daily schedule yourself, deciding when to wake, eat, study, and rest. This builds decision confidence.")
+                            BulletPointItem("Adapt Gracefully: When plans shift, take a deep breath. Focus on what you can manage, and trust Proverbs 3:5-6.")
+                            BulletPointItem("Work Structure: Use structured employment as a healthy bridge while learning to manage open-ended home environments.")
+                        }
+                    }
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth().clickable { expandedIndex = if (expandedIndex == 1) null else 1 },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.08f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "🗺️ Overcoming Decision Fatigue",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Icon(
+                        imageVector = if (expandedIndex == 1) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Toggle",
+                        tint = MaterialTheme.colorScheme.secondary
+                    )
+                }
+
+                AnimatedVisibility(visible = expandedIndex == 1) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "After years of having choices made for you, standard civilian environments can trigger intense choice overload or anxiety.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            BulletPointItem("Limit Options: Simplify choices initially (e.g. choose between 2 meals, buy similar clothing) to prevent cognitive overload.")
+                            BulletPointItem("Seek Wise Council: For large choices, talk to a Christian mentor or support partner who values objective guidance.")
+                            BulletPointItem("Take Pause: If you feel overwhelmed, step away from the immediate scene. Re-center in peaceful quietness.")
+                        }
+                    }
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth().clickable { expandedIndex = if (expandedIndex == 2) null else 2 },
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "❤️ Constructing Healthy Family Boundaries",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Icon(
+                        imageVector = if (expandedIndex == 2) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Toggle",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                AnimatedVisibility(visible = expandedIndex == 2) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "Establishing new boundaries with loved ones can feel complex. Communication is key to restoring trust and respect.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            BulletPointItem("Establish Boundaries: Use Henry Cloud and John Townsend's biblical boundaries to communicate limits with deep grace and absolute honesty.")
+                            BulletPointItem("Earn Trust: Remember that trust is built step-by-step through consistent, honest, daily action, not overnight.")
+                            BulletPointItem("Respect Their Time: Allow family members space to process the transition and heal at their own pace.")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReentryExpertAdviceTab() {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)),
+            border = BorderStroke(1.dp, Color(0xFF3F51B5).copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "✝️ Trusted Christian Voices & Psychologists",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF3F51B5)
+                )
+
+                // Author 1: Colson
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "• Chuck Colson & Prison Fellowship",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "The pioneer of modern Christian prison ministry. His classic work 'Born Again' and Prison Fellowship's free reentry workbooks offer incredibly practical spiritual structures for returning citizens.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+
+                // Author 2: Cloud & Townsend
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "• Drs. Henry Cloud & John Townsend (Boundaries)",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "The absolute gold standard for relational and emotional health. Learn how to construct strong biblical boundaries to protect your walk from toxic family dynamics or former negative influences.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+
+                // Author 3: Groeschel
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "• Pastor Craig Groeschel",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "His classic 'Winning the War in Your Mind' bridges Cognitive Behavioral Therapy (CBT) with Scripture, providing a step-by-step biblical filter to break free from the limiting inmate mindset.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+
+                // Author 4: Jantz
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "• Dr. Gregory Jantz",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "A Christian psychologist pioneer in whole-person care. His teachings address the complete physical, emotional, and spiritual toll of trauma and chemical struggles.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+            }
+        }
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)),
+            border = BorderStroke(1.dp, Color(0xFF673AB7).copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🧠 Trusted Secular Clinical Foundations",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF673AB7)
+                )
+
+                // Author 5: Robinson & Little
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "• Drs. Kenneth Robinson & Gregory Little (MRT Founders)",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Creators of Moral Reconation Therapy (MRT), designed specifically for criminal justice. Focuses on elevating moral reasoning and taking absolute personal responsibility, with zero anti-faith bias.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+
+                // Author 6: Frankl
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = "• Dr. Viktor Frankl (Man's Search for Meaning)",
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Renowned psychiatrist, logotherapist, and Holocaust survivor. His timeless work teaches how humans can find profound, God-given meaning and resilience in the face of extreme confinement and transition.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 12.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReentryToolboxTab() {
+    var haltHungry by remember { mutableStateOf(false) }
+    var haltAngry by remember { mutableStateOf(false) }
+    var haltLonely by remember { mutableStateOf(false) }
+    var haltTired by remember { mutableStateOf(false) }
+
+    var selectedBullseyeRing by remember { mutableStateOf(0) } // 0 = Inner, 1 = Middle, 2 = Outer
+
+    var thoughtInput by remember { mutableStateOf("") }
+    var isThoughtProcessed by remember { mutableStateOf(false) }
+
+    var customGoalInput by remember { mutableStateOf("") }
+    var goalsList by remember {
+        mutableStateOf(
+            listOf(
+                "Spend 10 minutes in prayer and reading Scripture",
+                "Apply for one job, study, or complete a vocational task",
+                "Attend an OverComer group, church service, or call a mentor",
+                "Secure healthy rest and proper sleep"
+            )
+        )
+    }
+    var checkedGoals by remember { mutableStateOf(setOf<String>()) }
+
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        // 1. HALT Check-in Tool
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+            border = BorderStroke(1.dp, Color(0xFF3F51B5).copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🍽️ The HALT Check-in Tool",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF3F51B5)
+                )
+                Text(
+                    text = "Transitioning back can feel overwhelming. Pause and check if physical/emotional fatigue is masking itself as a spiritual relapse.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    listOf(
+                        "🍕 Hungry" to { haltHungry = !haltHungry; haltHungry },
+                        "😡 Angry" to { haltAngry = !haltAngry; haltAngry },
+                        "👥 Lonely" to { haltLonely = !haltLonely; haltLonely },
+                        "😴 Tired" to { haltTired = !haltTired; haltTired }
+                    ).forEach { (label, toggle) ->
+                        val isChecked = when (label.substring(3)) {
+                            "Hungry" -> haltHungry
+                            "Angry" -> haltAngry
+                            "Lonely" -> haltLonely
+                            "Tired" -> haltTired
+                            else -> false
+                        }
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = if (isChecked) Color(0xFF3F51B5) else Color(0xFFE8EAF6),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .clickable { toggle() }
+                                .padding(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            Text(
+                                text = label,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = if (isChecked) Color.White else Color(0xFF3F51B5),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+
+                if (haltHungry || haltAngry || haltLonely || haltTired) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8EAF6)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            if (haltHungry) {
+                                Text("• Pizza/Food fuel: Go grab a healthy meal! God designed our bodies to require physical strength before our minds can rest.", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
+                            }
+                            if (haltAngry) {
+                                Text("• Calm the storm: Take a deep breath and pray. Invite Jesus to align your spirit before reacting to any trigger.", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
+                            }
+                            if (haltLonely) {
+                                Text("• Reach out: Text a mentor or Battle Buddy right now. Isolation is where old habits thrive; stay connected.", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
+                            }
+                            if (haltTired) {
+                                Text("• Safe Rest: It is time for proper sleep. Remember, Elijah was utterly exhausted when God fed him and let him sleep before speaking.", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 2. Boundaries Bullseye Tool
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+            border = BorderStroke(1.dp, Color(0xFF3F51B5).copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "🎯 The Boundaries Bullseye",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF3F51B5)
+                )
+                Text(
+                    text = "Sort your relationships into three concentric circles to safely build trust and avoid slipping back into old environments.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    listOf("🟢 Center (Inner)", "🟡 Middle Circle", "🔴 Outer Circle").forEachIndexed { index, ringName ->
+                        Box(modifier = Modifier.weight(1f)) {
+                            Button(
+                                onClick = { selectedBullseyeRing = index },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selectedBullseyeRing == index) Color(0xFF3F51B5) else Color(0xFFE8EAF6),
+                                    contentColor = if (selectedBullseyeRing == index) Color.White else Color(0xFF3F51B5)
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp)
+                            ) {
+                                Text(ringName, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        when (selectedBullseyeRing) {
+                            0 -> {
+                                Text("🟢 CENTER (Inner Circle) - Full Trust", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                Text("This is reserved exclusively for safe, faith-filled, positive influences (Christian mentors, pastors, healthy family, sponsors). They actively hold you accountable and build up your faith.", style = MaterialTheme.typography.bodySmall)
+                            }
+                            1 -> {
+                                Text("🟡 MIDDLE CIRCLE - Necessary Connections", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color(0xFFF57F17))
+                                Text("This is for standard daily contacts (probation officers, work colleagues, neighbors). These are polite, structured relationships built on respect and necessary tasks, but not deep spiritual vulnerability.", style = MaterialTheme.typography.bodySmall)
+                            }
+                            2 -> {
+                                Text("🔴 OUTER CIRCLE - Guarded Distance", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color(0xFFC62828))
+                                Text("This is for old friends, acquaintances, or loved ones who are still actively engaged in toxic behaviors. You love them, pray for them, but only engage from a distance in safe public settings. Never enter vulnerable spaces with them.", style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. Take Every Thought Captive Filter (CBT)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+            border = BorderStroke(1.dp, Color(0xFF3F51B5).copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "💭 \"Take Every Thought Captive\" Filter",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF3F51B5)
+                )
+                Text(
+                    text = "Aligning 2 Corinthians 10:5 with practical thought-reframing. When a limiting lie enters your mind (e.g. \"I'm ruined, I'll end up back inside\"), run it through the 3 C's.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                OutlinedTextField(
+                    value = thoughtInput,
+                    onValueChange = { thoughtInput = it; isThoughtProcessed = false },
+                    label = { Text("Enter a negative or limiting lie you are feeling...", style = MaterialTheme.typography.bodySmall) },
+                    modifier = Modifier.fillMaxWidth().testTag("reentry_thought_captive_input"),
+                    textStyle = MaterialTheme.typography.bodySmall,
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Button(
+                    onClick = { if (thoughtInput.isNotBlank()) isThoughtProcessed = true },
+                    modifier = Modifier.fillMaxWidth().testTag("reentry_process_thought_button"),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5)),
+                    shape = RoundedCornerShape(12.dp),
+                    enabled = thoughtInput.isNotBlank()
+                ) {
+                    Text("Apply 3 C's Filter 🛡️", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+
+                AnimatedVisibility(visible = isThoughtProcessed) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF9C4)), // Yellow alert-style card
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.padding(top = 8.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Text("🛡️ THE 3 C's FILTER IN ACTION:", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = Color(0xFFF57F17))
+                            
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Text("✊ 1. CATCH: Caught negative lie: \"$thoughtInput\"", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
+                                Text("🔍 2. CHECK: Ask yourself: 'Is this true based on God's Word, or is it my past talking?' Romans 8:1 says there is zero condemnation in Christ.", style = MaterialTheme.typography.bodySmall)
+                                Text("🔄 3. CHANGE: Replace it with Scripture! Confess: 'I am a brand new creation in Christ Jesus (2 Corinthians 5:17). The old has gone, the new has come!'", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // 4. Next 24 Hours Plan
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+            border = BorderStroke(1.dp, Color(0xFF3F51B5).copy(alpha = 0.2f))
+        ) {
+            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    text = "📅 The \"Next 24 Hours\" Planner",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF3F51B5)
+                )
+                Text(
+                    text = "Anxiety about finding a job, building credit, or long-term plans can cause panic. Shrink your world down to secured daily victories.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    goalsList.forEach { goal ->
+                        val isChecked = checkedGoals.contains(goal)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    checkedGoals = if (isChecked) checkedGoals - goal else checkedGoals + goal
+                                }
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (isChecked) Icons.Default.CheckCircle else Icons.Default.Info,
+                                contentDescription = null,
+                                tint = if (isChecked) Color(0xFF2E7D32) else Color(0xFF3F51B5),
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = goal,
+                                style = MaterialTheme.typography.bodySmall,
+                                textDecoration = if (isChecked) androidx.compose.ui.text.style.TextDecoration.LineThrough else null,
+                                color = if (isChecked) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    }
+                }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedTextField(
+                        value = customGoalInput,
+                        onValueChange = { customGoalInput = it },
+                        label = { Text("Add custom 24-hour goal...", style = MaterialTheme.typography.labelSmall) },
+                        modifier = Modifier.weight(1f).testTag("reentry_custom_goal_input"),
+                        textStyle = MaterialTheme.typography.bodySmall,
+                        shape = RoundedCornerShape(8.dp),
+                        singleLine = true
+                    )
+                    Button(
+                        onClick = {
+                            if (customGoalInput.isNotBlank()) {
+                                goalsList = goalsList + customGoalInput.trim()
+                                customGoalInput = ""
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5)),
+                        shape = RoundedCornerShape(8.dp),
+                        enabled = customGoalInput.isNotBlank(),
+                        contentPadding = PaddingValues(horizontal = 12.dp)
+                    ) {
+                        Text("Add", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReentryDailyFeedReminders() {
+    val feedItems = listOf(
+        "🍽️ OVERWHELMED? Check your HALT levels. Are you Hungry, Angry, Lonely, or Tired? Address those basic needs first before reacting to any triggers!",
+        "🎯 TRUST PROTOCOL: Remember the Boundaries Bullseye. Protect your walk by keeping safe, faith-filled mentors in your center circle. Engage outer circles from a distance.",
+        "💭 THOUGHT TRANSFORMATION: Caught a negative lie like 'I'm a failure'? Run it through the 3 C's Filter: Catch the lie, Check it against the Word, and Change it with Scripture!",
+        "📅 MANAGING ANXIETY: Don't try to win the next five years today. Shrink your world to the next 24 hours. Focus on your Micro-Missions and secure a daily victory!"
+    )
+    var currentIndex by remember { mutableStateOf(0) }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8EAF6)),
+        border = BorderStroke(1.dp, Color(0xFF3F51B5).copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Icon(imageVector = Icons.Default.Info, contentDescription = null, tint = Color(0xFF3F51B5), modifier = Modifier.size(18.dp))
+                    Text(
+                        text = "📢 DAILY RESTORATION FEED",
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, letterSpacing = 1.sp),
+                        color = Color(0xFF3F51B5)
+                    )
+                }
+                Text(
+                    text = "${currentIndex + 1}/${feedItems.size}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFF3F51B5)
+                )
+            }
+            
+            Text(
+                text = feedItems[currentIndex],
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(vertical = 4.dp),
+                lineHeight = 18.sp
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(
+                    onClick = { currentIndex = if (currentIndex > 0) currentIndex - 1 else feedItems.size - 1 },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF3F51B5))
+                ) {
+                    Text("Previous", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                TextButton(
+                    onClick = { currentIndex = if (currentIndex < feedItems.size - 1) currentIndex + 1 else 0 },
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFF3F51B5))
+                ) {
+                    Text("Next Reminder", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReentrySupportResourcesOnlyCard() {
+    val context = LocalContext.current
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF3F51B5).copy(alpha = 0.08f)),
+        border = BorderStroke(1.dp, Color(0xFF3F51B5).copy(alpha = 0.4f))
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Looking for Re-Entry Assistance?",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF3F51B5)
+            )
+            Button(
+                onClick = {
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse("https://www.reentry.org"))
+                    try {
+                        context.startActivity(intent)
+                    } catch (_: Exception) {}
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().testTag("reentry_support_resources_button")
+            ) {
+                Icon(imageVector = Icons.Default.Share, contentDescription = null, tint = Color.White)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Re-Entry Support and Transition Freedom resources click here", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }

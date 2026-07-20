@@ -5,11 +5,12 @@ import { academyLessons } from '../../lib/data'
 import {
   Target, Star, BookOpen, ChevronDown, ChevronUp, Check,
   Wind, MapPin, Phone, ExternalLink, MessageCircle, RefreshCw, Download,
-  X, Search, ArrowRight, Medal, Heart, Globe
+  X, Search, ArrowRight, Medal, Heart, Globe, Brain
 } from 'lucide-react'
 import type { FocusPath, VerseOfTheDay, AcademyLesson } from '../../lib/types'
 import VeteransTab from './VeteransTab'
 import ReentryTab from './ReentryTab'
+import MentalHealthSupport from './MentalHealthSupport'
 import { TrustedVoicesLibrary } from './InspirationTab'
 
 interface FreedomTabProps {
@@ -17,20 +18,22 @@ interface FreedomTabProps {
 }
 
 export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
-  const { userPath, freedomGoal, setFreedomGoal, verseOfTheDay, setVerseOfTheDay } = useAppStore()
+  const { userPath, freedomGoal, freedomGoals, setFreedomGoal, verseOfTheDay, setVerseOfTheDay } = useAppStore()
   const [showSettings, setShowSettings] = useState(false)
   const [showAcademy, setShowAcademy] = useState(false)
   const [isLoadingVerse, setIsLoadingVerse] = useState(false)
   const [selectedLesson, setSelectedLesson] = useState<AcademyLesson | null>(null)
 
   const path = userPath || 'SUBSTANCE_RECOVERY'
+  const pathGoal = freedomGoals[path] || (path === 'SUBSTANCE_RECOVERY' ? freedomGoal : null)
 
   const defaultDeclaration = {
     SUBSTANCE_RECOVERY: 'An OverComer has submitted their life wholly to Christ and no longer fights FOR victory over addiction — rather FROM a position of victory. I AM Loved By God. I AM NOT Who Others Say I Am. I AM NOT Who I Used To Be. I AM Who God Says I Am.',
     MENTAL_HEALTH: 'My mind belongs to Christ. God has not given me a spirit of fear, but of power, love, and a sound mind. I cast every anxious thought on Him, for He cares for me. I AM NOT Who I Used To Be — I AM a New Creation.',
     TOUGH_DAY: 'This day does not define me. Greater is He that is in me than he that is in the world. I choose to seek God first today. His grace is sufficient for me.',
     TESTIMONY_VICTORY: 'I am more than a conqueror through Christ who loves me! They overcame him by the blood of the Lamb and by the word of their testimony. My story is not over — God is still writing it!',
-    VETERAN_TRANSITION: 'I served with honor and I carry that honor still. My battles do not define me — my Creator does. The Lord is my strength and my shield. He has not given me a spirit of fear, but of power, love, and a sound mind. I am still being shaped by the God who knew me before I put on the uniform.'
+    VETERAN_TRANSITION: 'I am commissioned by King Jesus. He is my shield, my deliverer, and my secure fortress in every battle.',
+    REENTRY_RESTORATION: 'My past is nailed to the cross, and I am a new creation in Christ. God has a future and a hope for me to lead and thrive in society.'
   }
 
   const refreshVerse = useCallback(async () => {
@@ -49,8 +52,8 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
     if (!verseOfTheDay) void refreshVerse()
   }, [refreshVerse, verseOfTheDay])
 
-  const daysCount = freedomGoal?.startDate
-    ? Math.floor((Date.now() - freedomGoal.startDate) / (1000 * 60 * 60 * 24))
+  const daysCount = pathGoal?.startDate
+    ? Math.floor((Date.now() - pathGoal.startDate) / (1000 * 60 * 60 * 24))
     : 0
 
   return (
@@ -62,17 +65,19 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
         onRefresh={refreshVerse}
       />
 
+      <PathEncouragement path={path} />
+
       {/* Freedom Day Counter */}
       <FreedomCounterCard
         daysCount={daysCount}
-        struggleType={freedomGoal?.struggleType || getDefaultStruggle(path)}
+        struggleType={pathGoal?.struggleType || getDefaultStruggle(path)}
         path={path}
         onSettingsClick={() => setShowSettings(true)}
       />
 
       {/* Personal Declaration / Creed */}
       <DeclarationCard
-        declaration={freedomGoal?.customDeclaration || defaultDeclaration[path]}
+        declaration={pathGoal?.customDeclaration || defaultDeclaration[path]}
         path={path}
       />
 
@@ -90,20 +95,27 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
         />
       )}
 
+      {path === 'MENTAL_HEALTH' && (
+        <EmbeddedSupportSection title="Vetted Biblical Clinical Counseling" icon={<Brain className="w-5 h-5" />}>
+          <MentalHealthSupport />
+        </EmbeddedSupportSection>
+      )}
+
       {path === 'VETERAN_TRANSITION' && (
-        <EmbeddedSupportSection title="Veteran Transition & Freedom" icon={<Medal className="w-5 h-5" />}>
+        <EmbeddedSupportSection title="The Next Mission: Veteran Support & Wellness" icon={<Medal className="w-5 h-5" />}>
           <div className="p-4 pb-0"><VeteranCrisisBanner /></div>
           <VeteransTab />
         </EmbeddedSupportSection>
       )}
 
+      {path === 'REENTRY_RESTORATION' && (
+        <EmbeddedSupportSection title="Steps to Restoration & Freedom" icon={<RefreshCw className="w-5 h-5" />}>
+          <ReentryTab />
+        </EmbeddedSupportSection>
+      )}
+
       {/* Support & Church Locator */}
       <SupportLocatorCard />
-
-      {/* Post-incarceration support is available to every focus path in Android. */}
-      <EmbeddedSupportSection title="Post-Incarceration Support" icon={<Heart className="w-5 h-5" />}>
-        <ReentryTab />
-      </EmbeddedSupportSection>
 
       {/* Vetted biblical resource library */}
       <div className="bg-white rounded-3xl border border-[#CAC4D0]/60 p-4 shadow-sm">
@@ -113,13 +125,17 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
       {/* The Faith Connection */}
       <FaithConnectionCard />
 
-      <GroundingSkillsLibrary />
+      {path !== 'TESTIMONY_VICTORY' && (
+        <>
+          <GroundingSkillsLibrary />
 
-      {/* Calming Breathing Support */}
-      <BreathingCard />
+          {/* Calming Breathing Support */}
+          <BreathingCard />
 
-      {/* SOS Support Network */}
-      <SOSNetworkCard />
+          {/* SOS Support Network */}
+          <SOSNetworkCard />
+        </>
+      )}
 
       {/* Open Companion Button */}
       <button
@@ -134,9 +150,9 @@ export default function FreedomTab({ onNavigateToCompanion }: FreedomTabProps) {
       {showSettings && (
         <SettingsModal
           path={path}
-          startDate={freedomGoal?.startDate || Date.now() - (3 * 24 * 60 * 60 * 1000)}
-          struggleType={freedomGoal?.struggleType || getDefaultStruggle(path)}
-          declaration={freedomGoal?.customDeclaration || defaultDeclaration[path]}
+          startDate={pathGoal?.startDate || Date.now() - (3 * 24 * 60 * 60 * 1000)}
+          struggleType={pathGoal?.struggleType || getDefaultStruggle(path)}
+          declaration={pathGoal?.customDeclaration || defaultDeclaration[path]}
           onSave={(startDate, struggleType, declaration) => {
             setFreedomGoal({ startDate, struggleType, customDeclaration: declaration })
             setShowSettings(false)
@@ -161,9 +177,27 @@ function getDefaultStruggle(path: FocusPath): string {
     case 'MENTAL_HEALTH': return 'Anxiety & Depression'
     case 'TESTIMONY_VICTORY': return 'Victorious Breakthrough'
     case 'TOUGH_DAY': return 'Daily Stress'
-    case 'VETERAN_TRANSITION': return 'Military Transition & PTSD'
+    case 'VETERAN_TRANSITION': return 'Veteran Transition & PTSD'
+    case 'REENTRY_RESTORATION': return 'Re-entry Reintegration'
     default: return 'Substance Use'
   }
+}
+
+function PathEncouragement({ path }: { path: FocusPath }) {
+  const encouragement: Record<FocusPath, string> = {
+    SUBSTANCE_RECOVERY: 'Remember: You are not defined by your struggle, but by His grace. You are a new creation in Christ. Renew your mind, breathe deeply, and walk in absolute victory today.',
+    MENTAL_HEALTH: 'Remember: You are loved, cherished, and chosen by God. Rest in His peace and walk in emotional strength today.',
+    TOUGH_DAY: 'Today might feel like an all-around tough day, but God is your present help in times of trouble. Let His supernatural grace carry your load today.',
+    VETERAN_TRANSITION: 'Remember: Your identity is anchored in Jesus Christ, who has won the ultimate battle for you. It is alright to ask for help—God is your shield, your fortress, and your deliverer.',
+    REENTRY_RESTORATION: 'Remember: Your past is completely forgiven and forgotten by God. Christ has broken every chain of the past and has chosen you to lead with honor and integrity. Walk in His restoration today.',
+    TESTIMONY_VICTORY: 'Today is a Testimony and Victory Day! Praise God for His absolute faithfulness, rejoice in His mercy, and walk in the fullness of His triumph today.'
+  }
+
+  return (
+    <div className="rounded-2xl border border-primary-100 bg-primary-50 px-4 py-3">
+      <p className="text-sm leading-relaxed font-semibold text-primary-800">{encouragement[path]}</p>
+    </div>
+  )
 }
 
 function VerseCard({
@@ -225,7 +259,8 @@ function FreedomCounterCard({
     MENTAL_HEALTH: 'Days of Peace',
     TOUGH_DAY: 'Days of Strength',
     TESTIMONY_VICTORY: 'Days of Victory',
-    VETERAN_TRANSITION: 'Days of Healing'
+    VETERAN_TRANSITION: 'Days since taking off the uniform & entering civilian strength',
+    REENTRY_RESTORATION: 'Days since my release & step into restoration'
   }
 
   return (
@@ -263,7 +298,8 @@ function DeclarationCard({
     MENTAL_HEALTH: 'My Mental Peace Covenant',
     TOUGH_DAY: "Today's Declaration",
     TESTIMONY_VICTORY: 'My Victory Declaration',
-    VETERAN_TRANSITION: "My Warrior's Covenant"
+    VETERAN_TRANSITION: "My Warrior's Covenant",
+    REENTRY_RESTORATION: 'My Restoration Declaration'
   }
 
   return (

@@ -1,11 +1,12 @@
 # OverComer Web App
 
-This responsive web/PWA build mirrors the Android `OverComer-main` source at GitHub commit `c5e998ddc6faaa12d94d90d3a23cc0bf6540ab09` as closely as browser APIs allow.
+This responsive web/PWA build mirrors the Android `OverComer-main` source at GitHub commit `b3221bef200edde884d8fe0de3d30108f50bd035` as closely as browser APIs allow.
 
 ## Included experience
 
-- Android-matched welcome screen, five-tab navigation, focus paths, colors, and mobile spacing
-- Freedom counter, declarations, Bible affirmations, OverComer lessons, support locator, veteran transition, re-entry, vetted resources, and The Faith Connection
+- Android-matched welcome screen, five-tab navigation, six focus paths, colors, and mobile spacing
+- Freedom counter, declarations, Bible affirmations, OverComer lessons, support locator, The Next Mission veteran support, Steps to Restoration re-entry support, vetted resources, and The Faith Connection
+- Interactive veteran A.A.R., Stand Firm drill, Buddy Check, daily bulletin, Restoration HALT check-in, Boundaries Bullseye, 3 C's thought filter, and next-24-hours planner
 - Testimony & Victory Board and tracker logs
 - Four-digit-PIN private journal with AES-GCM encryption on the user's device
 - AI-assisted Thought Renewal analysis
@@ -45,3 +46,7 @@ VITE_SUPABASE_ANON_KEY=
 ```
 
 Gemini keys are entered by individual users in the app and stored locally in their browser.
+
+## Bolt import
+
+Upload the ZIP that contains this project to Bolt, or replace the files in the existing Bolt project. Then run `npm install` and `npm run dev`. Do not upload Android signing keys (`.jks` or `.keystore` files).

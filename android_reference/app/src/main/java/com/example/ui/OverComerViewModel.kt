@@ -525,6 +525,14 @@ class OverComerViewModel(application: Application) : AndroidViewModel(applicatio
                 "I am so sorry you are having an all-around tough day. I am here to listen, pray with you, and help lift your load.\n\n" +
                 "Tell me what happened today, or vent freely. We can do direct calming breathing exercises or find encouraging scriptures to help you get through today."
             }
+            "VETERAN_TRANSITION" -> {
+                "Welcome to The Next Mission: Veteran Support & Wellness. I am your guide here. I honor your service and sacrifice, and believe that through Christ's grace, you can walk in civilian strength and perfect emotional peace.\n\n" +
+                "If you are processing combat weight, coping with hypervigilance, experiencing PTSD triggers, or struggling with transition, let's talk. We have specialized, faith-based support and tools ready for you."
+            }
+            "REENTRY_RESTORATION" -> {
+                "Welcome to Steps to Restoration: Life and Leadership After Incarceration. I am your guide here. I believe that your past does not dictate your destiny; Christ does, and in Him, you are a brand new creation.\n\n" +
+                "If you are experiencing transition anxiety, struggling with decision fatigue, or rebuilding family boundaries, share it with me. We can walk through thought reframing, find curated resources, or seek comforting scriptures to guide your next steps toward victory."
+            }
             "TESTIMONY_VICTORY" -> {
                 "Glory to God! Today is a Testimony and Victory Day! I am so excited to hear about how the Lord has shown Himself strong on your behalf. As 1 Corinthians 15:57 says: 'But thanks be to God, which giveth us the victory through our Lord Jesus Christ!'\n\n" +
                 "Share your victory story, testimony, or breakthroughs with me today! Whether it is overcoming a temptation, experiencing a mental health lift, or celebrating a major milestone, let's praise Him and converse about how you are walking in perfect freedom!"

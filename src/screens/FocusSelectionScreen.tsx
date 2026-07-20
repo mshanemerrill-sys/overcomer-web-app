@@ -1,5 +1,5 @@
 import { type FocusPath } from '../lib/types'
-import { Cloud, Shield, Heart, Star, ChevronRight, Medal } from 'lucide-react'
+import { Cloud, Shield, Heart, Star, ChevronRight, RefreshCw } from 'lucide-react'
 import { useAppStore } from '../store/useAppStore'
 import { useEffect } from 'react'
 
@@ -78,11 +78,19 @@ export default function FocusSelectionScreen({ onSelect }: FocusSelectionScreenP
           />
 
           <FocusOptionCard
-            title="Veteran Transition & Freedom"
-            description="Sound biblical counsel for PTSD, transition struggles, and civilian reintegration. Includes national, state, and local support resources."
-            icon={<Medal className="w-6 h-6" />}
-            color="bg-green-700"
+            title="The Next Mission: Veteran Support & Wellness"
+            description="You were trained to endure the hardest battles, but you don't have to fight the invisible ones alone. Whether you are navigating the transition to civilian life, processing the weight of your service, or simply having a tough day, find faith-based tools and a community that understands. Seeking support isn't stepping down—it's stepping up. Click here for specialized veteran resources and daily strength."
+            icon={<Star className="w-6 h-6" />}
+            color="bg-[#1B5E20]"
             onClick={() => onSelect('VETERAN_TRANSITION')}
+          />
+
+          <FocusOptionCard
+            title="Steps to Restoration: Life and Leadership After Incarceration"
+            description="Your past does not dictate your destiny; Christ does. Moving forward requires strength, patience, and a strong support network. This space provides daily encouragement, targeted scripture, and a brotherhood of believers who understand the road you are walking. Your story isn't over—it’s just getting started. Click here to discover your value, your worth, and your next steps toward victory."
+            icon={<RefreshCw className="w-6 h-6" />}
+            color="bg-[#3F51B5]"
+            onClick={() => onSelect('REENTRY_RESTORATION')}
           />
 
           <FocusOptionCard

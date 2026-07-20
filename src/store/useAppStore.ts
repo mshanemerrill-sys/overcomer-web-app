@@ -32,6 +32,7 @@ interface AppState {
 
   // Freedom goal
   freedomGoal: FreedomGoal | null
+  freedomGoals: Partial<Record<FocusPath, FreedomGoal>>
   setFreedomGoal: (goal: Omit<FreedomGoal, 'id' | 'userId'>) => void
 
   // Saved chats
@@ -101,6 +102,9 @@ export const useAppStore = create<AppState>()(
         if ((state.userPath as string | null) === 'VETERANS') {
           set({ userPath: 'VETERAN_TRANSITION' })
         }
+        if (state.freedomGoal && !state.freedomGoals?.SUBSTANCE_RECOVERY) {
+          set({ freedomGoals: { ...(state.freedomGoals || {}), SUBSTANCE_RECOVERY: state.freedomGoal } })
+        }
         if (!state.verseOfTheDay) {
           set({ verseOfTheDay: getFallbackVerse() })
         }
@@ -142,13 +146,18 @@ export const useAppStore = create<AppState>()(
 
       // Freedom goal
       freedomGoal: null,
+      freedomGoals: {},
       setFreedomGoal: (goal) => {
+        const path = get().userPath || 'SUBSTANCE_RECOVERY'
         const newGoal: FreedomGoal = {
           ...goal,
           id: `goal_${get().user?.id || 'local'}`,
           userId: get().user?.id || 'local_user',
         }
-        set({ freedomGoal: newGoal })
+        set(state => ({
+          freedomGoal: newGoal,
+          freedomGoals: { ...state.freedomGoals, [path]: newGoal }
+        }))
       },
 
       // Saved chats
@@ -265,6 +274,7 @@ export const useAppStore = create<AppState>()(
         secureJournalPinHash: state.secureJournalPinHash,
         secureJournalEntries: state.secureJournalEntries,
         freedomGoal: state.freedomGoal,
+        freedomGoals: state.freedomGoals,
         savedChats: state.savedChats,
         chatMessages: state.chatMessages,
         verseOfTheDay: state.verseOfTheDay,
@@ -284,7 +294,8 @@ function getPathGreeting(path: FocusPath): ChatMessage {
     SUBSTANCE_RECOVERY: `Welcome to OverComer Support. I am your guide here. I believe that through Christ's grace, you can be set free completely and walk in full victory.\n\nIf you are feeling tempted, struggling with a habit, or feeling anxious, talk to me. We can walk through thought reframing or calming grounding exercises together, anchored in God's mercy.`,
     MENTAL_HEALTH: `Welcome to OverComer Mental Wellness Support. I am your guide here. I believe that through Christ's perfect love, you can experience peace that passeth all understanding.\n\nIf you are struggling with heavy thoughts, anxiety, depression, or distress, share it with me. We can walk through thought reframing or emotional grounding together.`,
     TESTIMONY_VICTORY: `Glory to God! Today is a Testimony and Victory Day! I am so excited to hear about how the Lord has shown Himself strong on your behalf. As 1 Corinthians 15:57 says: "But thanks be to God, which giveth us the victory through our Lord Jesus Christ!"\n\nShare your victory story, testimony, or breakthroughs with me today! Whether it is overcoming a temptation, experiencing a mental health lift, or celebrating a major milestone, let's praise Him and converse about how you are walking in perfect freedom!`,
-    VETERAN_TRANSITION: `Welcome, and thank you for your service. I honor the sacrifice you made — and I want you to know that your mission is not over.\n\nWhether you are processing the weight of what you carried in uniform, navigating the transition to civilian life, or simply having a hard day, I am here — without judgment. You can talk to me about anything.\n\nAs a brother or sister who served, you may have never been told that asking for help is not weakness. Let me say it clearly: it is one of the bravest, most tactically sound things you can do. Psalm 34:18 says, "The Lord is close to the brokenhearted and saves those who are crushed in spirit." He is close to you right now.\n\nWhat is on your heart today? I am listening.`
+    VETERAN_TRANSITION: `Welcome to The Next Mission: Veteran Support & Wellness. I am your guide here. I honor your service and sacrifice, and believe that through Christ's grace, you can walk in civilian strength and perfect emotional peace.\n\nIf you are processing combat weight, coping with hypervigilance, experiencing PTSD triggers, or struggling with transition, let's talk. We have specialized, faith-based support and tools ready for you.`,
+    REENTRY_RESTORATION: `Welcome to Steps to Restoration: Life and Leadership After Incarceration. I am your guide here. I believe that your past does not dictate your destiny; Christ does, and in Him, you are a brand new creation.\n\nIf you are experiencing transition anxiety, struggling with decision fatigue, or rebuilding family boundaries, share it with me. We can walk through thought reframing, find curated resources, or seek comforting scriptures to guide your next steps toward victory.`
   }
 
   return {

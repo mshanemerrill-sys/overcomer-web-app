@@ -28,6 +28,7 @@ export default function MainAppScreen({ onShowAuth, onShowApiSettings }: MainApp
       case 'TOUGH_DAY': return 'Tough Day'
       case 'TESTIMONY_VICTORY': return 'Victory'
       case 'VETERAN_TRANSITION': return 'Veteran'
+      case 'REENTRY_RESTORATION': return 'Restoration'
       default: return 'Select'
     }
   }
