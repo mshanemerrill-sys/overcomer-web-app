@@ -21,7 +21,7 @@ export async function loadCommunityVictories(): Promise<CommunityVictoryPost[]> 
   const { data, error } = await supabase.from('community_victories')
     .select('id,user_id,display_name,message,focus_path,created_at')
     .eq('is_visible', true)
-    .order('created_at', { ascending: false }).limit(100)
+    .order('created_at', { ascending: false }).limit(500)
   if (error) throw new Error('Unable to load community testimonies: ' + message(error))
   return (data ?? []) as CommunityVictoryPost[]
 }
