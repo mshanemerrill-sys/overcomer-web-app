@@ -865,7 +865,8 @@ function EmbeddedSupportSection({ title, icon, children }: {
 }
 
 function TestimonyVictoryBoard({ onNavigateToCompanion }: { onNavigateToCompanion: () => void }) {
-  const legacyPosts = useAppStore(state => state.victoryLogs.filter(log => log.type === 'TESTIMONY' && log.isShared))
+  const victoryLogs = useAppStore(state => state.victoryLogs)
+  const legacyPosts = useMemo(() => victoryLogs.filter(log => log.type === 'TESTIMONY' && log.isShared), [victoryLogs])
   const [migrationPending, setMigrationPending] = useState<string | null>(null)
   const [localPublished, setLocalPublished] = useState<string[]>([])
   const [shared, setShared] = useState<CommunityVictoryPost[]>([])
