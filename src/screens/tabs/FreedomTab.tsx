@@ -865,7 +865,6 @@ function EmbeddedSupportSection({ title, icon, children }: {
 }
 
 function TestimonyVictoryBoard({ onNavigateToCompanion }: { onNavigateToCompanion: () => void }) {
-  const user = useAppStore(state => state.user)
   const legacyPosts = useAppStore(state => state.victoryLogs.filter(log => log.type === 'TESTIMONY' && log.isShared))
   const [migrationPending, setMigrationPending] = useState<string | null>(null)
   const [localPublished, setLocalPublished] = useState<string[]>([])
@@ -933,7 +932,7 @@ function TestimonyVictoryBoard({ onNavigateToCompanion }: { onNavigateToCompanio
               <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{post.message}</p>
               <div className="mt-2 flex items-center justify-between gap-3">
                 <p className="text-xs font-bold text-[#E65100]">{post.display_name || 'An OverComer'} · {new Date(post.created_at).toLocaleString()}</p>
-                {user?.id === post.user_id && <button className="text-xs text-red-700 underline" onClick={() => void remove(post.id)}>Remove</button>}
+                {post.is_own && <button className="text-xs text-red-700 underline" onClick={() => void remove(post.id)}>Remove</button>}
               </div>
             </article>
           ))}

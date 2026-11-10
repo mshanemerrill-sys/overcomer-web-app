@@ -1,54 +1,60 @@
 import { isSupabaseConfigured, supabase } from './supabase'
 
-/** Only explicitly community-shared entries use this table. Personal logs stay local. */
+/** The canonical public-to-members feed is managed by authenticated Supabase RPCs. */
 export type CommunityVictoryPost = {
   id: string
-  user_id: string
   display_name: string
   message: string
   focus_path: string | null
   created_at: string
+  is_own: boolean
 }
-const message = (error: unknown) => error instanceof Error ? error.message : String(error)
+
+const errorText = (error: unknown) =>
+  error instanceof Error ? error.message : String(error)
+
 const ensureConfigured = () => {
-  if (!isSupabaseConfigured) throw new Error('Shared Victory Board is unavailable: cloud configuration is missing.')
+  if (!isSupabaseConfigured) {
+    throw new Error('Community Victory Board is unavailable because cloud configuration is missing.')
+  }
+}
+
+const requireSignedIn = async () => {
+  ensureConfigured()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  if (error || !user) throw new Error('Please sign in to view or share community testimonies.')
+  return user
 }
 
 export async function loadCommunityVictories(): Promise<CommunityVictoryPost[]> {
-  ensureConfigured()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) throw new Error('Sign in to see the Community Victory Board.')
-  const { data, error } = await supabase.from('community_victories')
-    .select('id,user_id,display_name,message,focus_path,created_at')
-    .eq('is_visible', true)
-    .order('created_at', { ascending: false }).limit(500)
-  if (error) throw new Error('Unable to load community testimonies: ' + message(error))
+  await requireSignedIn()
+  const { data, error } = await supabase.rpc('get_community_victory_feed', { p_limit: 100 })
+  if (error) throw new Error('Unable to load shared testimonies: ' + errorText(error))
   return (data ?? []) as CommunityVictoryPost[]
 }
 
-export async function publishCommunityVictory(content: string, focusPath: string | null): Promise<CommunityVictoryPost> {
-  ensureConfigured()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) throw new Error('Sign in to share a testimony with the community.')
+export async function publishCommunityVictory(content: string, focusPath: string | null): Promise<string> {
+  await requireSignedIn()
   const trimmed = content.trim()
-  if (!trimmed || trimmed.length > 10000) throw new Error('Please enter a testimony of up to 10,000 characters.')
-  const displayName = String(user.user_metadata?.display_name || 'OverComer').slice(0, 60)
-  const { data, error } = await supabase.from('community_victories').insert({
-    user_id: user.id,
-    display_name: displayName,
-    message: trimmed,
-    focus_path: focusPath,
-    is_visible: true,
-  }).select('id,user_id,display_name,message,focus_path,created_at').single()
-  if (error) throw new Error('Community sharing failed: ' + message(error))
-  return data as CommunityVictoryPost
+  if (!trimmed || trimmed.length > 1000) {
+    throw new Error('Please enter a testimony of 1 to 1,000 characters.')
+  }
+  // The existing server function verifies the author and does not rely on
+  // a user-controlled user_id. Personal journal entries are never uploaded.
+  const { data, error } = await supabase.rpc('publish_community_victory', {
+    p_message: trimmed,
+    p_focus_path: focusPath,
+    p_source_victory_id: null,
+    p_display_name: null,
+  })
+  if (error) throw new Error('Community sharing failed: ' + errorText(error))
+  if (typeof data !== 'string' || !data) throw new Error('The server did not confirm publication.')
+  return data
 }
 
 export async function hideOwnCommunityVictory(id: string): Promise<void> {
-  ensureConfigured()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Sign in to remove your community testimony.')
-  const { error } = await supabase.from('community_victories').delete()
-    .eq('id', id).eq('user_id', user.id)
-  if (error) throw new Error('Could not remove your testimony: ' + message(error))
+  await requireSignedIn()
+  const { data, error } = await supabase.rpc('remove_community_victory', { p_id: id })
+  if (error) throw new Error('Could not remove the testimony: ' + errorText(error))
+  if (data !== true) throw new Error('This testimony was not removed. Only its author can remove it.')
 }
