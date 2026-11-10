@@ -28,7 +28,7 @@ const requireSignedIn = async () => {
 
 export async function loadCommunityVictories(): Promise<CommunityVictoryPost[]> {
   await requireSignedIn()
-  const { data, error } = await supabase.rpc('get_community_victory_feed', { p_limit: 100 })
+  const { data, error } = await supabase.rpc('get_community_victory_feed', { p_limit: 500 })
   if (error) throw new Error('Unable to load shared testimonies: ' + errorText(error))
   return (data ?? []) as CommunityVictoryPost[]
 }
