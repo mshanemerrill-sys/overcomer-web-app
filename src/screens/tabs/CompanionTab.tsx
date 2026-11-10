@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../../store/useAppStore'
-import { generateSupportResponse, checkDailyLimit, getTodayUsageCount, isCustomKeyActive } from '../../lib/geminiClient'
+import { generateSupportResponse, checkDailyLimit, isCustomKeyActive } from '../../lib/geminiClient'
 import {
   Send, Save, Trash2, History, Loader as Loader2, Key, ExternalLink,
   ChevronDown, ChevronUp, Mic, Volume2, X, Radio, MessageCircle
@@ -119,7 +119,6 @@ export default function CompanionTab() {
   }
 
   const dailyLimitReached = checkDailyLimit()
-  const dailyCount = getTodayUsageCount()
   const customKeyActive = isCustomKeyActive()
 
   return (
@@ -131,8 +130,8 @@ export default function CompanionTab() {
             <h2 className="font-bold text-gray-900">OverComer's Companion</h2>
             <p className="text-xs text-gray-500">
               {customKeyActive
-                ? 'Unlimited AI Support'
-                : `${30 - dailyCount}/30 requests today`
+                ? 'Google AI via your key (Google quotas apply)'
+                : 'Free built-in Companion • No API key required'
               }
             </p>
           </div>
@@ -332,7 +331,7 @@ interface SpeechRecognitionLike {
 type SpeechRecognitionConstructor = new () => SpeechRecognitionLike
 
 function LiveVoiceSessionDialog({ onClose }: { onClose: () => void }) {
-  const { chatMessages, addChatMessage, userPath, customApiKey } = useAppStore()
+  const { chatMessages, addChatMessage, userPath } = useAppStore()
   const [state, setState] = useState<VoiceState>('READY')
   const [transcript, setTranscript] = useState('')
   const [spokenResponse, setSpokenResponse] = useState('Tap the microphone and speak freely.')
@@ -383,7 +382,7 @@ function LiveVoiceSessionDialog({ onClose }: { onClose: () => void }) {
     try {
       const response = await generateSupportResponse(text, chatMessages, userPath || 'SUBSTANCE_RECOVERY')
       if (response === 'NO_API_KEY_SETUP') {
-        setError('Add your Gemini API key before starting a live Companion session.')
+        setError('Optional AI requires your own Google API key. You can still use the free built-in voice Companion.')
         setState('READY')
         return
       }
@@ -398,10 +397,6 @@ function LiveVoiceSessionDialog({ onClose }: { onClose: () => void }) {
 
   const listen = () => {
     setError('')
-    if (!customApiKey?.trim()) {
-      setError('Add your Gemini API key before starting a live Companion session.')
-      return
-    }
     if (state === 'SPEAKING') {
       window.speechSynthesis.cancel()
       setState('READY')
@@ -439,7 +434,7 @@ function LiveVoiceSessionDialog({ onClose }: { onClose: () => void }) {
       <div className="w-full max-w-lg max-h-[94vh] overflow-y-auto rounded-3xl bg-[#211F26] border border-white/10 shadow-2xl p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-bold tracking-[0.18em] text-primary-200">GEMINI LIVE SESSION</p>
+            <p className="text-xs font-bold tracking-[0.18em] text-primary-200">FREE COMPANION VOICE SESSION</p>
             <h3 className="text-xl font-extrabold mt-1">OverComer’s Companion</h3>
           </div>
           <button onClick={onClose} className="p-2 rounded-full bg-white/10 hover:bg-white/20"><X className="w-5 h-5" /></button>
@@ -514,7 +509,7 @@ function ApiKeySetupCard({
         <div>
           <h3 className="font-bold text-gray-900 text-sm">Unlock Your Free AI Companion</h3>
           <p className="text-xs text-gray-600 mt-0.5">
-            A free Google Gemini API key is required. No credit card. Takes 2 minutes.
+            The built-in Companion is always free. Add your own Google API key for optional AI replies; free-tier limits and Google's billing terms apply.
           </p>
         </div>
       </div>
@@ -577,7 +572,7 @@ function ApiKeyInlinePrompt({ onOpenDialog }: { onOpenDialog: () => void }) {
     <div className="flex justify-start">
       <div className="max-w-[85%] bg-white shadow-md border border-primary-100 rounded-2xl rounded-bl-md px-4 py-3">
         <p className="text-sm text-gray-800 leading-relaxed">
-          To respond, I need a free Google Gemini API key configured on your device. It takes about 2 minutes and is completely free.
+          You can continue using the free built-in Companion without a key. Optionally add your own Google API key for AI-generated replies.
         </p>
         <button
           onClick={onOpenDialog}
