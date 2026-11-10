@@ -4,6 +4,7 @@ import {
   Loader2, Lock, LockOpen, Plus, ShieldCheck, Trash2, X
 } from 'lucide-react'
 import { useAppStore } from '../../store/useAppStore'
+import { publishCommunityVictory } from '../../lib/communityVictories'
 import { analyzeCognitiveDistortion } from '../../lib/geminiClient'
 import type {
   DistortionAnalysis, FocusPath, SecureJournalEntry, SecureJournalPayload, VictoryLog
@@ -67,6 +68,7 @@ function VictoryTracker() {
   const { victoryLogs, addVictoryLog, deleteVictoryLog, userPath } = useAppStore()
   const [filterType, setFilterType] = useState<'ALL' | LogType>('ALL')
   const [showAddModal, setShowAddModal] = useState(false)
+  const [shareStatus, setShareStatus] = useState('')
 
   const filtered = filterType === 'ALL'
     ? victoryLogs
@@ -74,6 +76,7 @@ function VictoryTracker() {
 
   return (
     <div className="relative p-4 space-y-4">
+      {shareStatus && <div role="status" className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">{shareStatus}</div>}
       <div className="flex gap-2 overflow-x-auto pb-1">
         {([
           ['ALL', 'All'], ['REFLECT', 'Reflections'], ['TRIGGER', 'Triggers'],
@@ -121,8 +124,18 @@ function VictoryTracker() {
         <AddLogModal
           userPath={userPath || 'SUBSTANCE_RECOVERY'}
           onClose={() => setShowAddModal(false)}
-          onAdd={log => {
-            addVictoryLog(log)
+          onAdd={async log => {
+            let shared = false
+            if (log.type === 'TESTIMONY' && log.isShared) {
+              try {
+                await publishCommunityVictory(log.notes, log.userPath)
+                shared = true
+                setShareStatus('Your testimony was published to the Community Victory Board for signed-in OverComer members.')
+              } catch (error) {
+                setShareStatus('The Community Victory Board could not publish your entry. It was saved privately on this device only. ' + (error instanceof Error ? error.message : 'Please try again.'))
+              }
+            } else setShareStatus('Saved privately. Your entry is not visible to the community.')
+            addVictoryLog({ ...log, isShared: shared })
             setShowAddModal(false)
           }}
         />
@@ -430,7 +443,7 @@ function AnalysisCard({ analysis, compact = false }: { analysis: DistortionAnaly
 
 function AddLogModal({ onClose, onAdd, userPath }: {
   onClose: () => void
-  onAdd: (log: Omit<VictoryLog, 'id' | 'timestamp' | 'userId'>) => void
+  onAdd: (log: Omit<VictoryLog, 'id' | 'timestamp' | 'userId'>) => Promise<void>
   userPath: FocusPath
 }) {
   const [type, setType] = useState<LogType>('REFLECT')
@@ -439,10 +452,10 @@ function AddLogModal({ onClose, onAdd, userPath }: {
   const [automaticThought, setAutomaticThought] = useState('')
   const [reframedTruth, setReframedTruth] = useState('')
   const [scriptureReference, setScriptureReference] = useState('')
-  const [share, setShare] = useState(type === 'TESTIMONY')
+  const [share, setShare] = useState(false)
   const user = useAppStore(state => state.user)
 
-  useEffect(() => setShare(type === 'TESTIMONY'), [type])
+  useEffect(() => setShare(false), [type])
 
   const options: Array<{ type: LogType; label: string; icon: React.ReactNode }> = [
     { type: 'REFLECT', label: 'Reflection', icon: <Heart className="w-4 h-4" /> },
@@ -482,7 +495,7 @@ function AddLogModal({ onClose, onAdd, userPath }: {
           {type === 'TESTIMONY' && (
             <label className="flex items-start gap-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
               <input type="checkbox" checked={share} onChange={event => setShare(event.target.checked)} className="mt-1" />
-              <span><strong>Add to Testimony & Victory Board</strong><br /><span className="text-xs">This board is stored on this device unless cloud sync is configured.</span></span>
+              <span><strong>Add to Testimony & Victory Board</strong><br /><span className="text-xs">Only check this if you want this testimony posted to the shared Community Victory Board. Private notes remain on this device.</span></span>
             </label>
           )}
         </div>

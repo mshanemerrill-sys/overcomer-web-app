@@ -1,7 +1,8 @@
 import type { ChatMessage, VerseOfTheDay, ScriptureResult, DistortionAnalysis, LocalResource, FocusPath } from './types'
+import { freeCompanionResponse } from './freeCompanion'
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models'
-const DEFAULT_MODEL = 'gemini-2.0-flash'
+const DEFAULT_MODEL = 'gemini-3.8-flash'
 
 const MAX_RETRIES = 4
 const INITIAL_BACKOFF_MS = 1500
@@ -304,10 +305,10 @@ async function callGemini(
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
     const response = await fetch(
-      `${GEMINI_API_BASE}/${model}:generateContent?key=${apiKey}`,
+      `${GEMINI_API_BASE}/${model}:generateContent`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
         body: JSON.stringify(request),
       }
     )
@@ -369,8 +370,8 @@ async function safeCallGemini(
   // Try primary model, then fallbacks. Rate limits and quota errors fall
   // through to the next model (a different model may have available quota).
   const models = model === DEFAULT_MODEL
-    ? [DEFAULT_MODEL, 'gemini-1.5-flash', 'gemini-1.5-flash-8b']
-    : [model, DEFAULT_MODEL, 'gemini-1.5-flash']
+    ? [DEFAULT_MODEL, 'gemini-3.6-flash']
+    : [model, DEFAULT_MODEL, 'gemini-3.6-flash']
 
   let lastErr: Error = new Error('UNKNOWN')
 
@@ -398,9 +399,8 @@ export async function generateSupportResponse(
   path: FocusPath,
   pastChatsSummary?: string
 ): Promise<string> {
-  if (checkDailyLimit()) {
-    return `You have reached your daily free usage limit of 30 responses/day on the shared fallback key.\n\nTo get unlimited replies instantly, tap the Key icon at the top of the screen to enter your own completely FREE Gemini API key from Google AI Studio. It takes under a minute, requires no credit card, and ensures you have a private, dedicated channel!`
-  }
+  // Without a personal Google key, respond entirely on-device without a paid or shared API call.
+  if (!getApiKey()) return freeCompanionResponse(message)
 
   // Filter out special marker messages and strip leading model-role messages.
   // Gemini requires the contents array to start with a 'user' role message —
@@ -434,10 +434,7 @@ export async function generateSupportResponse(
     systemInstruction: {
       parts: [{ text: systemInstructionWithPast }]
     },
-    generationConfig: {
-      temperature: 0.7,
-      topP: 0.95
-    }
+    generationConfig: { thinkingConfig: { thinkingLevel: 'low' } }
   }
 
   try {
@@ -462,10 +459,10 @@ export async function generateSupportResponse(
 export async function testApiConnection(key: string): Promise<{ ok: boolean; rateLimit?: boolean; error?: string }> {
   try {
     const response = await fetch(
-      `${GEMINI_API_BASE}/${DEFAULT_MODEL}:generateContent?key=${key.trim()}`,
+      `${GEMINI_API_BASE}/${DEFAULT_MODEL}:generateContent`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key.trim() },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: 'Hi' }] }],
           generationConfig: { maxOutputTokens: 5 }

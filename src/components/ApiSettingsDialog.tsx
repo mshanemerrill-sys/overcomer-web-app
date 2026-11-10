@@ -63,11 +63,11 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
             <div className="flex items-start gap-3">
               <Info className="w-5 h-5 text-primary-500 flex-shrink-0 mt-0.5" />
               <div className="space-y-3">
-                <p className="text-sm font-semibold text-secondary-800">100% Free &amp; Secure</p>
+                <p className="text-sm font-semibold text-secondary-800">Your Own Gemini API Key</p>
                 <ul className="text-xs text-secondary-700 space-y-2">
-                  <li>No cost: Google AI Studio API keys are completely free.</li>
+                  <li>Select a Google AI Studio project on the Free Tier with billing disabled. Free-tier quotas apply.</li>
                   <li>Private: Your key is stored only on this device — never on any server.</li>
-                  <li>Unlimited: Use AI features as much as you need, at zero cost.</li>
+                  <li>You can keep using eligible free-tier AI without paying for an upgrade. If you enable Google billing, Google may charge your own project.</li>
                 </ul>
               </div>
             </div>
@@ -86,7 +86,7 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
 
           {/* API Key Input */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Your Free Gemini API Key</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">Your Personal Gemini API Key</label>
             <div className="relative">
               <input
                 type={showKey ? 'text' : 'password'}
@@ -117,7 +117,7 @@ export default function ApiSettingsDialog({ onClose }: { onClose: () => void }) 
               >
                 aistudio.google.com/apikey
               </a>
-              {' '}— no credit card required.
+              {' '}— choose a billing-disabled Free Tier project to avoid API charges.
             </p>
           </div>
 
