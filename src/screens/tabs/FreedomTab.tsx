@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import { useAppStore } from '../../store/useAppStore'
+import { hideOwnCommunityVictory, loadCommunityVictories, publishCommunityVictory, type CommunityVictoryPost } from '../../lib/communityVictories'
 import { generateVerseOfTheDay } from '../../lib/geminiClient'
 import { academyLessons } from '../../lib/data'
 import {
@@ -864,7 +865,51 @@ function EmbeddedSupportSection({ title, icon, children }: {
 }
 
 function TestimonyVictoryBoard({ onNavigateToCompanion }: { onNavigateToCompanion: () => void }) {
-  const shared = useAppStore(state => state.victoryLogs.filter(log => log.type === 'TESTIMONY' && log.isShared))
+  const user = useAppStore(state => state.user)
+  const legacyPosts = useAppStore(state => state.victoryLogs.filter(log => log.type === 'TESTIMONY' && log.isShared))
+  const [migrationPending, setMigrationPending] = useState<string | null>(null)
+  const [localPublished, setLocalPublished] = useState<string[]>([])
+  const [shared, setShared] = useState<CommunityVictoryPost[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const reload = useCallback(async () => {
+    setLoading(true)
+    try {
+      setShared(await loadCommunityVictories())
+      setError('')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Community Victory Board could not load.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+  useEffect(() => {
+    void reload()
+    const timer = window.setInterval(() => void reload(), 30000)
+    const refreshOnFocus = () => void reload()
+    window.addEventListener('focus', refreshOnFocus)
+    return () => { window.clearInterval(timer); window.removeEventListener('focus', refreshOnFocus) }
+  }, [reload])
+  const publishLocal = async (id: string) => {
+    const entry = legacyPosts.find(item => item.id === id)
+    if (!entry || migrationPending) return
+    if (!window.confirm('Publish this previously local-only testimony to all signed-in OverComer community members?')) return
+    setMigrationPending(id)
+    try {
+      await publishCommunityVictory(entry.notes, entry.userPath)
+      window.localStorage.setItem('overcomer:cloud-shared:' + id, 'yes')
+      setLocalPublished(old => [...old, id])
+      setError('')
+      await reload()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not publish your existing testimony.')
+    } finally { setMigrationPending(null) }
+  }
+  const remove = async (id: string) => {
+    if (!window.confirm('Remove your shared testimony from the Community Victory Board?')) return
+    try { await hideOwnCommunityVictory(id); await reload() }
+    catch (e) { setError(e instanceof Error ? e.message : 'Could not remove testimony.') }
+  }
 
   return (
     <section className="rounded-3xl border-[1.5px] border-[#FFA000] bg-[#FFF8E1] p-5 shadow-sm">
@@ -875,18 +920,34 @@ function TestimonyVictoryBoard({ onNavigateToCompanion }: { onNavigateToCompanio
           <p className="text-xs text-amber-800">Celebrate what God has done through other OverComers.</p>
         </div>
       </div>
-      {shared.length === 0 ? (
-        <div className="mt-4 rounded-2xl bg-white/70 p-4 text-center">
-          <p className="text-sm font-semibold text-amber-900">No testimonies have been shared on this device yet.</p>
-          <p className="text-xs text-amber-700 mt-1">Open Logs, add a Testimony entry, and choose “Add to Testimony & Victory Board.”</p>
-        </div>
-      ) : (
-        <div className="mt-4 space-y-3">
-          {shared.slice(0, 8).map(log => (
-            <article key={log.id} className="rounded-2xl bg-white p-4 border border-amber-100">
-              <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">“{log.notes}”</p>
-              <p className="text-xs font-bold text-[#E65100] mt-2">— {log.authorName || 'An OverComer'}</p>
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <p className="text-xs text-amber-800">Community testimonies shared by signed-in OverComer users across platforms.</p>
+        <button onClick={() => void reload()} className="text-xs font-bold underline text-[#E65100]">Refresh</button>
+      </div>
+      {error && <p role="alert" className="mt-3 text-sm text-red-700">{error}</p>}
+      {loading && shared.length === 0 ? <p className="mt-4 text-sm text-amber-900">Loading shared testimonies...</p>
+        : shared.length === 0 ? <p className="mt-4 text-sm text-amber-900">No shared testimonies are available yet. Private entries are not shown.</p>
+        : <div className="mt-4 space-y-3">
+          {shared.map(post => (
+            <article key={post.id} className="rounded-2xl bg-white p-4 border border-amber-100">
+              <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{post.message}</p>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <p className="text-xs font-bold text-[#E65100]">{post.display_name || 'An OverComer'} · {new Date(post.created_at).toLocaleString()}</p>
+                {user?.id === post.user_id && <button className="text-xs text-red-700 underline" onClick={() => void remove(post.id)}>Remove</button>}
+              </div>
             </article>
+          ))}
+        </div>
+      }
+      {legacyPosts.filter(post => !localPublished.includes(post.id) && window.localStorage.getItem('overcomer:cloud-shared:' + post.id) !== 'yes').length > 0 && (
+        <div className="mt-4 rounded-2xl border border-amber-200 bg-white p-3">
+          <p className="text-sm font-bold text-amber-900">Previously shared on this device</p>
+          <p className="text-xs text-amber-800">These older entries were saved only on this device. Choose which ones to publish to the shared community board.</p>
+          {legacyPosts.filter(post => !localPublished.includes(post.id) && window.localStorage.getItem('overcomer:cloud-shared:' + post.id) !== 'yes').map(post => (
+            <div key={post.id} className="mt-2 border-t border-amber-100 pt-2">
+              <p className="text-sm whitespace-pre-wrap">{post.notes}</p>
+              <button disabled={migrationPending !== null} onClick={() => void publishLocal(post.id)} className="mt-1 text-sm font-semibold text-[#E65100] underline disabled:opacity-50">{migrationPending === post.id ? 'Publishing...' : 'Publish to shared board'}</button>
+            </div>
           ))}
         </div>
       )}
