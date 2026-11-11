@@ -84,6 +84,12 @@ export interface ScriptureResult {
   reference: string
   text: string
   explanation: string
+  /** Actual displayed Bible translation, never a license-restricted version substituted silently. */
+  displayedVersion?: 'KJV'
+  sourceNote?: string
+  selectedVersionLink?: string
+  scriptureAvailable?: boolean
+  commentaryIsAi?: boolean
 }
 
 // Cognitive distortion analysis

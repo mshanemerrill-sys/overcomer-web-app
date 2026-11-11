@@ -19,7 +19,7 @@ export default function BibleTab() {
         <div className="flex gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto scrollbar-hide">
           {[
             { key: 'reader', label: 'Bible Reader', icon: <BookOpen className="w-4 h-4" /> },
-            { key: 'study', label: 'AI Study Guide', icon: <Search className="w-4 h-4" /> },
+            { key: 'study', label: 'Scripture Study', icon: <Search className="w-4 h-4" /> },
             { key: 'creed', label: 'Creed & Shield', icon: <Shield className="w-4 h-4" /> },
             { key: 'philosophy', label: 'Philosophy', icon: <FileText className="w-4 h-4" /> }
           ].map(tab => (
@@ -42,7 +42,7 @@ export default function BibleTab() {
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 pb-8">
         {activeSubTab === 'reader' && <BibleReader version={bibleVersion} onVersionChange={setBibleVersion} />}
-        {activeSubTab === 'study' && <AIStudyGuide />}
+        {activeSubTab === 'study' && <AIStudyGuide version={bibleVersion} onVersionChange={setBibleVersion} />}
         {activeSubTab === 'creed' && <CreedAndShield />}
         {activeSubTab === 'philosophy' && <PhilosophyResources />}
       </div>
@@ -165,7 +165,7 @@ function BibleReader({ version, onVersionChange }: { version: BibleVersion; onVe
   )
 }
 
-function AIStudyGuide() {
+function AIStudyGuide({ version, onVersionChange }: { version: BibleVersion; onVersionChange: (v: BibleVersion) => void }) {
   const [searchInput, setSearchInput] = useState('')
   const [result, setResult] = useState<ScriptureResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -174,13 +174,14 @@ function AIStudyGuide() {
     if (!searchInput.trim()) return
     setIsLoading(true)
     try {
-      const res = await lookupScripture(searchInput.trim())
+      const res = await lookupScripture(searchInput.trim(), version)
       setResult(res)
     } catch {
       setResult({
         reference: searchInput,
-        text: 'Failed to load scripture.',
-        explanation: 'Please check your connection and try again.'
+        text: 'Scripture lookup is temporarily unavailable.',
+        explanation: 'Try a Quick Study reference. This does not necessarily mean your device is offline.',
+        scriptureAvailable: false,
       })
     } finally {
       setIsLoading(false)
@@ -189,7 +190,11 @@ function AIStudyGuide() {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 mb-4">AI Study Guide</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-2">Scripture Study</h2>
+      <p className="text-sm text-gray-600 mb-4">Bible study works without an AI key. A personal Gemini key adds optional AI commentary.</p>
+      <div className="flex flex-wrap gap-2 mb-4" aria-label="Study translation">
+        {ALL_VERSIONS.map(v => <button key={v} onClick={() => onVersionChange(v)} className={`px-3 py-1.5 rounded-full text-sm font-medium ${version === v ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-700'}`}>{bibleVersionLabels[v]}</button>)}
+      </div>
 
       <div className="bg-white rounded-2xl shadow-md border border-gray-100 p-4 mb-4">
         <div className="flex gap-2">
@@ -218,14 +223,16 @@ function AIStudyGuide() {
       {result && (
         <div className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
           <div className="p-4 bg-primary-50 border-b border-primary-100">
-            <h3 className="font-bold text-primary-700">{result.reference}</h3>
+            <h3 className="font-bold text-primary-700">{result.reference}{result.displayedVersion ? ` (${result.displayedVersion})` : ''}</h3>
           </div>
           <div className="p-4">
             <p className="text-gray-800 italic text-lg leading-relaxed mb-4">
-              "{result.text}"
+              {result.scriptureAvailable === false ? result.text : `“${result.text}”`}
             </p>
+            {result.sourceNote && <p className="text-sm text-gray-600 mb-3">{result.sourceNote}</p>}
+            {result.selectedVersionLink && <a href={result.selectedVersionLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 mb-4 underline">Read {bibleVersionLabels[version]} in a licensed Bible reader <ExternalLink className="w-4 h-4" /></a>}
             <div className="bg-accent-teal/10 rounded-xl p-4">
-              <h4 className="font-semibold text-accent-teal mb-2">OverComer Study Notes</h4>
+              <h4 className="font-semibold text-accent-teal mb-2">{result.commentaryIsAi ? 'AI Study Commentary' : 'OverComer Study Reflection'}</h4>
               <p className="text-gray-700 leading-relaxed">{result.explanation}</p>
             </div>
           </div>

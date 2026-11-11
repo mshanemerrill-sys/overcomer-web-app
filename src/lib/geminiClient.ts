@@ -1,4 +1,6 @@
 import type { ChatMessage, VerseOfTheDay, ScriptureResult, DistortionAnalysis, LocalResource, FocusPath } from './types'
+import { retrieveScripture } from './scriptureStudy'
+import type { BibleVersion } from './bibleData'
 import { freeCompanionResponse } from './freeCompanion'
 
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models'
@@ -607,52 +609,46 @@ function getFallbackVerse(): VerseOfTheDay {
 
 export { getFallbackVerse }
 
-export async function lookupScripture(reference: string): Promise<ScriptureResult> {
-  if (checkDailyLimit()) {
-    return {
-      reference,
-      text: 'Free Use Limit Reached',
-      explanation: 'Daily free usage limit reached on the shared system key. Please configure a free custom API key in Settings to continue unlimited scripture studies.'
-    }
-  }
-
-  const prompt = `Retrieve the full, authentic Bible verse text for the following scripture reference: "${reference}".
-Also, provide a detailed, extremely encouraging spiritual and practical commentary/pastoral reflection (3-4 sentences) on how this specific verse helps an OverComer find freedom, peace, or resilience.
-Prefer translations like NIV, AMP, ESV, or NKJV. Specify which translation you retrieved.
-
-Respond strictly in valid JSON format matching this exact schema:
-{
-  "reference": "The scripture citation reference (e.g., 'Philippians 4:13 (AMP)')",
-  "text": "The exact full text of the bible verse(s) retrieved",
-  "explanation": "The pastoral, comforting, encouraging spiritual explanation and study commentary"
-}`
+export async function lookupScripture(
+  reference: string,
+  selectedVersion: BibleVersion = 'NIV',
+): Promise<ScriptureResult> {
+  // Real Scripture is fetched independently. An AI failure must never erase
+  // a valid passage or be mislabeled as "no internet connection".
+  const scripture = await retrieveScripture(reference, selectedVersion)
+  const apiKey = getApiKey()
+  if (!scripture.scriptureAvailable || !apiKey) return scripture
 
   const request = {
-    contents: [{ parts: [{ text: prompt }] }],
+    contents: [{
+      parts: [{
+        text: 'Provide a brief, thoughtful 3-4 sentence Christian study reflection for the Bible reference "' +
+          reference.trim() + '". Explain relevant context, practical application, and grace. ' +
+          'Do not reproduce the Bible verse, invent Scripture wording, or claim to retrieve a ' +
+          'particular translation. Scripture text is supplied separately by a verified Bible source. ' +
+          'Return plain text only.',
+      }],
+    }],
     systemInstruction: {
-      parts: [{ text: 'You are an encouraging theological companion and Bible scholar. You always output responses in raw JSON format (no markdown formatting block labels like code blocks) containing only the keys: reference, text, explanation.' }]
+      parts: [{
+        text: 'You are an encouraging, careful Bible study companion. ' +
+          'Write commentary only; never fabricate or quote copyrighted verse text.',
+      }],
     },
-    generationConfig: { temperature: 0.4 }
   }
 
   try {
-    const response = await safeCallGemini(request)
-    incrementUsageCount()
-    const cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-    return JSON.parse(cleaned) as ScriptureResult
-  } catch (error) {
-    if ((error as Error).message === 'NO_API_KEY') {
-      return {
-        reference,
-        text: 'A free API key is required for scripture lookup.',
-        explanation: 'Tap the Key icon at the top of the screen and enter your free Gemini API key from aistudio.google.com/apikey to unlock scripture study.'
-      }
-    }
+    const commentary = (await safeCallGemini(request)).trim()
+    if (!commentary) return scripture
     return {
-      reference,
-      text: 'Failed to load scripture text.',
-      explanation: 'We were unable to connect to retrieve this scripture. Please check your internet connection.'
+      ...scripture,
+      explanation: commentary,
+      commentaryIsAi: true,
     }
+  } catch {
+    // The free study reflection remains visible if a personal Gemini key
+    // is expired, rate limited, invalid, or currently unreachable.
+    return scripture
   }
 }
 
