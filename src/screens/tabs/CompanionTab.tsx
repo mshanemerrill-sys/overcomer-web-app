@@ -194,19 +194,6 @@ export default function CompanionTab() {
         </button>
       </div>
 
-      {/* Daily limit warning */}
-      {dailyLimitReached && !customKeyActive && (
-        <div className="bg-amber-50 border-b border-amber-100 px-4 py-3">
-          <p className="text-sm text-amber-700">
-            You've reached today's free limit.{' '}
-            <button onClick={() => setShowApiDialog(true)} className="font-semibold underline">
-              Add your free API key
-            </button>{' '}
-            for unlimited access.
-          </p>
-        </div>
-      )}
-
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
 
