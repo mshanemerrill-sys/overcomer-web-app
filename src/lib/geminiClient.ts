@@ -444,17 +444,15 @@ export async function generateSupportResponse(
     incrementUsageCount()
     return response
   } catch (error) {
-    const msg = (error as Error).message
-    if (msg === 'NO_API_KEY' || msg === 'KEY_ERROR') {
-      return `NO_API_KEY_SETUP`
-    }
-    if (msg === 'RATE_LIMIT') {
-      return `Google's free tier is very busy right now. I automatically retried several times but the throttle hasn't cleared yet. Please wait a few minutes and try again. Remember Psalm 27:14: "Wait for the Lord; be strong and take heart."`
-    }
-    if (msg === 'QUOTA_EXHAUSTED') {
-      return `Your Gemini API key has reached its daily quota limit. This resets every 24 hours — please try again tomorrow. If this happens often, you can create a new free key at aistudio.google.com/apikey. Remember Isaiah 40:31: "Those who hope in the Lord will renew their strength."`
-    }
-    return `I am here for you. I had trouble connecting right now — please try again in a moment. While you wait, stand firm on Romans 8:37: "We are more than conquerors through Him who loved us."`
+    // A failed personal key must not turn a support conversation into an error.
+    // This fallback is local, free, and clearly identified as non-AI guidance.
+    const failure = (error as Error).message
+    const note = failure === 'KEY_ERROR'
+      ? 'Google rejected this Gemini key. Check it in Companion Settings. '
+      : 'The optional Google AI connection is unavailable. '
+    return note + 'This is free built-in encouragement, not an AI-generated reply.\n\n' +
+      freeCompanionResponse(message)
+
   }
 }
 
