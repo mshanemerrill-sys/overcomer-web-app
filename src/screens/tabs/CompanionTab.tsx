@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAppStore } from '../../store/useAppStore'
-import { generateSupportResponse, checkDailyLimit, isCustomKeyActive } from '../../lib/geminiClient'
+import { generateSupportResponse, isCustomKeyActive } from '../../lib/geminiClient'
 import {
   Send, Save, Trash2, History, Loader as Loader2, Key, ExternalLink,
   ChevronDown, ChevronUp, Mic, Volume2, X, Radio, MessageCircle
@@ -118,7 +118,6 @@ export default function CompanionTab() {
     }
   }
 
-  const dailyLimitReached = checkDailyLimit()
   const customKeyActive = isCustomKeyActive()
 
   return (
@@ -174,7 +173,7 @@ export default function CompanionTab() {
       {/* Legal micro-copy */}
       <div className="bg-amber-50 border-b border-amber-100 px-4 py-2">
         <p className="text-xs text-amber-700 leading-relaxed">
-          Your AI OverComer's Companion for biblical encouragement. For professional medical or clinical crisis support, please see the <strong>Re-entry</strong> resource tab.
+          Free built-in biblical encouragement is available without an API key. For immediate danger or medical emergencies, contact emergency services.
         </p>
       </div>
 
@@ -277,9 +276,9 @@ export default function CompanionTab() {
       <div className="bg-white border-t border-gray-100 p-4 safe-bottom">
         {!hasApiKey && (
           <p className="text-xs text-center text-gray-400 mb-2">
-            A free API key is required to chat.{' '}
+            Free built-in Companion is always available. A personal Gemini key is optional for enhanced AI.{' '}
             <button onClick={() => setShowApiDialog(true)} className="text-primary-500 font-semibold">
-              Set up in 2 minutes
+              Optional key setup
             </button>
           </p>
         )}
@@ -290,16 +289,16 @@ export default function CompanionTab() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder={hasApiKey ? 'Talk to your Companion...' : 'Add a free API key to begin...'}
+            placeholder="Talk to your Companion..."
             className="flex-1 input-field"
-            disabled={isLoading || (dailyLimitReached && !customKeyActive)}
+            disabled={isLoading}
           />
           <button
-            onClick={hasApiKey ? handleSend : () => setShowApiDialog(true)}
-            disabled={hasApiKey ? (!input.trim() || isLoading || (dailyLimitReached && !customKeyActive)) : false}
+            onClick={handleSend}
+            disabled={!input.trim() || isLoading}
             className="bg-primary-400 hover:bg-primary-500 disabled:bg-gray-200 text-white p-3 rounded-xl transition-colors"
           >
-            {hasApiKey ? <Send className="w-5 h-5" /> : <Key className="w-5 h-5" />}
+            <Send className="w-5 h-5" />
           </button>
         </div>
       </div>
@@ -382,7 +381,7 @@ function LiveVoiceSessionDialog({ onClose }: { onClose: () => void }) {
     try {
       const response = await generateSupportResponse(text, chatMessages, userPath || 'SUBSTANCE_RECOVERY')
       if (response === 'NO_API_KEY_SETUP') {
-        setError('Optional AI requires your own Google API key. You can still use the free built-in voice Companion.')
+        setError('Google AI is unavailable. The free built-in voice Companion remains available.')
         setState('READY')
         return
       }
